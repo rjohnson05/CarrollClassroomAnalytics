@@ -11,7 +11,7 @@ export default function Home() {
     const loadData = async () => {
         // Loads the data from the backend upon the page's initial loading
         try {
-            const response = await axios.get("http://localhost:8000/")
+            const response = await axios.get("http://localhost:8000/api")
             setData(response.data)
         } catch (error) {
             console.error(error)
