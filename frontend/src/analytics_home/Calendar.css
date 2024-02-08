@@ -1,0 +1,21 @@
+.main-title {
+    text-align: center;
+}
+
+.days-container {
+    display: flex;
+}
+
+.day {
+    flex: 1;
+    margin: 1em;
+}
+
+.day-header {
+    text-align: center;
+}
+
+.heatmap {
+    margin-top: 1em;
+    border: 1px solid black;
+}

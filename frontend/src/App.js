@@ -1,4 +1,4 @@
-import Calendar from './Calendar';
+import Calendar from './analytics_home/Calendar';
 import './App.css';
 
 function App() {
