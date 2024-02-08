@@ -4,8 +4,10 @@ from rest_framework.decorators import api_view
 
 
 @api_view(["GET"])
-def home(request):
+def get_number_classes(request):
     """
-    Currently returns a random text message for display on the home page
+    Returns the number of classrooms being utilized during a specified time period.
     """
+    start_time = request.query_params['start_time']
+    end_time = request.query_params['end_time']
     return Response({'message': 'New Incoming Data'})
