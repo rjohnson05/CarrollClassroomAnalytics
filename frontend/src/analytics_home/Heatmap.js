@@ -1,12 +1,13 @@
 import {useEffect, useState} from "react";
+import Popup from "reactjs-popup";
 
-export default function HeatMap({ timeBlockList }) {
+export default function HeatMap({ timeBlockList, numClassroomsList }) {
     /**
-     * Calculates the number of minutes between a start and end time.
+     * Calculates the number of minutes between a start and end time for display purposes.
      *
      * @param startTime   String representing the starting time for the block
      * @param endTime     String representing the ending time for the block
-     * @returns {number}  Number reprenting the number of minutes between the start and end time
+     * @returns {number}  Number representing the number of minutes between the start and end time
      */
     const calculateMinutes = (startTime, endTime) => {
         startTime = startTime.split(":");
@@ -44,14 +45,21 @@ export default function HeatMap({ timeBlockList }) {
         }
     }
 
+
     return (
         <div>
             {timeBlockList.map((timeBlock) => (
-                <div className="time-block" style={{
-                    border: '1px solid black',
-                    height: calculateMinutes(timeBlock[0], timeBlock[1]),
-                    background: calculateColor(11)}}>
-                </div>
+                <Popup trigger={
+                    <div className="time-block" style={{
+                        border: '1px solid black',
+                        height: calculateMinutes(timeBlock[0], timeBlock[1]),
+                        background: calculateColor(numClassroomsList[timeBlock[0]])}}>
+                    </div>}
+                       position="right center"
+                       on={['hover', 'focus']}>
+                    <div>Classrooms in Use: {numClassroomsList[timeBlock[0]]}</div>
+                </Popup>
+
             ))}
         </div>
 

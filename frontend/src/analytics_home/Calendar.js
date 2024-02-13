@@ -5,22 +5,29 @@ import './Calendar.css';
 import HeatMap from "./Heatmap";
 
 export default function Home() {
-    const [classData, setClassData] = useState(null);
+    const [timeBlocks, setTimeBlocks] = useState();
+    const [numberClasses, setNumberClasses] = useState();
+    const [classDataLoaded, setClassDataLoaded] = useState(false);
 
     useEffect(() => {
         loadData();
     }, []);
 
+    /**
+     * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
+     * second contains the number of classes running during each time block. Both of these dictionaries are stored as state.
+     */
     const loadData = async () => {
-        // Loads the data from the backend upon the page's initial loading
         try {
-            // const response = await axios.get("http://localhost:8000/api")
-            // setData(response.data)
-            setClassData([[5,4,8,7,1],[1,5,4,7,8],[1,4,8,5,6],[1,0,2,5,8],[4,7,8,5,2]])
+            const classesData = await axios.get("http://localhost:8000/api/get_number_classes");
+            setTimeBlocks(classesData.data[0]);
+            setNumberClasses(classesData.data[1]);
+            setClassDataLoaded(true);
         } catch (error) {
-            console.error(error)
+            console.error(error);
         }
-    };
+    }
+
 
     return (
         <div>
@@ -28,12 +35,12 @@ export default function Home() {
             <div className="days-container">
                 <div className="day">
                     <h3 className="day-header">Monday</h3>
-                    <HeatMap className="heatmap" timeBlockList={[['7:30','8:00'],['8:00','8:45'],['8:45','8:50'],['8:50','9:00'],
-                        ['9:00','9:50'],['9:50','10:00'],['10:00','10:50'],['10:50','11:00'],['11:00','11:50'],
-                        ['11:50','12:00'],['12:00','12:50'],['12:50','1:00'],['1:00','1:50'],['1:50','2:00'],
-                        ['2:00','2:15'],['2:15','2:50'],['2:50','3:00'],['3:00','3:30'],['3:30','3:45'],['3:45','3:50'],
-                        ['3:50','4:00'],['4:00','4:50'],['4:50','5:00'],['5:00','5:50'],['5:50','6:00'],['6:00','6:30'],
-                        ['6:30','6:45'],['6:45','8:00'],['8:00','9:00']]}/>
+                    {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
+                     Loading text is displayed */}
+                    {classDataLoaded ?
+                        <HeatMap className="heatmap" timeBlockList={timeBlocks['M']}
+                                 numClassroomsList={numberClasses['M']}/> :
+                        <p>Loading...</p>}
                 </div>
                 <div className="day">
                     <h3 className="day-header">Tuesday</h3>

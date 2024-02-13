@@ -39,8 +39,18 @@ class Instructor(models.Model):
 
 
 class Course(models.Model):
+    DAYS = {
+        "M": "Monday",
+        "T": "Tuesday",
+        "W": "Wednesday",
+        "th": "Thursday",
+        "MW": "Monday, Wednesday",
+        "MWF": "Monday, Wednesday, Friday",
+        "Tth": "Tuesday, Thursday",
+    }
     name = models.CharField(max_length=15)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="course_classroom")
+    day = models.CharField(max_length=3, choices=DAYS)
     start_time = models.TimeField()
     end_time = models.TimeField()
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
