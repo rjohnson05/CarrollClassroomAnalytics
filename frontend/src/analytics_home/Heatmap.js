@@ -48,7 +48,8 @@ export default function HeatMap({ timeBlockList, numClassroomsList }) {
 
     return (
         <div>
-            {timeBlockList.map((timeBlock) => (
+            {timeBlockList ?
+            timeBlockList.map((timeBlock) => (
                 <Popup trigger={
                     <div className="time-block" style={{
                         border: '1px solid black',
@@ -59,8 +60,7 @@ export default function HeatMap({ timeBlockList, numClassroomsList }) {
                        on={['hover', 'focus']}>
                     <div>Classrooms in Use: {numClassroomsList[timeBlock[0]]}</div>
                 </Popup>
-
-            ))}
+                )) : <p>No heatmap data loaded</p>}
         </div>
 
     );

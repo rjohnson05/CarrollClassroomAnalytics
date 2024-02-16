@@ -19,7 +19,6 @@ class Classroom(models.Model):
         "STCH": "St. Charles Hall",
         "WBAR": "Waterbarn",
     }
-
     name = models.CharField(max_length=8, primary_key=True)
     building = models.CharField(max_length=4, choices=BUILDINGS)
     room_num = models.IntegerField()
@@ -32,7 +31,7 @@ class Classroom(models.Model):
 
 class Instructor(models.Model):
     name = models.CharField(max_length=50)
-    style = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    style = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
@@ -54,7 +53,7 @@ class Course(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
-    type = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="course_type")
+    type = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name

@@ -9,7 +9,7 @@ export default function Home() {
     const [numberClasses, setNumberClasses] = useState();
     const [classDataLoaded, setClassDataLoaded] = useState(false);
 
-    useEffect(() => {
+    useEffect(async () => {
         loadData();
     }, []);
 
