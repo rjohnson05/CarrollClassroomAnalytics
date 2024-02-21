@@ -35,13 +35,13 @@ export default function HeatMap({ timeBlockList, numClassroomsList }) {
         if (numberClasses === 0) {
             return 'white';
         } else if (numberClasses <= 5) {
-            return 'lightgray';
+            return '#e7d87d';
         } else if (numberClasses <= 10) {
-            return 'red';
+            return '#dd9f40';
         } else if (numberClasses <= 20) {
-            return 'darkgray';
-        } else {
-            return 'black';
+            return '#b4451f';
+        } else if (numberClasses > 20) {
+            return '#b01111';
         }
     }
 
@@ -56,11 +56,12 @@ export default function HeatMap({ timeBlockList, numClassroomsList }) {
                         height: calculateMinutes(timeBlock[0], timeBlock[1]),
                         background: calculateColor(numClassroomsList[timeBlock[0]])}}>
                     </div>}
+                       className="popup-content popup-arrow popup-overlay"
                        position="right center"
                        on={['hover', 'focus']}>
-                    <div>Classrooms in Use: {numClassroomsList[timeBlock[0]]}</div>
+                    <div><p className="popup-title">Classrooms in Use:</p> {numClassroomsList[timeBlock[0]]}</div>
                 </Popup>
-                )) : <p>No heatmap data loaded</p>}
+                )) : <p>No heatmap data available</p>}
         </div>
 
     );

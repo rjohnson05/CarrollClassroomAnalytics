@@ -3,6 +3,7 @@ import axios from "axios";
 
 import './Calendar.css';
 import HeatMap from "./Heatmap";
+import NavBar from "./NavBar";
 
 export default function Home() {
     const [timeBlocks, setTimeBlocks] = useState();
@@ -10,8 +11,9 @@ export default function Home() {
     const [classDataLoaded, setClassDataLoaded] = useState(false);
 
     useEffect(async () => {
-        loadData();
+        await loadData();
     }, []);
+
 
     /**
      * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
@@ -31,10 +33,11 @@ export default function Home() {
 
     return (
         <div>
-            <h1 className="main-title">Overall Classroom Utilization</h1>
+            <NavBar />
+            <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
             <div className="days-container">
                 <div className="day">
-                    <h3 className="day-header">Monday</h3>
+                    <h3 className="day-header">MONDAY</h3>
                     {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                      Loading text is displayed */}
                     {classDataLoaded ?
@@ -43,19 +46,19 @@ export default function Home() {
                         <p>Loading...</p>}
                 </div>
                 <div className="day">
-                    <h3 className="day-header">Tuesday</h3>
+                    <h3 className="day-header">TUESDAY</h3>
                     <div className="heat-map">Heat Map</div>
                 </div>
                 <div className="day">
-                    <h3 className="day-header">Wednesday</h3>
+                    <h3 className="day-header">WEDNESDAY</h3>
                     <div className="heat-map">Heat Map</div>
                 </div>
                 <div className="day">
-                    <h3 className="day-header">Thursday</h3>
+                    <h3 className="day-header">THURSDAY</h3>
                     <div className="heat-map">Heat Map</div>
                 </div>
                 <div className="day">
-                    <h3 className="day-header">Friday</h3>
+                    <h3 className="day-header">FRIDAY</h3>
                     <div className="heat-map">Heat Map</div>
                 </div>
             </div>
