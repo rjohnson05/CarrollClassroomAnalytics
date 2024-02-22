@@ -18,30 +18,27 @@ export default function Home() {
         const file = event.target.files[0];
         if (!file) return;
 
-        const reader = new FileReader();
+        setFile(file);
 
+        const reader = new FileReader();
         reader.onloadend = () => {
             const csv = reader.result;
             console.log(csv); // You can process the CSV data here
         };
-
         reader.readAsText(file);
     };
 
-      const handleOnSubmit = (event) => {
-        const reader = new FileReader();
-
+    const handleOnSubmit = (event) => {
         event.preventDefault();
-
-
         if (file) {
-          reader.onload = function (event) {
-            const csvOutput = event.target.result;
-          };
-
-          reader.readAsText(file);
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const csvOutput = event.target.result;
+            };
+            reader.readAsText(file);
         }
-      };
+    };
+
     const loadData = async () => {
         try {
             const classesData = await axios.get("http://localhost:8000/api/get_number_classes");
@@ -59,14 +56,7 @@ export default function Home() {
 
             {/* File Picker */}
             <input type="file" accept=".csv" id="picker" onChange={handleFileChange}/>
-
-            <button
-                onClick={(event) => {
-                    handleOnSubmit(event);
-                }}
-            >
-                Import File
-            </button>
+            <button onClick={handleOnSubmit}>Import File</button>
 
             <div className="days-container">
                 <div className="day">
@@ -74,8 +64,7 @@ export default function Home() {
                     {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                         Loading text is displayed */}
                     {classDataLoaded ?
-                        <HeatMap className="heatmap" timeBlockList={timeBlocks['M']}
-                                 numClassroomsList={numberClasses['M']}/> :
+                        <HeatMap className="heatmap" timeBlockList={timeBlocks['M']} numClassroomsList={numberClasses['M']}/> :
                         <p>Loading...</p>}
                 </div>
                 <div className="day">

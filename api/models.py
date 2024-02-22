@@ -25,6 +25,9 @@ class Classroom(models.Model):
     occupancy = models.IntegerField()
     type = models.CharField(max_length=10)
 
+# SEC_SHORT_TITLE, CSM_BLDG, CSM_ROOM, SEC_CAPACITY, SEC_SUBJECT
+#
+
     def __str__(self):
         return self.name
 
@@ -32,6 +35,8 @@ class Classroom(models.Model):
 class Instructor(models.Model):
     name = models.CharField(max_length=50)
     style = models.CharField(max_length=20)
+
+# SEC_FACULTY_INFO, CSM_INSTR_METHOD
 
     def __str__(self):
         return self.name
@@ -54,6 +59,8 @@ class Course(models.Model):
     end_time = models.TimeField()
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
     type = models.CharField(max_length=20)
+
+# SEC_SHORT_TITLE, CSM_START_TIME, CSM_END_TIME, SEC_SUBJECT
 
     def __str__(self):
         return self.name

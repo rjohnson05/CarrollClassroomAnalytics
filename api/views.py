@@ -1,6 +1,10 @@
+import csv
+from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from api.models import Course
+from api.models import Course, Classroom, Instructor
 
 
 @api_view(["GET"])
@@ -27,6 +31,38 @@ def get_number_classes(request):
         all_num_classes[day] = day_num_classes
     return Response([time_blocks, all_num_classes])
 
+
+
+
+
+def upload_csv(request):
+    if request.method == 'POST' and request.FILES['file']:
+        csv_file = request.FILES['file']
+        decoded_file = csv_file.read().decode('utf-8').splitlines()
+
+        csv_reader = csv.DictReader(decoded_file)
+        for row in csv_reader:
+            # Convert choice values to their corresponding keys
+            building_key = [key for key, value in Classroom.BUILDINGS if value == row['building']][0]
+            day_key = [key for key, value in Course.DAYS if value == row['day']][0]
+
+            # Create related objects if necessary
+            instructor, _ = Instructor.objects.get_or_create(name=row['instructor_name'], style=row['instructor_style'])
+            classroom, _ = Classroom.objects.get_or_create(name=row['classroom_name'], building=building_key, room_num=row['room_num'], occupancy=row['occupancy'], type=row['classroom_type'])
+
+            # Create Course object
+            Course.objects.create(
+                name=row['course_name'],
+                classroom=classroom,
+                day=day_key,
+                start_time=row['start_time'],
+                end_time=row['end_time'],
+                instructor=instructor,
+                type=row['course_type']
+            )
+
+        return JsonResponse({'message': 'CSV file uploaded and data inserted successfully'})
+    return JsonResponse({'error': 'No file provided'}, status=400)
 
 def get_time_blocks():
     """
