@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import './Calendar.css';
@@ -8,15 +8,40 @@ export default function Home() {
     const [timeBlocks, setTimeBlocks] = useState();
     const [numberClasses, setNumberClasses] = useState();
     const [classDataLoaded, setClassDataLoaded] = useState(false);
+    const [file, setFile] = useState()
 
-    useEffect(async () => {
+    useEffect(() => {
         loadData();
     }, []);
 
-    /**
-     * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
-     * second contains the number of classes running during each time block. Both of these dictionaries are stored as state.
-     */
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const csv = reader.result;
+            console.log(csv); // You can process the CSV data here
+        };
+
+        reader.readAsText(file);
+    };
+
+      const handleOnSubmit = (event) => {
+        const reader = new FileReader();
+
+        event.preventDefault();
+
+
+        if (file) {
+          reader.onload = function (event) {
+            const csvOutput = event.target.result;
+          };
+
+          reader.readAsText(file);
+        }
+      };
     const loadData = async () => {
         try {
             const classesData = await axios.get("http://localhost:8000/api/get_number_classes");
@@ -28,15 +53,26 @@ export default function Home() {
         }
     }
 
-
     return (
         <div>
             <h1 className="main-title">Overall Classroom Utilization</h1>
+
+            {/* File Picker */}
+            <input type="file" accept=".csv" id="picker" onChange={handleFileChange}/>
+
+            <button
+                onClick={(event) => {
+                    handleOnSubmit(event);
+                }}
+            >
+                Import File
+            </button>
+
             <div className="days-container">
                 <div className="day">
                     <h3 className="day-header">Monday</h3>
                     {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
-                     Loading text is displayed */}
+                        Loading text is displayed */}
                     {classDataLoaded ?
                         <HeatMap className="heatmap" timeBlockList={timeBlocks['M']}
                                  numClassroomsList={numberClasses['M']}/> :
@@ -60,5 +96,5 @@ export default function Home() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

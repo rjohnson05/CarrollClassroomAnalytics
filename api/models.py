@@ -2,23 +2,23 @@ from django.db import models
 
 
 class Classroom(models.Model):
-    BUILDINGS = {
-        "CENG": "Civil Engineering",
-        "CHPL": "All Saints Chapel",
-        "CUBE": "Cube",
-        "EQCT": "Equine Center",
-        "FSCT": "Fortin Science Center Labs",
-        "GUAD": "Guadalupe Hall",
-        "HAC": "Hunthausen Activity Center",
-        "LYHS": "",
-        "OCON": "O'Connell Hall",
-        "OFCP": "Off-Campus",
-        "PCCC": "Perkins Call Canine Center",
-        "PECT": "PE Center",
-        "SIMP": "Simperman Hall",
-        "STCH": "St. Charles Hall",
-        "WBAR": "Waterbarn",
-    }
+    BUILDINGS = [
+        ("CENG", "Civil Engineering"),
+        ("CHPL", "All Saints Chapel"),
+        ("CUBE", "Cube"),
+        ("EQCT", "Equine Center"),
+        ("FSCT", "Fortin Science Center Labs"),
+        ("GUAD", "Guadalupe Hall"),
+        ("HAC", "Hunthausen Activity Center"),
+        ("LYHS", ""),
+        ("OCON", "O'Connell Hall"),
+        ("OFCP", "Off-Campus"),
+        ("PCCC", "Perkins Call Canine Center"),
+        ("PECT", "PE Center"),
+        ("SIMP", "Simperman Hall"),
+        ("STCH", "St. Charles Hall"),
+        ("WBAR", "Waterbarn"),
+    ]
     name = models.CharField(max_length=8, primary_key=True)
     building = models.CharField(max_length=4, choices=BUILDINGS)
     room_num = models.IntegerField()
@@ -38,15 +38,15 @@ class Instructor(models.Model):
 
 
 class Course(models.Model):
-    DAYS = {
-        "M": "Monday",
-        "T": "Tuesday",
-        "W": "Wednesday",
-        "th": "Thursday",
-        "MW": "Monday, Wednesday",
-        "MWF": "Monday, Wednesday, Friday",
-        "Tth": "Tuesday, Thursday",
-    }
+    DAYS = [
+        ("M", "Monday"),
+        ("T", "Tuesday"),
+        ("W", "Wednesday"),
+        ("th", "Thursday"),
+        ("MW", "Monday, Wednesday"),
+        ("MWF", "Monday, Wednesday, Friday"),
+        ("Tth", "Tuesday, Thursday"),
+    ]
     name = models.CharField(max_length=15)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="course_classroom")
     day = models.CharField(max_length=3, choices=DAYS)

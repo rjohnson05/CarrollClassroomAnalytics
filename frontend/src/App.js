@@ -6,5 +6,4 @@ function App() {
     <Calendar />
   );
 }
-
 export default App;
