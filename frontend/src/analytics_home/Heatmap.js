@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import Popup from "reactjs-popup";
 
+//something is not getting passed into this parameter`
 export default function HeatMap({ timeBlockList, numClassroomsList }) {
     /**
      * Calculates the number of minutes between a start and end time for display purposes.
