@@ -19,19 +19,19 @@ class Classroom(models.Model):
         ("STCH", "St. Charles Hall"),
         ("WBAR", "Waterbarn"),
     )
-    name = models.CharField(max_length=8, primary_key=True)
-    building = models.CharField(max_length=4, choices=BUILDINGS)
+    name = models.CharField(max_length=255, primary_key=True)
+    building = models.CharField(max_length=255, choices=BUILDINGS)
     room_num = models.IntegerField()
     occupancy = models.IntegerField()
-    type = models.CharField(max_length=10)
+    type = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
 
 
 class Instructor(models.Model):
-    name = models.CharField(max_length=50)
-    style = models.CharField(max_length=20)
+    name = models.CharField(max_length=255)
+    style = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
@@ -47,13 +47,13 @@ class Course(models.Model):
         ("MWF", "Monday, Wednesday, Friday"),
         ("Tth", "Tuesday, Thursday"),
     )
-    name = models.CharField(max_length=15)
+    name = models.CharField(max_length=255)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="course_classroom")
-    day = models.CharField(max_length=3, choices=DAYS)
+    day = models.CharField(max_length=255, choices=DAYS)
     start_time = models.TimeField()
     end_time = models.TimeField()
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
-    type = models.CharField(max_length=20)
+    type = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
