@@ -1,4 +1,4 @@
-import logo from './carroll_logo.png';
+import logo from './images/carroll_logo.png';
 import './Navbar.css';
 export default function NavBar() {
     return (

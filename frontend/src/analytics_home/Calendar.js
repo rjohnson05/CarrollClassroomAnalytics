@@ -1,17 +1,23 @@
 import React, {useEffect, useState} from "react";
+import {Box, Button, Fab} from "@mui/material";
 import axios from "axios";
 
 import './Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import Filter from "./Filter";
 
 export default function Home() {
     const [timeBlocks, setTimeBlocks] = useState();
     const [numberClasses, setNumberClasses] = useState();
     const [classDataLoaded, setClassDataLoaded] = useState(false);
 
-    useEffect(async () => {
-        await loadData();
+    useEffect( () => {
+        async function fetchData() {
+            const response = await loadData();
+        }
+        fetchData();
     }, []);
 
 
@@ -35,6 +41,18 @@ export default function Home() {
         <div>
             <NavBar />
             <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
+            <Fab variant="extended" size="medium" color="primary" sx={{
+                backgroundColor: '#cfb988',
+                color: '#4a4644',
+                fontWeight: 'bold',
+                '&:hover': {
+                    backgroundColor: "#bfaa7a"
+                },}}
+                 className="filter">
+                <FilterAltIcon/>
+                FILTER
+            </Fab>
+            <Filter></Filter>
             <div className="days-container">
                 <div className="day">
                     <h3 className="day-header">MONDAY</h3>

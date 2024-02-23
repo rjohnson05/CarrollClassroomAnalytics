@@ -84,8 +84,8 @@ WSGI_APPLICATION = 'carroll_classroom_analytics.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'carroll_classrooms',
-        'USER': 'carroll_user',
+        'NAME': 'test_classroom',
+        'USER': 'test_user',
         'PASSWORD': 'Comfypillow01*',
         'HOST': 'localhost',
         'PORT': 3306
