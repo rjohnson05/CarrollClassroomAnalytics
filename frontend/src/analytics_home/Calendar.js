@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, Fab} from "@mui/material";
+import 'primeicons/primeicons.css'
 import axios from "axios";
 
 import './Calendar.css';
@@ -12,6 +12,7 @@ export default function Home() {
     const [timeBlocks, setTimeBlocks] = useState();
     const [numberClasses, setNumberClasses] = useState();
     const [classDataLoaded, setClassDataLoaded] = useState(false);
+    const [filterOpen, setFilterOpen] = useState(false);
 
     useEffect( () => {
         async function fetchData() {
@@ -41,18 +42,23 @@ export default function Home() {
         <div>
             <NavBar />
             <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
-            <Fab variant="extended" size="medium" color="primary" sx={{
-                backgroundColor: '#cfb988',
-                color: '#4a4644',
-                fontWeight: 'bold',
-                '&:hover': {
-                    backgroundColor: "#bfaa7a"
-                },}}
-                 className="filter">
-                <FilterAltIcon/>
-                FILTER
-            </Fab>
-            <Filter></Filter>
+
+            <div className="filter-container">
+                <button className="filter-button" onClick={() => {setFilterOpen(!filterOpen)}}>
+                <span className="pi pi-filter-fill filter-icon"></span>FILTER</button>
+            {filterOpen && <fieldset className="filter-dropdown">
+
+                <div>
+                    <input className="" type="checkbox" name="simp"/>
+                    <label className="filter-options" htmlFor="simp">Simperman Hall</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="ocon" value="OConnell Hall"/>
+                    <label className="filter-options" htmlFor="ocon">O'Connell Hall</label>
+                </div>
+            </fieldset>}
+            </div>
+
             <div className="days-container">
                 <div className="day">
                     <h3 className="day-header">MONDAY</h3>

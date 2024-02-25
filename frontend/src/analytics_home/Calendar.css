@@ -2,9 +2,34 @@
     text-align: center;
 }
 
-.filter_box {
+.filter-container {
     float: right;
-    left: -15em;
+    position: relative;
+    top: -1em;
+    left: -9em;
+}
+
+.filter-button {
+    font-size: 15px;
+    height: 3em;
+    border-radius: 5px;
+    background-color: #3c1952;
+    color: white;
+}
+
+.filter-icon {
+    margin-right: 5px;
+}
+
+.filter-button, .filter-dropdown {
+    width: 10em;
+}
+
+.filter-dropdown {
+    position: absolute;
+    background-color: white;
+    border: 1px solid black;
+    z-index: 2;
 }
 
 .days-container {
