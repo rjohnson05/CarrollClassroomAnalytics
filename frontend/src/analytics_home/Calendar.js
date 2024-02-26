@@ -8,19 +8,23 @@ import NavBar from "./NavBar";
 
 
 export default function Home() {
+    const [firstRender, setFirstRender] = useState(true);
     const [timeBlocks, setTimeBlocks] = useState({});
     const [numberClasses, setNumberClasses] = useState({});
     const [filterOpen, setFilterOpen] = useState(false);
-    const [buildingFilterList, setBuildingFilterList] = useState([]);
+    const [buildingFilter, setBuildingFilter] = useState({});
     const [buildingNames, setBuildingNames] = useState({});
 
     useEffect( () => {
-        console.log("List: ", buildingFilterList)
+        console.log("List: ", buildingFilter)
         async function fetchData() {
             await loadData();
+            if (firstRender) {
+                await loadFilter();
+            }
         }
         fetchData();
-    }, [buildingFilterList]);
+    }, [buildingFilter]);
 
 
     /**
@@ -30,15 +34,22 @@ export default function Home() {
     const loadData = async () => {
         try {
             const classesData = await axios.get("http://localhost:8000/api/get_number_classes",
-                {params: {buildings: buildingFilterList}});
+                {params: {buildings: buildingFilter}});
             setTimeBlocks(classesData.data[0]);
             setNumberClasses(classesData.data[1]);
-
-            const buildingNamesData = await axios.get("http://localhost:8000/api/get_building_names");
-            setBuildingNames(buildingNamesData.data);
         } catch (error) {
             console.error(error);
         }
+    }
+
+    const loadFilter = async () => {
+        const buildingNamesData = await axios.get("http://localhost:8000/api/get_building_names");
+            const filter = {}
+            Object.keys(buildingNamesData.data).forEach(item => {
+                filter[item] = false; // Initialize all filters to false
+            });
+        setBuildingFilter(filter)
+        setFirstRender(false)
     }
 
     /**
@@ -49,13 +60,10 @@ export default function Home() {
      * @param building  list of dictionary objects holding the abbreviation for the checked buildings
      */
     const filterBuilding = (building) => {
-        setBuildingFilterList(prevList => {
-            if (buildingFilterList.includes(building['abbrev'])) {
-                return prevList.filter(item => item !== building['abbrev']);
-            } else {
-                return [...prevList, building['abbrev']]
-            }
-        });
+        setBuildingFilter(prevState => ({
+            ...prevState,
+            [building]: !prevState[building], // Toggle the value
+        }));
     }
 
 
