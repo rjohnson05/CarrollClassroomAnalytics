@@ -4,5 +4,5 @@
 # Byte-compiled / optimized / DLL files
 __pycache__
 
-# React build files
-build/
+# Log Files
+*.log

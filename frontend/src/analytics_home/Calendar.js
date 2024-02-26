@@ -5,21 +5,22 @@ import axios from "axios";
 import './Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import Filter from "./Filter";
+
 
 export default function Home() {
-    const [timeBlocks, setTimeBlocks] = useState();
-    const [numberClasses, setNumberClasses] = useState();
-    const [classDataLoaded, setClassDataLoaded] = useState(false);
+    const [timeBlocks, setTimeBlocks] = useState({});
+    const [numberClasses, setNumberClasses] = useState({});
     const [filterOpen, setFilterOpen] = useState(false);
+    const [buildingFilterList, setBuildingFilterList] = useState([]);
+    const [buildingNames, setBuildingNames] = useState({});
 
     useEffect( () => {
+        console.log("List: ", buildingFilterList)
         async function fetchData() {
-            const response = await loadData();
+            await loadData();
         }
         fetchData();
-    }, []);
+    }, [buildingFilterList]);
 
 
     /**
@@ -28,13 +29,33 @@ export default function Home() {
      */
     const loadData = async () => {
         try {
-            const classesData = await axios.get("http://localhost:8000/api/get_number_classes");
+            const classesData = await axios.get("http://localhost:8000/api/get_number_classes",
+                {params: {buildings: buildingFilterList}});
             setTimeBlocks(classesData.data[0]);
             setNumberClasses(classesData.data[1]);
-            setClassDataLoaded(true);
+
+            const buildingNamesData = await axios.get("http://localhost:8000/api/get_building_names");
+            setBuildingNames(buildingNamesData.data);
         } catch (error) {
             console.error(error);
         }
+    }
+
+    /**
+     * Changes the current building filter based on the number of checkboxes the user has checked. This is used for
+     * altering the appearance of the heatmaps. If a box is checked, the corresponding building abbrevation is added to
+     * the list. If the box is unchecked, its abbreviation is removed.
+     *
+     * @param building  list of dictionary objects holding the abbreviation for the checked buildings
+     */
+    const filterBuilding = (building) => {
+        setBuildingFilterList(prevList => {
+            if (buildingFilterList.includes(building['abbrev'])) {
+                return prevList.filter(item => item !== building['abbrev']);
+            } else {
+                return [...prevList, building['abbrev']]
+            }
+        });
     }
 
 
@@ -46,25 +67,25 @@ export default function Home() {
             <div className="filter-container">
                 <button className="filter-button" onClick={() => {setFilterOpen(!filterOpen)}}>
                 <span className="pi pi-filter-fill filter-icon"></span>FILTER</button>
-            {filterOpen && <fieldset className="filter-dropdown">
 
-                <div>
-                    <input className="" type="checkbox" name="simp"/>
-                    <label className="filter-options" htmlFor="simp">Simperman Hall</label>
-                </div>
-                <div>
-                    <input type="checkbox" name="ocon" value="OConnell Hall"/>
-                    <label className="filter-options" htmlFor="ocon">O'Connell Hall</label>
-                </div>
-            </fieldset>}
+                {filterOpen &&
+                    <form className="filter-dropdown">
+                        {Object.keys(buildingNames).map(abbrev => (
+                            <div>
+                                <input type="checkbox" name={abbrev} onClick={() => filterBuilding({abbrev})} />
+                                <label className="filter-options" htmlFor={abbrev}>{buildingNames[abbrev]}</label>
+                            </div>
+                        ))}
+                    </form>
+                }
             </div>
 
             <div className="days-container">
-                <div className="day">
+            <div className="day">
                     <h3 className="day-header">MONDAY</h3>
                     {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                      Loading text is displayed */}
-                    {classDataLoaded ?
+                    {timeBlocks ?
                         <HeatMap className="heatmap" timeBlockList={timeBlocks['M']}
                                  numClassroomsList={numberClasses['M']}/> :
                         <p>Loading...</p>}

@@ -2,6 +2,10 @@ from django.db import models
 
 
 class Classroom(models.Model):
+    """
+    Contains all ORM models for the classroom analytics software. The models for Classes, Courses, and Instructors are
+    all included here.
+    """
     BUILDINGS = {
         "CENG": "Civil Engineering",
         "CHPL": "All Saints Chapel",
@@ -10,7 +14,6 @@ class Classroom(models.Model):
         "FSCT": "Fortin Science Center Labs",
         "GUAD": "Guadalupe Hall",
         "HAC": "Hunthausen Activity Center",
-        "LYHS": "",
         "OCON": "O'Connell Hall",
         "OFCP": "Off-Campus",
         "PCCC": "Perkins Call Canine Center",

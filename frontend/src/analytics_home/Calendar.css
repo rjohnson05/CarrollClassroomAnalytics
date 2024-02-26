@@ -6,7 +6,7 @@
     float: right;
     position: relative;
     top: -1em;
-    left: -9em;
+    left: -5em;
 }
 
 .filter-button {
@@ -17,12 +17,16 @@
     color: white;
 }
 
+.filter-button:hover {
+    cursor: pointer;
+}
+
 .filter-icon {
     margin-right: 5px;
 }
 
 .filter-button, .filter-dropdown {
-    width: 10em;
+    width: 14em;
 }
 
 .filter-dropdown {
@@ -35,6 +39,9 @@
 .days-container {
     display: flex;
     margin-top: 4em;
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
 }
 
 .day {
