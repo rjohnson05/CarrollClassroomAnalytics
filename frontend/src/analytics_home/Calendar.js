@@ -16,7 +16,6 @@ export default function Home() {
     const [buildingNames, setBuildingNames] = useState({});
 
     useEffect( () => {
-        console.log("List: ", buildingFilter)
         async function fetchData() {
             await loadData();
             if (firstRender) {
@@ -33,10 +32,21 @@ export default function Home() {
      */
     const loadData = async () => {
         try {
+            // Creates the list of buildings that are currently selected for querying
+            const currentFilter = []
+            Object.keys(buildingFilter).forEach(building => {
+                if (buildingFilter[building] === true) {
+                    currentFilter.push(building)
+                }
+            })
+
             const classesData = await axios.get("http://localhost:8000/api/get_number_classes",
-                {params: {buildings: buildingFilter}});
+                {params: {buildings: currentFilter}});
             setTimeBlocks(classesData.data[0]);
             setNumberClasses(classesData.data[1]);
+
+            const buildingNamesData = await axios.get("http://localhost:8000/api/get_building_names");
+            setBuildingNames(buildingNamesData.data);
         } catch (error) {
             console.error(error);
         }
@@ -62,7 +72,7 @@ export default function Home() {
     const filterBuilding = (building) => {
         setBuildingFilter(prevState => ({
             ...prevState,
-            [building]: !prevState[building], // Toggle the value
+            [building['abbrev']]: !prevState[building['abbrev']],
         }));
     }
 
@@ -80,7 +90,7 @@ export default function Home() {
                     <form className="filter-dropdown">
                         {Object.keys(buildingNames).map(abbrev => (
                             <div>
-                                <input type="checkbox" name={abbrev} onClick={() => filterBuilding({abbrev})} />
+                                <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev} onClick={() => filterBuilding({abbrev})} />
                                 <label className="filter-options" htmlFor={abbrev}>{buildingNames[abbrev]}</label>
                             </div>
                         ))}
