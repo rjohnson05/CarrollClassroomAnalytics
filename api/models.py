@@ -6,23 +6,22 @@ class Classroom(models.Model):
     Contains all ORM models for the classroom analytics software. The models for Classes, Courses, and Instructors are
     all included here.
     """
-    BUILDINGS = (
-        ("CENG", "Civil Engineering"),
-        ("CHPL", "All Saints Chapel"),
-        ("CUBE", "Cube"),
-        ("EQCT", "Equine Center"),
-        ("FSCT", "Fortin Science Center Labs"),
-        ("GUAD", "Guadalupe Hall"),
-        ("HAC", "Hunthausen Activity Center"),
-        ("LYHS", ""),
-        ("OCON", "O'Connell Hall"),
-        ("OFCP", "Off-Campus"),
-        ("PCCC", "Perkins Call Canine Center"),
-        ("PECT", "PE Center"),
-        ("SIMP", "Simperman Hall"),
-        ("STCH", "St. Charles Hall"),
-        ("WBAR", "Waterbarn"),
-    )
+    BUILDINGS = {
+        "CENG": "Civil Engineering",
+        "CHPL": "All Saints Chapel",
+        "CUBE": "Cube",
+        "EQCT": "Equine Center",
+        "FSCT": "Fortin Science Center Labs",
+        "GUAD": "Guadalupe Hall",
+        "HAC": "Hunthausen Activity Center",
+        "OCON": "O'Connell Hall",
+        "OFCP": "Off-Campus",
+        "PCCC": "Perkins Call Canine Center",
+        "PECT": "PE Center",
+        "SIMP": "Simperman Hall",
+        "STCH": "St. Charles Hall",
+        "WBAR": "Waterbarn",
+    }
     name = models.CharField(max_length=255, primary_key=True)
     building = models.CharField(max_length=255, choices=BUILDINGS)
     room_num = models.IntegerField()
