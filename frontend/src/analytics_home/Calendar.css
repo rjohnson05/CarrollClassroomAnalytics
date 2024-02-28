@@ -1,16 +1,22 @@
+body {
+    background-color: #f2f2f2;
+}
+
 .main-title {
     text-align: center;
+    margin-bottom: 1em;
 }
 
 .filter-container {
     float: right;
     position: relative;
-    top: -1em;
-    left: -5em;
+    top: -4em;
+    right: 7em;
 }
 
 .filter-button {
     font-size: 15px;
+    /*width: 100px;*/
     height: 3em;
     border-radius: 5px;
     background-color: #3c1952;
@@ -36,9 +42,21 @@
     z-index: 2;
 }
 
+.heatmap-container {
+    border: 1px solid black;
+    background-color: white;
+    margin: 1%;
+    padding: 1%;
+}
+
+.legend-container {
+    margin: auto;
+    text-align: center;
+    width: 28%;
+}
+
 .days-container {
     display: flex;
-    margin-top: 4em;
     margin-left: auto;
     margin-right: auto;
     width: 95%;
@@ -46,7 +64,7 @@
 
 .day {
     flex: 1;
-    margin: 1em;
+    margin: 0 1em 0 1em;
 }
 
 .day-header {
@@ -66,28 +84,28 @@
     margin-top: 2em;
 }
 
-.popup-title {
-    font-weight: bold;
-    display: inline;
-}
+/*.popup-title {*/
+/*    font-weight: bold;*/
+/*    display: inline;*/
+/*}*/
 
-.popup-content {
-  margin: auto;
-  background: rgb(255, 255, 255);
-  width: 50%;
-  padding: 5px;
-}
-.popup-arrow {
-  color: rgb(255, 255, 255);
-}
-[role='tooltip'].popup-content {
-  width: 200px;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
-}
+/*.popup-content {*/
+/*  margin: auto;*/
+/*  background: rgb(255, 255, 255);*/
+/*  width: 50%;*/
+/*  padding: 5px;*/
+/*}*/
+/*.popup-arrow {*/
+/*  color: rgb(255, 255, 255);*/
+/*}*/
+/*[role='tooltip'].popup-content {*/
+/*  width: 200px;*/
+/*  box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;*/
+/*}*/
 
-.popup-overlay {
-  background: rgba(0, 0, 0, 0.5);
-}
-[data-popup='tooltip'].popup-overlay {
-  background: transparent;
-}
+/*.popup-overlay {*/
+/*  background: rgba(0, 0, 0, 0.5);*/
+/*}*/
+/*[data-popup='tooltip'].popup-overlay {*/
+/*  background: transparent;*/
+/*}*/

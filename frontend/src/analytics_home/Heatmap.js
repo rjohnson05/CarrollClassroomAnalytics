@@ -1,7 +1,29 @@
-import {useEffect, useState} from "react";
-import Popup from "reactjs-popup";
+import * as d3 from "d3";
+import { Tooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
+import './Heatmap.css'
 
-export default function HeatMap({ timeBlockList, numClassroomsList }) {
+
+/**
+ * Component to display the number of classrooms in use for each time block during throughout a day. These numbers are
+ * coded by color, with time blocks with large number of classrooms in use being represented by a darker color and time
+ * blocks with less classrooms in use being represented by a lighter color. If the time blocks are hovered over by the
+ * mouse, a tooltip displays the number of classrooms in use.
+ *
+ * @param timeBlockList dictionary containing each possible block of time during the day
+ * @param numClassroomsList dictionary containing the number of classrooms used during each time block throughout the day
+ *
+ * @author Ryan Johnson
+ */
+export default function Heatmap({ timeBlockList, numClassroomsList }) {
+    if (timeBlockList === undefined || numClassroomsList === undefined) {
+        return;
+    }
+    const numClasses = Object.values(numClassroomsList);
+    const colorScale = d3.scaleLinear()
+            .domain([0, Math.max(...numClasses)])
+            .range(['yellow', 'purple'])
+
     /**
      * Calculates the number of minutes between a start and end time for display purposes.
      *
@@ -22,47 +44,21 @@ export default function HeatMap({ timeBlockList, numClassroomsList }) {
         return (hours + minutes)/(1.7);
     }
 
-    /**
-     * Calculates the shade color for a time block based on the number of classrooms being utilized during that
-     * particular block. Lighter color shades indicate less utilized classrooms, while darker shades indicate a greater
-     * number of classrooms being used.
-     *
-     * @param numberClasses Number representing the number of classrooms being actively used during a particular time
-     *                      period
-     * @returns {string}    String representing the color to be assigned to the time block
-     */
-    const calculateColor = (numberClasses) => {
-        if (numberClasses === 0) {
-            return 'white';
-        } else if (numberClasses <= 5) {
-            return '#e7d87d';
-        } else if (numberClasses <= 10) {
-            return '#dd9f40';
-        } else if (numberClasses <= 20) {
-            return '#b4451f';
-        } else if (numberClasses > 20) {
-            return '#b01111';
-        }
-    }
-
 
     return (
         <div>
+            <Tooltip className="light" anchorSelect=".tooltip-target" place="right" render={({content}) => (
+                <span>Classrooms in Use: {content}</span>
+            )}>Classrooms in Use: {}</Tooltip>
             {timeBlockList ?
-            timeBlockList.map((timeBlock) => (
-                <Popup trigger={
-                    <div className="time-block" style={{
-                        border: '1px solid black',
-                        height: calculateMinutes(timeBlock[0], timeBlock[1]),
-                        background: calculateColor(numClassroomsList[timeBlock[0]])}}>
-                    </div>}
-                       className="popup-content popup-arrow popup-overlay"
-                       position="right center"
-                       on={['hover', 'focus']}>
-                    <div><p className="popup-title">Classrooms in Use:</p> {numClassroomsList[timeBlock[0]]}</div>
-                </Popup>
+                timeBlockList.map((timeBlock) => (
+                    <svg viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
+                         style={{display: "block", border: '1px solid black'}}>
+                        <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1])}
+                              fill={colorScale(numClassroomsList[timeBlock[0]])}
+                              className="tooltip-target" data-tooltip-content={numClassroomsList[timeBlock[0]]} />
+                    </svg>
                 )) : <p>No heatmap data available</p>}
         </div>
-
     );
 }
