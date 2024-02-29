@@ -50,8 +50,7 @@ for index, row in df.iterrows():
 
     classroom = Classroom.objects.create(
         name=row['CSM_ROOM'],
-        building=Classroom.BUILDINGS.get(row['CSM_BLDG'], 'Unknown'),
-        # building=Classroom.BUILDINGS[row['CSM_BLDG']],
+        building=row['CSM_BLDG'],
         room_num=row['SEC_SYNONYM'],
         occupancy=row['SEC_CAPACITY'],
         type=row['SEC_SUBJECT'],

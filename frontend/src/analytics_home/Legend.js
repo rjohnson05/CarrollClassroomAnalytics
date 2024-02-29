@@ -14,7 +14,7 @@ export default function Legend({numClassroomsList}) {
     const svgRef = React.useRef(null);
     const numClasses = Object.values(numClassroomsList);
 
-    const margin = {top: 20, bottom: 10, left: 5, right: 0};
+    const margin = {top: 20, bottom: 10, left: 5, right: 4};
     const width = 400;
     const height = 50;
 
@@ -40,9 +40,7 @@ export default function Legend({numClassroomsList}) {
             .attr("transform",`translate(${0}, ${height + margin.top})`)
 
         // Creates the color range for the legend
-        const startColor = "yellow"
-        const endColor = "purple"
-        const colors = [startColor, endColor]
+        const colors = ['white','#fcf881', '#eb0000', 'purple']
         const colorRange = d3.range(0, 1, 1.0 / (colors.length - 1))
         colorRange.push(1)
 

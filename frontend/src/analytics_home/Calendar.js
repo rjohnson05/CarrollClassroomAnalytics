@@ -11,7 +11,7 @@ import Legend from "./Legend"
  * Displays the main page, showing the number of used classrooms during each time block throughout the week. Allows the
  * user to filter different buildings to view the number of used classrooms in any combination of buildings.
  *
- * @author Ryan Johnson
+ * @author Ryan Johnson, Adrian Rincon-Jimanez
  */
 export default function Home() {
     const [firstRender, setFirstRender] = useState(true);
@@ -28,6 +28,7 @@ export default function Home() {
          * in the buildings filter.
          */
         async function fetchData() {
+            console.log(buildingFilter)
             await loadData();
             if (firstRender) {
                 await loadFilter();
@@ -36,43 +37,10 @@ export default function Home() {
         fetchData();
     }, [buildingFilter]);
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-            const csv = reader.result;
-            console.log(csv); // You can process the CSV data here
-        };
-
-        reader.readAsText(file);
-    };
-
-    const handleOnSubmit = async (event) => {
-        event.preventDefault();
-
-        console.log("handleOnSubmit is working")
-
-        if (file) {
-            const formData = new FormData();
-            formData.append("file", file);
-
-            try {
-                await axios.post("http://localhost:8000/api/upload_csv",  {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    }
-                });
-                // Optional: Add code to handle successful upload
-            } catch (error) {
-                console.error("Error uploading CSV:", error);
-                // Optional: Add code to handle upload failure
-            }
-        }
-    };
-
+    /**
+     * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
+     * second contains the number of classes running during each time block. Both of these dictionaries are stored as state.
+     */
     const loadData = async () => {
         try {
             // Creates the list of buildings that are currently selected in the filter, used for querying
@@ -88,7 +56,6 @@ export default function Home() {
                 {params: {buildings: currentFilter}});
             setTimeBlocks(classesData.data[0]);
             setNumberClasses(classesData.data[1]);
-            console.log(numberClasses)
 
             // Loads the names of all buildings in the database for use in the filter
             const buildingNamesData = await axios.get("http://localhost:8000/api/get_building_names");
@@ -163,28 +130,50 @@ export default function Home() {
                 <div className="days-container">
                     <div className="day">
                         <h3 className="day-header">MONDAY</h3>
-                        {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
+                            {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                      Loading text is displayed */}
                         {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
-                            <HeatMap className="heatmap" timeBlockList={timeBlocks['M']}
-                                        numClassroomsList={numberClasses['M']}/> :
-                            <p>Loading...</p>}
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['M']}
+                                            numClassroomsList={numberClasses['M']}/>
+                            </div>
+                            : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">TUESDAY</h3>
-                        <div className="heat-map">Heat Map</div>
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['T']}
+                                        numClassroomsList={numberClasses['T']}/>
+                            </div>
+                            : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">WEDNESDAY</h3>
-                        <div className="heat-map">Heat Map</div>
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['W']}
+                                        numClassroomsList={numberClasses['W']}/>
+                            </div>
+                            : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">THURSDAY</h3>
-                        <div className="heat-map">Heat Map</div>
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['th']}
+                                        numClassroomsList={numberClasses['th']}/>
+                            </div>
+                            : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">FRIDAY</h3>
-                        <div className="heat-map">Heat Map</div>
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['F']}
+                                         numClassroomsList={numberClasses['F']}/>
+                            </div>
+                            : <p>Loading...</p>}
                     </div>
                 </div>
             </div>

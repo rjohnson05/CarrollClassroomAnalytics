@@ -21,8 +21,8 @@ export default function Heatmap({ timeBlockList, numClassroomsList }) {
     }
     const numClasses = Object.values(numClassroomsList);
     const colorScale = d3.scaleLinear()
-            .domain([0, Math.max(...numClasses)])
-            .range(['yellow', 'purple'])
+            .domain([0, 1*Math.max(...numClasses) / 3, 2 *Math.max(...numClasses) / 3,  Math.max(...numClasses)])
+            .range(['white', '#fcf881', '#eb0000', 'purple'])
 
     /**
      * Calculates the number of minutes between a start and end time for display purposes.
@@ -40,23 +40,33 @@ export default function Heatmap({ timeBlockList, numClassroomsList }) {
             return (60 + minutes)/(1.6);
         }
         // Handles all other hour changes
-        const hours = 60*(endTime[0] - startTime[0]);
-        return (hours + minutes)/(1.7);
+        const hourMinutes = 60*(endTime[0] - startTime[0]);
+        return (hourMinutes + minutes)/6;
     }
 
 
     return (
         <div>
-            <Tooltip className="light" anchorSelect=".tooltip-target" place="right" render={({content}) => (
-                <span>Classrooms in Use: {content}</span>
-            )}>Classrooms in Use: {}</Tooltip>
+            <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" render={({content}) => {
+                if (content) {
+                    const contentParts = content.split(",");
+                    return (
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span>Time: {contentParts[0]?.substring(0,5)} - {contentParts[1]?.substring(0,5)}</span>
+                            <span>Classrooms in Use: {contentParts[2]}</span>
+                        </div>
+                    );
+                } else {
+                    return null;
+                }
+            }}></Tooltip>
             {timeBlockList ?
                 timeBlockList.map((timeBlock) => (
                     <svg viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
-                         style={{display: "block", border: '1px solid black'}}>
-                        <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1])}
+                         style={{display: "block"}}>
+                        <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1]) + 1}
                               fill={colorScale(numClassroomsList[timeBlock[0]])}
-                              className="tooltip-target" data-tooltip-content={numClassroomsList[timeBlock[0]]} />
+                              className="tooltip-target" data-tooltip-content={[timeBlock[0], timeBlock[1], numClassroomsList[timeBlock[0]]]} />
                     </svg>
                 )) : <p>No heatmap data available</p>}
         </div>

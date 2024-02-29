@@ -81,8 +81,8 @@ WSGI_APPLICATION = 'carroll_classroom_analytics.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test_classroom',
-        'USER': 'test_user',
+        'NAME': 'carroll_classrooms',
+        'USER': 'carroll_user',
         'PASSWORD': 'Comfypillow01*',
         'HOST': 'localhost',
         'PORT': 3306
@@ -141,9 +141,11 @@ LOGGING = {
         },
         "file": {
             "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "./logging.log"
-        }
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": "./logs/classrooms_analytics.log",
+            "when": "D",
+            "backupCount": 100,
+        },
     },
     "root": {
         "handlers": ["console", "file"],
