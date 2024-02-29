@@ -1,44 +1,47 @@
 from django.db import models
 
-
 class Classroom(models.Model):
-    BUILDINGS = [
-        ("CENG", "Civil Engineering"),
-        ("CHPL", "All Saints Chapel"),
-        ("CUBE", "Cube"),
-        ("EQCT", "Equine Center"),
-        ("FSCT", "Fortin Science Center Labs"),
-        ("GUAD", "Guadalupe Hall"),
-        ("HAC", "Hunthausen Activity Center"),
-        ("LYHS", ""),
-        ("OCON", "O'Connell Hall"),
-        ("OFCP", "Off-Campus"),
-        ("PCCC", "Perkins Call Canine Center"),
-        ("PECT", "PE Center"),
-        ("SIMP", "Simperman Hall"),
-        ("STCH", "St. Charles Hall"),
-        ("WBAR", "Waterbarn"),
-    ]
-    name = models.CharField(max_length=8, primary_key=True)
-    building = models.CharField(max_length=4, choices=BUILDINGS)
+    BUILDINGS = {
+        "": "",
+        "CENG": "Civil Engineering",
+        "CHPL": "All Saints Chapel",
+        "CUBE": "Cube",
+        "EQCT": "Equine Center",
+        "FSCT": "Fortin Science Center Labs",
+        "GUAD": "Guadalupe Hall",
+        "HAC": "Hunthausen Activity Center",
+        "OCON": "O'Connell Hall",
+        "OFCP": "Off-Campus",
+        "PCCC": "Perkins Call Canine Center",
+        "PECT": "PE Center",
+        "SIMP": "Simperman Hall",
+        "STCH": "St. Charles Hall",
+        "WBAR": "Waterbarn",
+    }
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    building = models.CharField(max_length=255, choices=BUILDINGS)
+    # room_num = models.CharField(max_length=255)
+    # occupancy = models.CharField(max_length=255)
     room_num = models.IntegerField()
-    occupancy = models.IntegerField()
-    type = models.CharField(max_length=10)
+    occupancy = models.FloatField()
+    type = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
 
 
 class Instructor(models.Model):
-    name = models.CharField(max_length=50)
-    style = models.CharField(max_length=20)
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    style = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
 
 
 class Course(models.Model):
-    DAYS = [
+    DAYS = (
         ("M", "Monday"),
         ("T", "Tuesday"),
         ("W", "Wednesday"),
@@ -46,18 +49,19 @@ class Course(models.Model):
         ("MW", "Monday, Wednesday"),
         ("MWF", "Monday, Wednesday, Friday"),
         ("Tth", "Tuesday, Thursday"),
-    ]
-    name = models.CharField(max_length=15)
-    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="course_classroom")
-    day = models.CharField(max_length=3, choices=DAYS)
+    )
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    # classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="course_classroom")
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    day = models.CharField(max_length=255, choices=DAYS)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
-    type = models.CharField(max_length=20)
+    # start_time = models.CharField(max_length=255)
+    # end_time = models.CharField(max_length=255)
+    # instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
+    # type = models.CharField(max_length=255)
+    instructor = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
-
-
-class ImportedData(models.Model):
-    file = models.FileField(upload_to='uploaded_files/')  # Define a FileField to store the uploaded CSV file

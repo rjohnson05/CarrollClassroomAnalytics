@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from api.models import Course, ImportedData, Classroom, Instructor
+from api.models import Course, Classroom, Instructor
 from .forms import FileUploadForm  # Import the form for handling file uploads
 import logging
 
@@ -47,20 +47,20 @@ def upload_csv(file):
         return False, str(e)
 
 
-@api_view(["GET", "POST"])
+@api_view(["GET"])
 def get_number_classes(request):
-    if request.method == "POST":
-        form = FileUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            file = request.FILES["file"]
-            # Save the uploaded file to the database
-            imported_data = ImportedData.objects.create(file=file)
-            # Process the uploaded CSV file
-            upload_csv(imported_data.file)
-            # return Response({"message": "File uploaded and processed successfully"})
-        else:
-            return Response({"error": "Invalid form data"})
-    elif request.method == "GET":  # Handle GET request to get number of classes
+    # if request.method == "POST":
+    #     form = FileUploadForm(request.POST, request.FILES)
+    #     if form.is_valid():
+    #         file = request.FILES["file"]
+    #         # Save the uploaded file to the database
+    #         imported_data = ImportedData.objects.create(file=file)
+    #         # Process the uploaded CSV file
+    #         upload_csv(imported_data.file)
+    #         # return Response({"message": "File uploaded and processed successfully"})
+    #     else:
+    #         return Response({"error": "Invalid form data"})
+    # elif request.method == "GET":  # Handle GET request to get number of classes
         """
         Queries the number of courses running during each time block and then stores this information in a dictionary.
         Returns an HTTP request containing two dictionaries, the first of which containing the time blocks and the second
