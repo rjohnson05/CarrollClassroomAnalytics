@@ -6,3 +6,6 @@ __pycache__
 
 # Log Files
 *.log
+
+frontend/build/
+frontend/node_modules/
