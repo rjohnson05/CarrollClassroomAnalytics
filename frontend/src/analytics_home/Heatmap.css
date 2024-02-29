@@ -1,0 +1,6 @@
+.light {
+    background-color: var(--rt-color-white);
+    color: var(--rt-color-dark);
+    /*border: 1px solid black;*/
+    opacity: 1;
+}

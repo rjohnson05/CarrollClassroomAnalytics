@@ -2,6 +2,10 @@ from django.db import models
 
 
 class Classroom(models.Model):
+    """
+    Contains all ORM models for the classroom analytics software. The models for Classes, Courses, and Instructors are
+    all included here.
+    """
     BUILDINGS = {
         "": "",
         "CENG": "Civil Engineering",
@@ -56,6 +60,7 @@ class Course(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     instructor = models.CharField(max_length=255)
+
 
     def __str__(self):
         return self.name
