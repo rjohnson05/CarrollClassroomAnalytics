@@ -1,5 +1,4 @@
 import pandas as pd
-# from django.contrib.auth.models import User
 import os
 import django
 
