@@ -3,3 +3,8 @@
 
 # Byte-compiled / optimized / DLL files
 __pycache__
+
+
+# files
+frontend/build/
+frontend/node_modules/
