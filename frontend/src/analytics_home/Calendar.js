@@ -28,7 +28,6 @@ export default function Home() {
          * in the buildings filter.
          */
         async function fetchData() {
-            console.log(buildingFilter)
             await loadData();
             if (firstRender) {
                 await loadFilter();

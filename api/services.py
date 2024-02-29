@@ -35,7 +35,6 @@ def calculate_time_blocks(buildings) -> []:
             end_times = [time[0].strftime("%H:%M:%S") for time in
                          Course.objects.values_list('end_time').filter(classroom__building__in=buildings,
                                                                        day__contains=day).distinct()]
-        logger.info(f"Start Times: {start_times}, End Times: {end_times}")
         all_times.append(start_times + end_times)
         start_end_times = sorted(set(start_times + end_times))  # Organizes times from earliest to latest
         logger.debug(f"calculate_time_blocks: Possible Start/End Times: {start_end_times}")
