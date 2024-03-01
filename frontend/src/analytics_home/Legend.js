@@ -10,7 +10,7 @@ import * as d3 from "d3";
  * @returns {Element} svg image containing the legend with a title and x-axis
  * @author Ryan Johnson
  */
-export default function Legend({numClassroomsList}) {
+export default function Legend({numClassroomsList, maxNumberClasses}) {
     const svgRef = React.useRef(null);
     const numClasses = Object.values(numClassroomsList);
 
@@ -30,7 +30,7 @@ export default function Legend({numClassroomsList}) {
 
         // Creating the x-axis
         const xScale = d3.scaleLinear()
-            .domain([0, Math.max(...numClasses)])
+            .domain([0, maxNumberClasses])
             .range([margin.left, width]);
         const xAxisGenerator = d3.axisBottom(xScale)
             .ticks(5)
@@ -74,7 +74,7 @@ export default function Legend({numClassroomsList}) {
             .attr("text-anchor", "middle")
             .attr("font-weight", "bold")
             .text("Number of Classrooms Used");
-    }, [numClassroomsList]);
+    }, [maxNumberClasses]);
 
     return <svg ref={svgRef} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom} />;
 }

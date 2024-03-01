@@ -15,14 +15,10 @@ import './Heatmap.css'
  *
  * @author Ryan Johnson
  */
-export default function Heatmap({ timeBlockList, numClassroomsList }) {
-    if (timeBlockList === undefined || numClassroomsList === undefined) {
-        return;
-    }
-    const numClasses = Object.values(numClassroomsList);
+export default function Heatmap({ timeBlockList, numClassroomsList, maxNumberClasses }) {
     const colorScale = d3.scaleLinear()
-            .domain([0, 1*Math.max(...numClasses) / 3, 2 *Math.max(...numClasses) / 3,  Math.max(...numClasses)])
-            .range(['white', '#fcf881', '#eb0000', 'purple'])
+        .domain([0, 1*maxNumberClasses / 3, 2 *maxNumberClasses / 3,  maxNumberClasses])
+        .range(['white', '#fcf881', '#eb0000', 'purple'])
 
     /**
      * Calculates the number of minutes between a start and end time for display purposes.
@@ -41,7 +37,7 @@ export default function Heatmap({ timeBlockList, numClassroomsList }) {
         }
         // Handles all other hour changes
         const hourMinutes = 60*(endTime[0] - startTime[0]);
-        return (hourMinutes + minutes)/6;
+        return (hourMinutes + minutes)/5;
     }
 
 

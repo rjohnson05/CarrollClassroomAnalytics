@@ -35,8 +35,12 @@ def calculate_time_blocks(buildings) -> []:
             end_times = [time[0].strftime("%H:%M:%S") for time in
                          Course.objects.values_list('end_time').filter(classroom__building__in=buildings,
                                                                        day__contains=day).distinct()]
-        all_times.append(start_times + end_times)
-        start_end_times = sorted(set(start_times + end_times))  # Organizes times from earliest to latest
+        # all_times.append(start_times + end_times + ['6:00:00', '21:15:00'])
+        all_times = start_times + end_times + ['06:00:00', '21:15:00']
+        for element in set(all_times):
+            print(f"Element: {element}, Type: {type(element)}")
+        logger.info(f"{day} Set: {set(all_times)}")
+        start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
         logger.debug(f"calculate_time_blocks: Possible Start/End Times: {start_end_times}")
         time_blocks = []  # Stores the time block tuples for a given day
 
@@ -74,17 +78,18 @@ def calculate_number_classes(buildings='all'):
             block_end_time = block[1]
             if buildings == 'all':
                 # Counts the number of courses (campus-wide) running between the current block's start/end times
-                block_num_classes = Course.objects.all().filter(start_time__gte=block_start_time,
+                block_num_classes = Course.objects.all().filter(start_time__lte=block_start_time,
                                                                 end_time__gte=block_end_time)
             else:
                 # Counts the number of courses (within specified buildings) running between the current block's
                 # start/end times
-                block_num_classes = Course.objects.all().filter(start_time__gte=block_start_time,
+                block_num_classes = Course.objects.all().filter(start_time__lte=block_start_time,
                                                                 end_time__gte=block_end_time,
                                                                 classroom__building__in=buildings)
             day_num_classes[block_start_time] = len(block_num_classes)
         logger.debug(f"calculate_number_classes: Number of classes for time blocks during {day}: {day_num_classes}")
         all_num_classes[day] = day_num_classes
+        logger.info(f"Number of Classes: {all_num_classes}")
     logger.debug(f"calculate_number_classes: Number of classes calculated for time blocks in {buildings}")
     return [time_blocks, all_num_classes]
 

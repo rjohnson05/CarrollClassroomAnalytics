@@ -143,7 +143,7 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": "./logs/classrooms_analytics.log",
-            "when": "D",
+            "when": "midnight",
             "backupCount": 100,
         },
     },

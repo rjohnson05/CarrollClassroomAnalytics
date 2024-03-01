@@ -6,6 +6,7 @@ import './Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
 import Legend from "./Legend"
+import * as d3 from "d3";
 
 /**
  * Displays the main page, showing the number of used classrooms during each time block throughout the week. Allows the
@@ -17,6 +18,7 @@ export default function Home() {
     const [firstRender, setFirstRender] = useState(true);
     const [timeBlocks, setTimeBlocks] = useState(false);
     const [numberClasses, setNumberClasses] = useState(false);
+    const [maxNumClasses, setMaxNumClasses] = useState(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [buildingFilter, setBuildingFilter] = useState({});
     const [buildingNames, setBuildingNames] = useState({});
@@ -35,6 +37,10 @@ export default function Home() {
         }
         fetchData();
     }, [buildingFilter]);
+
+    useEffect(() => {
+        calculateMaxNumClasses()
+    }, [numberClasses]);
 
     /**
      * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
@@ -65,6 +71,22 @@ export default function Home() {
     }
 
     /**
+     * Calculates the new maximum number of classrooms used within the current building filter, passed to the legend and
+     * heatmaps for consistency in color scales. This max is updated whenever the building filter is changed.
+     */
+    const calculateMaxNumClasses = () => {
+        let maxNumberClasses = 0;
+        for (let dayClasses of Object.values(numberClasses)) {
+            for (let numClasses of Object.values(dayClasses)) {
+                if (numClasses > maxNumberClasses) {
+                    maxNumberClasses = numClasses;
+                }
+            }
+        }
+        setMaxNumClasses(maxNumberClasses);
+    }
+
+    /**
      * Fetches the names of all the buildings from the database in which classrooms are located. These names are used
      * for the building filter.
      */
@@ -89,7 +111,7 @@ export default function Home() {
     const filterBuilding = (building) => {
         setBuildingFilter(prevState => ({
             ...prevState,
-            [building['abbrev']]: !prevState[building['abbrev']],
+            [building['abbrev']]: !prevState[building['abbrev']]
         }));
     }
 
@@ -121,8 +143,8 @@ export default function Home() {
 
             <div className="heatmap-container">
                 <div className="legend-container">
-                    {Object.keys(numberClasses).length > 0 ?
-                        <Legend className="legend" numClassroomsList={numberClasses['M']}/>
+                    {Object.keys(numberClasses).length > 0 && maxNumClasses ?
+                        <Legend className="legend" numClassroomsList={numberClasses} maxNumberClasses={maxNumClasses}/>
                          : 'Legend Loading...'}
                 </div>
 
@@ -131,46 +153,46 @@ export default function Home() {
                         <h3 className="day-header">MONDAY</h3>
                             {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                      Loading text is displayed */}
-                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                             <div className="heatmap">
                                 <HeatMap timeBlockList={timeBlocks['M']}
-                                            numClassroomsList={numberClasses['M']}/>
+                                            numClassroomsList={numberClasses['M']} maxNumberClasses={maxNumClasses}/>
                             </div>
                             : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">TUESDAY</h3>
-                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                             <div className="heatmap">
                                 <HeatMap timeBlockList={timeBlocks['T']}
-                                        numClassroomsList={numberClasses['T']}/>
+                                        numClassroomsList={numberClasses['T']} maxNumberClasses={maxNumClasses}/>
                             </div>
                             : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">WEDNESDAY</h3>
-                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                             <div className="heatmap">
                                 <HeatMap timeBlockList={timeBlocks['W']}
-                                        numClassroomsList={numberClasses['W']}/>
+                                        numClassroomsList={numberClasses['W']} maxNumberClasses={maxNumClasses}/>
                             </div>
                             : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">THURSDAY</h3>
-                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                             <div className="heatmap">
                                 <HeatMap timeBlockList={timeBlocks['th']}
-                                        numClassroomsList={numberClasses['th']}/>
+                                        numClassroomsList={numberClasses['th']} maxNumberClasses={maxNumClasses}/>
                             </div>
                             : <p>Loading...</p>}
                     </div>
                     <div className="day">
                         <h3 className="day-header">FRIDAY</h3>
-                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0) ?
+                        {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                             <div className="heatmap">
                                 <HeatMap timeBlockList={timeBlocks['F']}
-                                         numClassroomsList={numberClasses['F']}/>
+                                         numClassroomsList={numberClasses['F']} maxNumberClasses={maxNumClasses}/>
                             </div>
                             : <p>Loading...</p>}
                     </div>
