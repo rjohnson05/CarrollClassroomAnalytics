@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { Tooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import './Heatmap.css'
+import {Link} from "react-router-dom";
 
 
 /**
@@ -15,7 +16,7 @@ import './Heatmap.css'
  *
  * @author Ryan Johnson
  */
-export default function Heatmap({ timeBlockList, numClassroomsList, maxNumberClasses }) {
+export default function Heatmap({ day, buildingList, timeBlockList, numClassroomsList, maxNumberClasses }) {
     const colorScale = d3.scaleLinear()
         .domain([0, 1*maxNumberClasses / 3, 2 *maxNumberClasses / 3,  maxNumberClasses])
         .range(['white', '#fcf881', '#eb0000', 'purple'])
@@ -43,13 +44,25 @@ export default function Heatmap({ timeBlockList, numClassroomsList, maxNumberCla
 
     return (
         <div>
-            <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" render={({content}) => {
+            <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" clickable={true} render={({content}) => {
                 if (content) {
                     const contentParts = content.split(",");
                     return (
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span>Time: {contentParts[0]?.substring(0,5)} - {contentParts[1]?.substring(0,5)}</span>
                             <span>Classrooms in Use: {contentParts[2]}</span>
+                            <span>Buildings: {Object.entries(buildingList)
+                                .filter(([key, value]) => key && value) // Filter out empty keys and false values
+                                .map(([key]) => key) // Extract building codes
+                                .join(', ')}</span>
+                            <Link className="link" to={`/used_classrooms`}
+                                  state={{
+                                      day: contentParts[3],
+                                      buildingList: Object.entries(buildingList).filter(([key, value]) => key && value)
+                                          .map(([key]) => key).join(', '),
+                                      startTime: contentParts[0]?.substring(0,5),
+                                      endTime: contentParts[1]?.substring(0,5)}}>
+                                View Used Classrooms</Link>
                         </div>
                     );
                 } else {
@@ -58,11 +71,12 @@ export default function Heatmap({ timeBlockList, numClassroomsList, maxNumberCla
             }}></Tooltip>
             {timeBlockList ?
                 timeBlockList.map((timeBlock) => (
-                    <svg viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
+                    <svg key={timeBlock} viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
                          style={{display: "block"}}>
                         <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1]) + 1}
                               fill={colorScale(numClassroomsList[timeBlock[0]])}
-                              className="tooltip-target" data-tooltip-content={[timeBlock[0], timeBlock[1], numClassroomsList[timeBlock[0]]]} />
+                              className="tooltip-target" data-tooltip-content={[timeBlock[0], timeBlock[1],
+                            numClassroomsList[timeBlock[0]], day, buildingList]} />
                     </svg>
                 )) : <p>No heatmap data available</p>}
         </div>

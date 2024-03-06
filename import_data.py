@@ -9,22 +9,18 @@ from api.models import Classroom, Instructor, Course
 
 
 def day_maker():
-    if row['CSM_MONDAY'] == 'Y' and row['CSM_WEDNESDAY'] == 'Y' and row['CSM_FRIDAY'] == 'Y':
-        Course.DAYS = 'MWF'
-    elif row['CSM_MONDAY'] == 'Y' and row['CSM_WEDNESDAY'] == 'Y':
-        Course.DAYS = 'MW'
-    elif row['CSM_TUESDAY'] == 'Y' and row['CSM_THURSDAY'] == 'Y':
-        Course.DAYS = 'MW'
-    elif row['CSM_MONDAY'] == 'Y':
-        Course.DAYS = 'M'
-    elif row['CSM_TUESDAY'] == 'Y':
-        Course.DAYS = 'T'
-    elif row['CSM_WEDNESDAY'] == 'Y':
-        Course.DAYS = 'W'
-    elif row['CSM_THURSDAY'] == 'Y':
-        Course.DAYS = 'th'
-    else:
-        Course.DAYS = ''
+    days = ""
+    if row['CSM_MONDAY'] == 'Y':
+        days += 'M'
+    if row['CSM_TUESDAY'] == 'Y':
+        days += 'T'
+    if row['CSM_WEDNESDAY'] == 'Y':
+        days += 'W'
+    if row['CSM_THURSDAY'] == 'Y':
+        days += 'th'
+    if row['CSM_FRIDAY'] == 'Y':
+        days += 'F'
+    Course.DAYS = days
     return Course.DAYS
 
 
@@ -49,7 +45,7 @@ for index, row in df.iterrows():
     )
 
     classroom = Classroom.objects.create(
-        name=row['CSM_ROOM'],
+        name=row['CSM_BLDG'] + "-" + row['CSM_ROOM'],
         building=row['CSM_BLDG'],
         room_num=row['SEC_SYNONYM'],
         occupancy=row['SEC_CAPACITY'],
@@ -60,14 +56,13 @@ for index, row in df.iterrows():
     course = Course.objects.create(
         id=row['TEST_INDEX'],
         name=row['SEC_SHORT_TITLE'],
-        # classroom=row['CSM_ROOM'],
         classroom=classroom,
         day=Course.DAYS,
-        # day=Course.DAYS[row['']],
         start_time=row['CSM_START_TIME'],
         end_time=row['CSM_END_TIME'],
         instructor=instructor,
-        # type=instructor,
+        enrollment=row['STUDENTS_AND_RESERVED_SEATS'],
+
     )
 
     print("CSV data has been loaded into the Django database.")

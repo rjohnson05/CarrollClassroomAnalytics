@@ -22,11 +22,11 @@ def get_number_classes(request):
     if buildings.__len__() == 0:
         # Get data for all buildings campus-wide
         number_classes = services.calculate_number_classes()
-        logger.info(f"get_number_classes: Calculated class numbers for all-campus - {number_classes}")
+        logger.debug(f"get_number_classes: Calculated class numbers for all-campus - {number_classes}")
     else:
         # Get data for only specified buildings
         number_classes = services.calculate_number_classes(buildings)
-        logger.info(f"get_building_classes: Calculated class numbers for {buildings} - {number_classes}")
+        logger.debug(f"get_building_classes: Calculated class numbers for {buildings} - {number_classes}")
     return Response(number_classes)
 
 
@@ -41,3 +41,21 @@ def get_building_names(request):
     """
     buildings_list = services.get_all_buildings()
     return Response(buildings_list)
+
+@api_view(["GET"])
+def get_used_classrooms(request):
+    day = request.GET.get("day")
+    start_time = request.GET.get("startTime")
+    end_time = request.GET.get("endTime")
+    buildings = request.GET.get("buildings")
+    if buildings == "":
+        # Get data for all buildings campus-wide
+        used_classrooms = services.get_used_classrooms(day, start_time, end_time)
+        logger.debug(f"get_used_classrooms: Found used classrooms across all-campus - {used_classrooms}")
+    else:
+        buildings_list = buildings.split(",")
+        # Get data for only specified buildings
+        used_classrooms = services.get_used_classrooms(day, start_time, end_time, buildings_list)
+        logger.debug(f"get_used_classrooms: Found used classrooms for {buildings_list} - {used_classrooms}")
+
+    return Response(used_classrooms)

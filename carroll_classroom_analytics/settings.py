@@ -142,7 +142,7 @@ LOGGING = {
         "file": {
             "level": "INFO",
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": "./logs/classrooms_analytics.log",
+            "filename": "logs/classrooms_analytics.log",
             "when": "midnight",
             "backupCount": 100,
         },

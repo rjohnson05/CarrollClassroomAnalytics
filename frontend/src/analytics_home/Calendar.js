@@ -131,7 +131,7 @@ export default function Home() {
                 {filterOpen &&
                     <form className="filter-dropdown">
                         {Object.keys(buildingNames).map(abbrev => (
-                            <div>
+                            <div key={abbrev}>
                                 <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
                                        onClick={() => filterBuilding({abbrev})}/>
                                 <label className="filter-options" htmlFor={abbrev}>{buildingNames[abbrev]}</label>
@@ -167,35 +167,42 @@ export default function Home() {
                             <p>7 PM</p>
                             <p>8 PM</p>
                             <p>9 PM</p>
+                            <p>10 PM</p>
+                            <p>11 PM</p>
                         </div>
 
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
-                        <hr className="hour-line"/>
+                        <div className="hour-lines">
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                            <hr className="hour-line"/>
+                        </div>
                     </div>
 
                     <div className="days-container">
-                        <div className="day">
+                    <div className="day">
                             <h3 className="day-header">MONDAY</h3>
                             {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                  Loading text is displayed */}
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['M']}
-                                             numClassroomsList={numberClasses['M']} maxNumberClasses={maxNumClasses}/>
+                                             day='M' buildingList={buildingFilter} numClassroomsList={numberClasses['M']}
+                                             maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
                         </div>
@@ -204,7 +211,8 @@ export default function Home() {
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['T']}
-                                             numClassroomsList={numberClasses['T']} maxNumberClasses={maxNumClasses}/>
+                                             day='T' buildingList={buildingFilter} numClassroomsList={numberClasses['T']}
+                                             maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
                         </div>
@@ -213,7 +221,8 @@ export default function Home() {
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['W']}
-                                             numClassroomsList={numberClasses['W']} maxNumberClasses={maxNumClasses}/>
+                                             day='W' buildingList={buildingFilter} numClassroomsList={numberClasses['W']}
+                                             maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
                         </div>
@@ -222,7 +231,8 @@ export default function Home() {
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['th']}
-                                             numClassroomsList={numberClasses['th']} maxNumberClasses={maxNumClasses}/>
+                                             day='th' buildingList={buildingFilter} numClassroomsList={numberClasses['th']}
+                                             maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
                         </div>
@@ -231,7 +241,8 @@ export default function Home() {
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['F']}
-                                             numClassroomsList={numberClasses['F']} maxNumberClasses={maxNumClasses}/>
+                                             day='F' buildingList={buildingFilter} numClassroomsList={numberClasses['F']}
+                                             maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
                         </div>

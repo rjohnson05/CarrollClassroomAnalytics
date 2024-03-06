@@ -60,6 +60,7 @@ class Course(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     instructor = models.CharField(max_length=255)
+    enrollment = models.FloatField()
 
     def __str__(self):
         return self.name

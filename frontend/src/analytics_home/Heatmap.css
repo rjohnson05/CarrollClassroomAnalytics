@@ -3,3 +3,9 @@
     color: var(--rt-color-dark);
     opacity: 1;
 }
+
+.link {
+    font-weight: bold;
+    margin-top: 5px;
+    color: white;
+}

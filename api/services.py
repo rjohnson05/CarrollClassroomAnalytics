@@ -36,10 +36,7 @@ def calculate_time_blocks(buildings) -> []:
                          Course.objects.values_list('end_time').filter(classroom__building__in=buildings,
                                                                        day__contains=day).distinct()]
         # all_times.append(start_times + end_times + ['6:00:00', '21:15:00'])
-        all_times = start_times + end_times + ['06:00:00', '21:15:00']
-        for element in set(all_times):
-            print(f"Element: {element}, Type: {type(element)}")
-        logger.info(f"{day} Set: {set(all_times)}")
+        all_times = start_times + end_times + ['06:00:00', '23:59:00']
         start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
         logger.debug(f"calculate_time_blocks: Possible Start/End Times: {start_end_times}")
         time_blocks = []  # Stores the time block tuples for a given day
@@ -78,18 +75,26 @@ def calculate_number_classes(buildings='all'):
             block_end_time = block[1]
             if buildings == 'all':
                 # Counts the number of courses (campus-wide) running between the current block's start/end times
-                block_num_classes = Course.objects.all().filter(start_time__lte=block_start_time,
+                block_num_classes = Course.objects.all().filter(day__contains=day,
+                                                                start_time__lte=block_start_time,
                                                                 end_time__gte=block_end_time)
             else:
                 # Counts the number of courses (within specified buildings) running between the current block's
                 # start/end times
-                block_num_classes = Course.objects.all().filter(start_time__lte=block_start_time,
+                block_num_classes = Course.objects.all().filter(day__contains=day,
+                                                                start_time__lte=block_start_time,
                                                                 end_time__gte=block_end_time,
                                                                 classroom__building__in=buildings)
-            day_num_classes[block_start_time] = len(block_num_classes)
+            # Account for the possibility of several courses in a single classrooms by only counting the unique
+            # classrooms in use
+            unique_classrooms = []
+            for course in block_num_classes:
+                if course.classroom.name not in unique_classrooms:
+                    unique_classrooms.append(course.classroom.name)
+
+            day_num_classes[block_start_time] = len(unique_classrooms)
         logger.debug(f"calculate_number_classes: Number of classes for time blocks during {day}: {day_num_classes}")
         all_num_classes[day] = day_num_classes
-        logger.info(f"Number of Classes: {all_num_classes}")
     logger.debug(f"calculate_number_classes: Number of classes calculated for time blocks in {buildings}")
     return [time_blocks, all_num_classes]
 
@@ -100,3 +105,32 @@ def get_all_buildings():
     """
     buildings_list = Classroom.BUILDINGS
     return buildings_list
+
+
+def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str = "all") -> []:
+    """
+    Returns a list of all classrooms used during a specified time block and data about the course being held in the
+    classroom during the specified time block.
+    """
+    if buildings == 'all':
+        current_courses = Course.objects.all().filter(day__contains=day,
+                                                      start_time__lte=start_time,
+                                                      end_time__gte=end_time)
+    else:
+        current_courses = Course.objects.all().filter(day__contains=day,
+                                                      start_time__lte=start_time,
+                                                      end_time__gte=end_time,
+                                                      classroom__building__in=buildings)
+
+    courses_data = [[course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrollment]
+                    for course in current_courses]
+
+    classrooms_dict = {}
+    for course_data in courses_data:
+        classroom = course_data.pop(1)
+        if classroom not in classrooms_dict.keys():
+            classrooms_dict[classroom] = course_data
+        else:
+            classrooms_dict[classroom] += course_data
+
+    return classrooms_dict
