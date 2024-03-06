@@ -51,10 +51,6 @@ export default function Heatmap({ day, buildingList, timeBlockList, numClassroom
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span>Time: {contentParts[0]?.substring(0,5)} - {contentParts[1]?.substring(0,5)}</span>
                             <span>Classrooms in Use: {contentParts[2]}</span>
-                            <span>Buildings: {Object.entries(buildingList)
-                                .filter(([key, value]) => key && value) // Filter out empty keys and false values
-                                .map(([key]) => key) // Extract building codes
-                                .join(', ')}</span>
                             <Link className="link" to={`/used_classrooms`}
                                   state={{
                                       day: contentParts[3],

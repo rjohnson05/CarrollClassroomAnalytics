@@ -129,8 +129,8 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
     for course_data in courses_data:
         classroom = course_data.pop(1)
         if classroom not in classrooms_dict.keys():
-            classrooms_dict[classroom] = course_data
+            classrooms_dict[classroom] = [course_data]
         else:
-            classrooms_dict[classroom] += course_data
+            classrooms_dict[classroom] += [course_data]
 
     return classrooms_dict

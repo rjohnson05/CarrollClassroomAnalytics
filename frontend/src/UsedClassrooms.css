@@ -1,0 +1,84 @@
+.classrooms-header {
+    color: #3c1952;
+    font-family: Helvetica, sans-serif;
+    text-align: center;
+    margin-top: 2em;
+}
+
+.allClasses {
+    display: flex;
+    width: 95%;
+    margin: 0 auto;
+}
+
+.classroomsCol {
+    display: flex;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    flex-direction: column;
+}
+
+.class-group {
+    break-inside: avoid;
+}
+
+.classroom {
+    position: relative;
+    background-color: #3c1952;
+    color: white;
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
+    height: 50px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    cursor: pointer;
+    transition: border-radius 0.3s;
+}
+
+.classroom-square {
+    border-radius: 0;
+}
+
+.dropdown-icon {
+    position: relative;
+    margin-top: 1.5%;
+}
+
+.classroom-title {
+    font-size: 25px;
+    font-weight: bold;
+    margin: 0.8%;
+}
+
+.courses {
+    width: 90%;
+    margin: 0 auto;
+        height: 0;
+    transition: height 0.3s ease;
+}
+
+.courses-visible {
+    height: 140px;
+}
+
+.course {
+    border: 1px solid black;
+    background-color: white;
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+.course-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.course-instructor, .course-seats {
+    font-size: 18px;
+    margin: 1% 10%;
+}
