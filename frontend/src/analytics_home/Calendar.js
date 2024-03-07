@@ -64,6 +64,9 @@ export default function Home() {
 
             // Loads the names of all buildings in the database for use in the filter
             const buildingNamesData = await axios.get("http://localhost:8000/api/get_building_names");
+            // If an empty selection is not in the BUILDINGS dict, create one for selecting/deselecting all building boxes at once
+            buildingNamesData.data[""] = "SELECT ALL"
+
             setBuildingNames(buildingNamesData.data);
         } catch (error) {
             console.error(error);
@@ -109,10 +112,27 @@ export default function Home() {
      * @param building  list of dictionary objects holding the abbreviation for the checked buildings
      */
     const filterBuilding = (building) => {
-        setBuildingFilter(prevState => ({
+        // Handle the SELECT ALL filter option by setting all buildings to true if none are currently selected and false
+        // if at least one other building is selected
+        if (building.abbrev === "") {
+            const tempBuildingFilter = {};
+            if (Object.values(buildingFilter).includes(true)) {
+                for (let key of Object.keys(buildingFilter)) {
+                    tempBuildingFilter[key] = false;
+                }
+            } else {
+                for (let key of Object.keys(buildingFilter)) {
+                    tempBuildingFilter[key] = true;
+                }
+            }
+            setBuildingFilter(tempBuildingFilter)
+        } else {
+            // Handle if a building checkbox is selected/deselected
+            setBuildingFilter(prevState => ({
             ...prevState,
             [building['abbrev']]: !prevState[building['abbrev']]
         }));
+        }
     }
 
 
@@ -130,6 +150,7 @@ export default function Home() {
 
                 {filterOpen &&
                     <form className="filter-dropdown">
+                        {console.log("Rerendering")}
                         {Object.keys(buildingNames).map(abbrev => (
                             <div key={abbrev}>
                                 <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
