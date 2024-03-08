@@ -30,7 +30,7 @@ export default function Home() {
     const columns = [
     {field: 'name', header: 'Name'},
     {field: 'room_num', header: 'Room Number'},
-    {field: 'buildings', header: 'Building'}
+    {field: 'building', header: 'Building'}
     ];
 
 
@@ -284,30 +284,6 @@ export default function Home() {
                                 ))}
                             </DataTable>
                         </div>
-
-                        {/*<div>*/}
-                        {/*<DataTable value={classrooms} tableStyle={{ minWidth: '50rem' }}>*/}
-                        {/*    <Column field={classrooms.name} header="Name"></Column>*/}
-                        {/*    <Column field={classrooms.building} header="Building"></Column>*/}
-                        {/*    <Column field={classrooms.room_num} header="Room Number"></Column>*/}
-                        {/*</DataTable>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="">*/}
-                        {/*    <h1>Classrooms</h1>*/}
-                        {/*    <ul>*/}
-                        {/*        {Array.isArray(classrooms) ? (*/}
-                        {/*            classrooms.map(classroom => (*/}
-                        {/*                <li key={classroom.id}>*/}
-                        {/*                    {classroom.name} - {classroom.building} - {classroom.room_num}*/}
-                        {/*                </li>*/}
-                        {/*            ))*/}
-                        {/*        ) : (*/}
-                        {/*            <p>No classrooms found</p>*/}
-                        {/*        )}*/}
-                        {/*    </ul>*/}
-                        {/*</div>*/}
-
                     </div>
                 </div>
             </div>
