@@ -1,11 +1,49 @@
+from django.shortcuts import render
+from django.core import serializers
+from django.core.serializers import serialize
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-
+from api.models import Classroom, Instructor, Course
 from api import services
-
+from django.core import serializers
 import logging
 logger = logging.getLogger("views")
 
+
+
+# json_serializer = serializers.get_serializer("json")()
+# companies = json_serializer.serialize(Classroom.objects.all(), ensure_ascii=False)
+
+def get_classroom_data(request):
+    data = list(Classroom.objects.values())
+    return JsonResponse(data, safe=False)
+
+# def get_classroom_data(request):
+#     classrooms = Classroom.objects.all()
+#     serialized_classrooms = serialize('json', classrooms)  # Serialize all fields by default
+#     return JsonResponse(serialized_classrooms, safe=False)
+
+# def get_classroom_data(request):
+#     classrooms = Classroom.objects.all().values()
+#     return JsonResponse(list(classrooms), safe=False)
+
+# def get_classroom_data(request):
+#     classrooms = Classroom.objects.all()
+#     data = serializers.serialize("json", classrooms)
+#     return JsonResponse(data, safe=False)
+
+# def get_model_data(request):
+#     if request.method == 'POST':
+#         task = request.POST.get('task')
+#         new_classroom = Classroom(user=request.user, task=task)
+#         new_classroom.save()
+#
+#     all_classrooms = Classroom.objects.filter(user=request.user)
+#     context = {
+#         'classroom': all_classrooms
+#     }
+#     return render(request, 'frontend/src/analytics_home/Calendar.js', context)
 
 @api_view(["GET"])
 def get_number_classes(request):
@@ -28,6 +66,9 @@ def get_number_classes(request):
         number_classes = services.calculate_number_classes(buildings)
         logger.debug(f"get_building_classes: Calculated class numbers for {buildings} - {number_classes}")
     return Response(number_classes)
+
+
+
 
 
 @api_view(["GET"])

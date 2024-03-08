@@ -1,20 +1,25 @@
 import React, {useEffect, useState} from "react";
 import 'primeicons/primeicons.css'
 import axios from "axios";
-
 import './Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
 import Legend from "./Legend"
 import * as d3 from "d3";
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+// import { Classroom } from 'api/models.py';
 
 /**
  * Displays the main page, showing the number of used classrooms during each time block throughout the week. Allows the
  * user to filter different buildings to view the number of used classrooms in any combination of buildings.
  *
- * @author Ryan Johnson, Adrian Rincon-Jimanez
+ * @author Ryan Johnson, Adrian Rincon Jimenez
  */
 export default function Home() {
+        // const [products, setProducts] = useState([]);
+    const [classrooms, setClassrooms] = useState([]);
+    // const [classrooms, setClassrooms] = useState(null);
     const [firstRender, setFirstRender] = useState(true);
     const [timeBlocks, setTimeBlocks] = useState(false);
     const [numberClasses, setNumberClasses] = useState(false);
@@ -22,6 +27,55 @@ export default function Home() {
     const [filterOpen, setFilterOpen] = useState(false);
     const [buildingFilter, setBuildingFilter] = useState({});
     const [buildingNames, setBuildingNames] = useState({});
+    const columns = [
+    {field: 'name', header: 'Name'},
+    {field: 'room_num', header: 'Room Number'},
+    {field: 'buildings', header: 'Building'}
+    ];
+
+    //  useEffect(() => {
+    //     Classroom.getProductsMini().then(data => setProducts(data));
+    // }, []);
+
+  //   axios.get('/api/get_model_data/')  // Make a GET request to your API endpoint
+  // .then(response => {
+  //   const modelData = response.data;  // Extract the data from the response
+  //   // Process and display your model data as needed
+  //   modelData.forEach(item => {
+  //     console.log(item);  // Example: Log each item to the console
+  //   });
+  // })
+  // .catch(error => {
+  //   console.error('Error fetching model data:', error);
+  // });
+
+
+  //   axios.get('/api/get_classroom_data/')
+  // .then(response => {
+  //   const modelData = response.data;
+  //
+  //   // Example: Group objects by a specific attribute (e.g., 'category')
+  //   const groupedData = {};
+  //   modelData.forEach(item => {
+  //     const name = item.name;  // Assuming 'category' is an attribute of your model
+  //     if (!groupedData[name]) {
+  //       groupedData[name] = [];  // Create a new array if category doesn't exist
+  //     }
+  //     groupedData[name].push(item);  // Push the item to the corresponding category array
+  //   });
+  //
+  //   // Now 'groupedData' contains objects organized by category
+  //   console.log(groupedData);
+  // })
+  // .catch(error => {
+  //   console.error('Error fetching model data:', error);
+  // });
+
+
+// classrooms.forEach(classroom => {
+//     console.log(classroom.fields.building);
+//     console.log(classroom.fields.room_num);
+// });
 
     useEffect( () => {
         /**
@@ -38,9 +92,23 @@ export default function Home() {
         fetchData();
     }, [buildingFilter]);
 
-    useEffect(() => {
-        calculateMaxNumClasses()
-    }, [numberClasses]);
+
+
+  useEffect(() => {
+    // Define a function to fetch data from your Django backend
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/get_classroom_data/'); // Change the URL to match your Django endpoint
+        setClassrooms(response.data); // Set the fetched data to the state
+          console.log(response.data)
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    // Call the fetchData function when the component mounts
+    fetchData();
+  }, []);
 
     /**
      * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
@@ -194,14 +262,15 @@ export default function Home() {
                     </div>
 
                     <div className="days-container">
-                    <div className="day">
+                        <div className="day">
                             <h3 className="day-header">MONDAY</h3>
                             {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                  Loading text is displayed */}
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['M']}
-                                             day='M' buildingList={buildingFilter} numClassroomsList={numberClasses['M']}
+                                             day='M' buildingList={buildingFilter}
+                                             numClassroomsList={numberClasses['M']}
                                              maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
@@ -211,7 +280,8 @@ export default function Home() {
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['T']}
-                                             day='T' buildingList={buildingFilter} numClassroomsList={numberClasses['T']}
+                                             day='T' buildingList={buildingFilter}
+                                             numClassroomsList={numberClasses['T']}
                                              maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
@@ -221,7 +291,8 @@ export default function Home() {
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['W']}
-                                             day='W' buildingList={buildingFilter} numClassroomsList={numberClasses['W']}
+                                             day='W' buildingList={buildingFilter}
+                                             numClassroomsList={numberClasses['W']}
                                              maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
@@ -231,7 +302,8 @@ export default function Home() {
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['th']}
-                                             day='th' buildingList={buildingFilter} numClassroomsList={numberClasses['th']}
+                                             day='th' buildingList={buildingFilter}
+                                             numClassroomsList={numberClasses['th']}
                                              maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
@@ -240,15 +312,49 @@ export default function Home() {
                             <h3 className="day-header">FRIDAY</h3>
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
-                                    <HeatMap timeBlockList={timeBlocks['F']}
-                                             day='F' buildingList={buildingFilter} numClassroomsList={numberClasses['F']}
-                                             maxNumberClasses={maxNumClasses}/>
+                                    < HeatMap timeBlockList={timeBlocks['F']}
+                                              day='F' buildingList={buildingFilter}
+                                              numClassroomsList={numberClasses['F']}
+                                              maxNumberClasses={maxNumClasses}/>
                                 </div>
                                 : <p>Loading...</p>}
                         </div>
+
+                        <div className="card">
+                            <DataTable value={classrooms} tableStyle={{minWidth: '50rem'}}>
+                                {columns.map((col, i) => (
+                                    <Column key={col.field} field={col.field} header={col.header}/>
+                                ))}
+                            </DataTable>
+                        </div>
+
+                        {/*<div>*/}
+                        {/*<DataTable value={classrooms} tableStyle={{ minWidth: '50rem' }}>*/}
+                        {/*    <Column field={classrooms.name} header="Name"></Column>*/}
+                        {/*    <Column field={classrooms.building} header="Building"></Column>*/}
+                        {/*    <Column field={classrooms.room_num} header="Room Number"></Column>*/}
+                        {/*</DataTable>*/}
+                        {/*</div>*/}
+
+                        {/*<div className="">*/}
+                        {/*    <h1>Classrooms</h1>*/}
+                        {/*    <ul>*/}
+                        {/*        {Array.isArray(classrooms) ? (*/}
+                        {/*            classrooms.map(classroom => (*/}
+                        {/*                <li key={classroom.id}>*/}
+                        {/*                    {classroom.name} - {classroom.building} - {classroom.room_num}*/}
+                        {/*                </li>*/}
+                        {/*            ))*/}
+                        {/*        ) : (*/}
+                        {/*            <p>No classrooms found</p>*/}
+                        {/*        )}*/}
+                        {/*    </ul>*/}
+                        {/*</div>*/}
+
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+

@@ -23,6 +23,7 @@ class Classroom(models.Model):
         "STCH": "St. Charles Hall",
         "WBAR": "Waterbarn",
     }
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     building = models.CharField(max_length=255, choices=BUILDINGS)
