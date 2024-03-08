@@ -33,49 +33,6 @@ export default function Home() {
     {field: 'buildings', header: 'Building'}
     ];
 
-    //  useEffect(() => {
-    //     Classroom.getProductsMini().then(data => setProducts(data));
-    // }, []);
-
-  //   axios.get('/api/get_model_data/')  // Make a GET request to your API endpoint
-  // .then(response => {
-  //   const modelData = response.data;  // Extract the data from the response
-  //   // Process and display your model data as needed
-  //   modelData.forEach(item => {
-  //     console.log(item);  // Example: Log each item to the console
-  //   });
-  // })
-  // .catch(error => {
-  //   console.error('Error fetching model data:', error);
-  // });
-
-
-  //   axios.get('/api/get_classroom_data/')
-  // .then(response => {
-  //   const modelData = response.data;
-  //
-  //   // Example: Group objects by a specific attribute (e.g., 'category')
-  //   const groupedData = {};
-  //   modelData.forEach(item => {
-  //     const name = item.name;  // Assuming 'category' is an attribute of your model
-  //     if (!groupedData[name]) {
-  //       groupedData[name] = [];  // Create a new array if category doesn't exist
-  //     }
-  //     groupedData[name].push(item);  // Push the item to the corresponding category array
-  //   });
-  //
-  //   // Now 'groupedData' contains objects organized by category
-  //   console.log(groupedData);
-  // })
-  // .catch(error => {
-  //   console.error('Error fetching model data:', error);
-  // });
-
-
-// classrooms.forEach(classroom => {
-//     console.log(classroom.fields.building);
-//     console.log(classroom.fields.room_num);
-// });
 
     useEffect( () => {
         /**
