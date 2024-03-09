@@ -277,13 +277,39 @@ export default function Home() {
                                 : <p>Loading...</p>}
                         </div>
 
+
                         <div className="card">
-                            <DataTable value={classrooms} tableStyle={{minWidth: '50rem'}}>
-                                {columns.map((col, i) => (
-                                    <Column key={col.field} field={col.field} header={col.header}/>
-                                ))}
-                            </DataTable>
+                            <div className="table-container">
+                                <table className="table" style={{minWidth: '50rem'}}>
+                                    <thead>
+                                    <tr>
+                                        {columns.map((col, i) => (
+                                            <th key={i}>{col.header}</th>
+                                        ))}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {classrooms.map((classroom, i) => (
+                                        <tr key={i}>
+                                            {columns.map((col, j) => (
+                                                <td key={j}>{classroom[col.field]}</td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+
+                        {/*<div>*/}
+                        {/*<div className="card">*/}
+                        {/*    <DataTable value={classrooms} tableStyle={{minWidth: '50rem'}}>*/}
+                        {/*        {columns.map((col, i) => (*/}
+                        {/*            <Column key={col.field} field={col.field} header={col.header}/>*/}
+                        {/*        ))}*/}
+                        {/*    </DataTable>*/}
+                        {/*</div>*/}
+                        {/*</div>*/}
                     </div>
                 </div>
             </div>
