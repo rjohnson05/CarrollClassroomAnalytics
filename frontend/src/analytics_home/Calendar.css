@@ -134,6 +134,7 @@ body {
 
 .table-container {
     overflow-x: auto;
+    margin-top: 20px;
 }
 
 .table {

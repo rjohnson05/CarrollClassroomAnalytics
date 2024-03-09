@@ -17,7 +17,7 @@ import { Column } from 'primereact/column';
  * @author Ryan Johnson, Adrian Rincon Jimenez
  */
 export default function Home() {
-        // const [products, setProducts] = useState([]);
+    // const [products, setProducts] = useState([]);
     const [classrooms, setClassrooms] = useState([]);
     // const [classrooms, setClassrooms] = useState(null);
     const [firstRender, setFirstRender] = useState(true);
@@ -28,13 +28,13 @@ export default function Home() {
     const [buildingFilter, setBuildingFilter] = useState({});
     const [buildingNames, setBuildingNames] = useState({});
     const columns = [
-    {field: 'name', header: 'Name'},
-    {field: 'room_num', header: 'Room Number'},
-    {field: 'building', header: 'Building'}
+        {field: 'name', header: 'Name'},
+        {field: 'room_num', header: 'Room Number'},
+        {field: 'building', header: 'Building'}
     ];
 
 
-    useEffect( () => {
+    useEffect(() => {
         /**
          * Fetches the data detailing the number of classes per time block from the database upon startup, reloading
          * whenever the building filter is changed. Also loads the names of the buildings from the database for use
@@ -46,26 +46,26 @@ export default function Home() {
                 await loadFilter();
             }
         }
+
         fetchData();
     }, [buildingFilter]);
 
 
+    useEffect(() => {
+        // Define a function to fetch data from your Django backend
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('/api/get_classroom_data/'); // Change the URL to match your Django endpoint
+                setClassrooms(response.data); // Set the fetched data to the state
+                console.log(response.data)
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
 
-  useEffect(() => {
-    // Define a function to fetch data from your Django backend
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/api/get_classroom_data/'); // Change the URL to match your Django endpoint
-        setClassrooms(response.data); // Set the fetched data to the state
-          console.log(response.data)
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    // Call the fetchData function when the component mounts
-    fetchData();
-  }, []);
+        // Call the fetchData function when the component mounts
+        fetchData();
+    }, []);
 
     /**
      * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
@@ -117,10 +117,10 @@ export default function Home() {
      */
     const loadFilter = async () => {
         const buildingNamesData = await axios.get("http://localhost:8000/api/get_building_names");
-            const filter = {}
-            Object.keys(buildingNamesData.data).forEach(item => {
-                filter[item] = false; // Initialize all filters to false
-            });
+        const filter = {}
+        Object.keys(buildingNamesData.data).forEach(item => {
+            filter[item] = false; // Initialize all filters to false
+        });
         setBuildingFilter(filter)
         setFirstRender(false)
     }
@@ -222,7 +222,7 @@ export default function Home() {
                         <div className="day">
                             <h3 className="day-header">MONDAY</h3>
                             {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
-                 Loading text is displayed */}
+             Loading text is displayed */}
                             {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
                                 <div className="heatmap">
                                     <HeatMap timeBlockList={timeBlocks['M']}
@@ -276,41 +276,30 @@ export default function Home() {
                                 </div>
                                 : <p>Loading...</p>}
                         </div>
-
-
-                        <div className="card">
-                            <div className="table-container">
-                                <table className="table" style={{minWidth: '50rem'}}>
-                                    <thead>
-                                    <tr>
-                                        {columns.map((col, i) => (
-                                            <th key={i}>{col.header}</th>
-                                        ))}
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {classrooms.map((classroom, i) => (
-                                        <tr key={i}>
-                                            {columns.map((col, j) => (
-                                                <td key={j}>{classroom[col.field]}</td>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/*<div>*/}
-                        {/*<div className="card">*/}
-                        {/*    <DataTable value={classrooms} tableStyle={{minWidth: '50rem'}}>*/}
-                        {/*        {columns.map((col, i) => (*/}
-                        {/*            <Column key={col.field} field={col.field} header={col.header}/>*/}
-                        {/*        ))}*/}
-                        {/*    </DataTable>*/}
-                        {/*</div>*/}
-                        {/*</div>*/}
                     </div>
+                </div>
+            </div>
+
+            <div className="card">
+                <div className="table-container">
+                    <table className="table" style={{minWidth: '50rem'}}>
+                        <thead>
+                        <tr>
+                            {columns.map((col, i) => (
+                                <th key={i}>{col.header}</th>
+                            ))}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {classrooms.map((classroom, i) => (
+                            <tr key={i}>
+                                {columns.map((col, j) => (
+                                    <td key={j}>{classroom[col.field]}</td>
+                                ))}
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
