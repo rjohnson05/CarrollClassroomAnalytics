@@ -28,13 +28,10 @@
     background-color: #3c1952;
     color: white;
     display: flex;
-    justify-content: center;
     border-radius: 20px;
     height: 50px;
     width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 2%;
+    margin: 2% auto 0 auto;
     cursor: pointer;
     transition: border-radius 0.3s;
 }
@@ -43,21 +40,41 @@
     border-radius: 0;
 }
 
+.dropdown-title {
+    margin-left: auto;
+    margin-right: auto;
+    white-space: nowrap;
+    display: flex;
+}
+
 .dropdown-icon {
     position: relative;
-    margin-top: 1.5%;
+    margin: auto 0;
 }
 
 .classroom-title {
+    position: relative;
+    margin: auto 0;
     font-size: 25px;
     font-weight: bold;
-    margin: 0.8%;
+}
+
+.info-icon {
+    position: absolute;
+    top: 25%;
+    margin-left: 95%;
+    transform: scale(1.5);
+    color: white;
+}
+
+.info-icon:hover {
+    color: #cfb988;
 }
 
 .courses {
     width: 90%;
     margin: 0 auto;
-        height: 0;
+    height: 0;
     transition: height 0.3s ease;
 }
 

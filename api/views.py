@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from api import services
 
 import logging
+
 logger = logging.getLogger("views")
 
 
@@ -36,11 +37,12 @@ def get_building_names(request):
     Returns a dictionary of all buildings holding classes that are currently in the database. The keys in this
     dictionary are the four-letter abbreviations for the building, while the values are the full names for the buildings.
 
-    :param request: HTTP request object
-    :return: HTTP response object containing a dictionary of all the buildings currently holding classes
+    @param request: HTTP request object
+    @return: HTTP response object containing a dictionary of all the buildings currently holding classes
     """
     buildings_list = services.get_all_buildings()
     return Response(buildings_list)
+
 
 @api_view(["GET"])
 def get_used_classrooms(request):
@@ -59,3 +61,12 @@ def get_used_classrooms(request):
         logger.debug(f"get_used_classrooms: Found used classrooms for {buildings_list} - {used_classrooms}")
 
     return Response(used_classrooms)
+
+
+@api_view(["GET"])
+def get_classroom_data(request):
+    classroom_name = request.GET.get("classroom")
+    logger.info(f"views.get_classroom_data: Classroom Name: {classroom_name}")
+    courses = services.get_classroom_courses(classroom_name)
+    logger.debug(f"get_classroom_data: Found courses held in {classroom_name}: {courses}")
+    return Response(courses)

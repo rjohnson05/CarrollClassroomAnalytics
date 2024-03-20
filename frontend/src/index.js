@@ -5,15 +5,18 @@ import './index.css';
 import Calendar from './analytics_home/Calendar';
 import UsedClassrooms from "./UsedClassrooms";
 import reportWebVitals from './reportWebVitals';
+import ClassroomInfo from "./individual_classroom/ClassroomInfo";
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <Calendar />
-    },
-    {
+    }, {
         path: "/used_classrooms/",
-        element: <UsedClassrooms />
+        element: <UsedClassrooms/>
+    }, {
+        path: "/classrooms/:id",
+        element: <ClassroomInfo />
     }
 ])
 const root = ReactDOM.createRoot(document.getElementById('root'));

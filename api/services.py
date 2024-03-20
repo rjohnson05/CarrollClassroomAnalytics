@@ -122,8 +122,9 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
                                                       end_time__gte=end_time,
                                                       classroom__building__in=buildings)
 
-    courses_data = [[course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrollment]
-                    for course in current_courses]
+    courses_data = [
+        [course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrollment]
+        for course in current_courses]
 
     classrooms_dict = {}
     for course_data in courses_data:
@@ -134,3 +135,72 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
             classrooms_dict[classroom] += [course_data]
 
     return classrooms_dict
+
+
+def calculate_classroom_time_blocks(classroom: str) -> []:
+    """
+    Finds all possible time blocks used in the specified classroom and then returns this information in a dictionary.
+    This dictionary uses the abbreviation for every weekday ('M', 'T', etc.) as the keys and an array of arrays as
+    the values. Each of these value arrays contains many sub-arrays containing the start and end times for the block.
+    If no time blocks are found for the specified classroom, an empty dictionary is returned.
+
+    :param  classroom        String representing the name of the classroom to be queried
+    :return  Dictionary containing every possible time block in which there could be a different course
+    """
+    logger.info(f"services.calculate_classroom_time_blocks: Classroom Name: {classroom}")
+    days_list = ['M', 'T', 'W', 'th', 'F']
+    classroom_time_blocks = {}
+    for day in days_list:
+        # Finds all start/end times in the specified building on the current day
+        start_times = [time[0].strftime("%H:%M:%S") for time in
+                       Course.objects.filter(classroom__name=classroom, day__contains=day).values_list(
+                           'start_time').distinct()]
+        end_times = [time[0].strftime("%H:%M:%S") for time in
+                     Course.objects.values_list('end_time').filter(classroom__name=classroom,
+                                                                   day__contains=day).distinct()]
+        all_times = start_times + end_times + ['06:00:00', '23:59:00']
+        start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
+        logger.debug(f"calculate_classroom_time_blocks: Possible Start/End Times: {start_end_times}")
+        time_blocks = []  # Stores the time block tuples for a given day
+
+        if len(start_end_times) > 0:
+            # Group the time blocks together
+            for i in range(0, len(start_end_times) - 1):
+                time_block = [start_end_times[i], start_end_times[i + 1]]
+                time_blocks.append(time_block)
+            classroom_time_blocks[day] = time_blocks
+            logger.debug(f"List of Time Blocks for {classroom}: {classroom_time_blocks}")
+    return classroom_time_blocks
+
+
+def get_classroom_courses(classroom: str) -> {}:
+    """
+    Finds all courses taking place in the specified classroom. These courses are stored in a dictionary, with all possible
+    time periods used as the keys and the name of the course being held during the time block being the value. If there
+    are no courses being held in the classroom during a time block, the value for the time block is an empty string.
+
+    :param classroom: String representing the name of the classroom to be queried :returns: Array holding two
+    dictionaries, the first storing time blocks and the second the courses running during those time blocks
+    """
+    time_blocks = calculate_classroom_time_blocks(classroom)
+    if not time_blocks:
+        logger.debug(f"get_classroom_courses: No time blocks found for {classroom}")
+        return [{}, {}]
+    classroom_courses = {}  # Dictionary to hold all the courses data
+    for day, day_block_list in time_blocks.items():
+        day_courses = {}  # Dictionary to hold the classroom's courses during a single day
+        for block in day_block_list:
+            block_start_time = block[0]
+            block_end_time = block[1]
+            running_course = Course.objects.all().filter(day__contains=day,
+                                                         start_time__lte=block_start_time,
+                                                         end_time__gte=block_end_time,
+                                                         classroom__name=classroom)
+            courses_data = [[course.name, course.instructor, course.enrollment] for course in running_course]
+            if len(running_course) == 0:
+                courses_data = ["", "", 0]
+            day_courses[block_start_time] = courses_data
+        logger.debug(f"get_classroom_courses: Courses for {classroom} on {day}: {day_courses}")
+        classroom_courses[day] = day_courses
+    logger.debug(f"get_classroom_courses: Courses found in {classroom}: {classroom_courses}")
+    return [time_blocks, classroom_courses]

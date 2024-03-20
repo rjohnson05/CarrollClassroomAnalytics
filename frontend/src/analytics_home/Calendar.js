@@ -150,7 +150,6 @@ export default function Home() {
 
                 {filterOpen &&
                     <form className="filter-dropdown">
-                        {console.log("Rerendering")}
                         {Object.keys(buildingNames).map(abbrev => (
                             <div key={abbrev}>
                                 <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
