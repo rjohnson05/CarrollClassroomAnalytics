@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import 'primeicons/primeicons.css'
 import axios from "axios";
 import './Calendar.css';
@@ -10,16 +10,8 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 // import { Classroom } from 'api/models.py';
 
-/**
- * Displays the main page, showing the number of used classrooms during each time block throughout the week. Allows the
- * user to filter different buildings to view the number of used classrooms in any combination of buildings.
- *
- * @author Ryan Johnson, Adrian Rincon Jimenez
- */
 export default function Home() {
-    // const [products, setProducts] = useState([]);
     const [classrooms, setClassrooms] = useState([]);
-    // const [classrooms, setClassrooms] = useState(null);
     const [firstRender, setFirstRender] = useState(true);
     const [timeBlocks, setTimeBlocks] = useState(false);
     const [numberClasses, setNumberClasses] = useState(false);
@@ -27,10 +19,13 @@ export default function Home() {
     const [filterOpen, setFilterOpen] = useState(false);
     const [buildingFilter, setBuildingFilter] = useState({});
     const [buildingNames, setBuildingNames] = useState({});
+    const [showTable, setShowTable] = useState(false); // State variable to toggle display
+
     const columns = [
-        {field: 'name', header: 'Name'},
-        {field: 'room_num', header: 'Room Number'},
-        {field: 'building', header: 'Building'}
+        { field: 'name', header: 'Name' },
+        { field: 'room_num', header: 'Room Number' },
+        { field: 'building', header: 'Building' },
+        { field: 'numberOfClasses', header: 'Number of Classes' }
     ];
 
 
@@ -51,21 +46,62 @@ export default function Home() {
     }, [buildingFilter]);
 
 
-    useEffect(() => {
-        // Define a function to fetch data from your Django backend
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('/api/get_classroom_data/'); // Change the URL to match your Django endpoint
-                setClassrooms(response.data); // Set the fetched data to the state
-                console.log(response.data)
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+    // useEffect(() => {
+    //     // Define a function to fetch data from your Django backend
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axios.get('/api/get_classroom_data/'); // Change the URL to match your Django endpoint
+    //             setClassrooms(response.data); // Set the fetched data to the state
+    //             console.log(response.data)
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //         }
+    //     };
+    //
+    //     // Call the fetchData function when the component mounts
+    //     fetchData();
+    // }, []);
 
-        // Call the fetchData function when the component mounts
-        fetchData();
-    }, []);
+    useEffect(() => {
+    const fetchData = async () => {
+        try {
+            // Fetch classroom data
+            const response = await axios.get('/api/get_classroom_data/');
+            const classroomsData = response.data;
+
+            // Fetch number of classes data
+            const classesData = await axios.get("http://localhost:8000/api/get_number_classes", {
+                params: { buildings: Object.keys(buildingFilter) }
+            });
+            const numberClassesData = classesData.data[1];
+
+            // Map number of classes to the classrooms data
+            const updatedClassrooms = classroomsData.map(classroom => {
+                const identifier = classroom.room_num;
+                const numberOfClasses = numberClassesData[identifier] || 0;
+                return { ...classroom, numberOfClasses };
+            });
+
+            // Set the updated classrooms data to the state
+            setClassrooms(updatedClassrooms);
+
+            // Calculate maxNumClasses
+            let maxNumberClasses = 0;
+            Object.values(numberClassesData).forEach(numClasses => {
+                if (numClasses > maxNumberClasses) {
+                    maxNumberClasses = numClasses;
+                }
+            });
+            setMaxNumClasses(maxNumberClasses);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+
+    };
+
+    fetchData();
+}, []);
+
 
     /**
      * Loads the data from the backend. This loads two dictionaries. The first contains the time block divisions, and the
@@ -141,37 +177,69 @@ export default function Home() {
     }
 
 
-    return (
-        <div className="body">
-            <NavBar/>
-            <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
+    const toggleTableDisplay = () => {
+    setShowTable(!showTable); // Toggle the state variable
+    };
 
-            <div className="filter-container">
-                <button className="filter-button" onClick={() => {
-                    setFilterOpen(!filterOpen)
-                }}>
-                    <span className="pi pi-filter-fill filter-icon"></span>FILTER
-                </button>
+return (
+    <div className="body">
+        <NavBar/>
+        <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
 
-                {filterOpen &&
-                    <form className="filter-dropdown">
-                        {Object.keys(buildingNames).map(abbrev => (
-                            <div key={abbrev}>
-                                <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
-                                       onClick={() => filterBuilding({abbrev})}/>
-                                <label className="filter-options" htmlFor={abbrev}>{buildingNames[abbrev]}</label>
-                            </div>
-                        ))}
-                    </form>
-                }
+        <div className="filter-container">
+            <button className="filter-button" onClick={() => {
+                setFilterOpen(!filterOpen)
+            }}>
+                <span className="pi pi-filter-fill filter-icon"></span>FILTER
+            </button>
+
+            {filterOpen &&
+                <form className="filter-dropdown">
+                    {Object.keys(buildingNames).map(abbrev => (
+                        <div key={abbrev}>
+                            <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
+                                   onClick={() => filterBuilding({abbrev})}/>
+                            <label className="filter-options" htmlFor={abbrev}>{buildingNames[abbrev]}</label>
+                        </div>
+                    ))}
+                </form>
+            }
+        </div>
+
+        <button onClick={toggleTableDisplay}>Toggle Table</button>
+
+        {/* Display either the heatmap or the table based on the showTable state */}
+        {showTable ? (
+            <div className="card">
+                <div className="table-container">
+                    <table className="table" style={{ minWidth: '50rem' }}>
+                        <thead>
+                            <tr>
+                                {columns.map((col, i) => (
+                                    <th key={i}>{col.header}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {classrooms.map((classroom, i) => (
+                                <tr key={i}>
+                                    {columns.map((col, j) => (
+                                        <td key={j}>{classroom[col.field]}</td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
+        ) : (
             <div className="heatmap-container">
                 <div className="legend-container">
                     {Object.keys(numberClasses).length > 0 && maxNumClasses ?
                         <Legend className="legend" numClassroomsList={numberClasses} maxNumberClasses={maxNumClasses}/>
                         : 'Legend Loading...'}
                 </div>
+
 
                 <div className="week-grid">
                     <div className="time-grid">
@@ -279,30 +347,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-
-            <div className="card">
-                <div className="table-container">
-                    <table className="table" style={{minWidth: '50rem'}}>
-                        <thead>
-                        <tr>
-                            {columns.map((col, i) => (
-                                <th key={i}>{col.header}</th>
-                            ))}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {classrooms.map((classroom, i) => (
-                            <tr key={i}>
-                                {columns.map((col, j) => (
-                                    <td key={j}>{classroom[col.field]}</td>
-                                ))}
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    );
-}
-
+        )}
+    </div>
+)
+};
