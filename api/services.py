@@ -21,12 +21,13 @@ def calculate_time_blocks(buildings) -> []:
     building_time_blocks = {}
     for day in days_list:
         if buildings == 'all':
-            # Finds all start/end times on the current day and converts them from datetime objects to strings
+            # Finds all start/end times on the current day from ALL buildings and converts them from datetime objects to strings
             start_times = [time[0].strftime("%H:%M:%S") for time in
                            Course.objects.filter(day__contains=day).values_list(
-                               'start_time').distinct()]
+                               'start_time').distinct().exclude(classroom__building="Unknown")]
             end_times = [time[0].strftime("%H:%M:%S") for time in
-                         Course.objects.values_list('end_time').filter(day__contains=day).distinct()]
+                         Course.objects.values_list('end_time').filter(day__contains=day).distinct()
+                         .exclude(classroom__building="Unknown")]
         else:
             # Finds all start/end times in the specified building on the current day
             start_times = [time[0].strftime("%H:%M:%S") for time in
@@ -75,12 +76,13 @@ def calculate_number_classes(buildings='all'):
             block_end_time = block[1]
             if buildings == 'all':
                 # Counts the number of courses (campus-wide) running between the current block's start/end times
-                block_num_classes = Course.objects.all().filter(day__contains=day,
+                block_num_classes = (Course.objects.all().filter(day__contains=day,
                                                                 start_time__lte=block_start_time,
                                                                 end_time__gte=block_end_time)
+                                     .exclude(classroom__building="Unknown"))
             else:
                 # Counts the number of courses (within specified buildings) running between the current block's
-                # start/end times
+                # start/end times for a subset of buildings
                 block_num_classes = Course.objects.all().filter(day__contains=day,
                                                                 start_time__lte=block_start_time,
                                                                 end_time__gte=block_end_time,

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import 'primeicons/primeicons.css'
 import axios from "axios";
 
@@ -6,7 +6,6 @@ import './Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
 import Legend from "./Legend"
-import * as d3 from "d3";
 
 /**
  * Displays the main page, showing the number of used classrooms during each time block throughout the week. Allows the
@@ -22,6 +21,17 @@ export default function Home() {
     const [filterOpen, setFilterOpen] = useState(false);
     const [buildingFilter, setBuildingFilter] = useState({});
     const [buildingNames, setBuildingNames] = useState({});
+    const filterButtonRef = useRef(null);
+    const filterDropdownRef = useRef(false);
+
+    useEffect(() => {
+        // Adds a mouse listener to the whole page for closing the filter with a click outside the filter
+        document.addEventListener('mousedown', toggleFilter);
+
+        return () => {
+            document.removeEventListener('mousedown', toggleFilter);
+        };
+    }, [filterOpen]);
 
     useEffect( () => {
         /**
@@ -135,6 +145,22 @@ export default function Home() {
         }
     }
 
+    /**
+     * Opens and closes the buildings filter. Clicking the "Filter" button toggles the dropdown on and off. Clicking outside
+     * the dropdown closes the filter.
+     *
+     * @param e Event storing the mouse click
+     */
+    const toggleFilter = (e) => {
+        if (filterButtonRef.current.contains(e.target)) {
+            // Open the filter when the button is clicked
+            setFilterOpen(!filterOpen);
+        } else if (filterOpen && !filterDropdownRef.current.contains(e.target)) {
+            // Close the filter if an area outside the filter box or button is clicked
+            setFilterOpen(false);
+        }
+    }
+
 
     return (
         <div className="body">
@@ -142,14 +168,12 @@ export default function Home() {
             <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
 
             <div className="filter-container">
-                <button className="filter-button" onClick={() => {
-                    setFilterOpen(!filterOpen)
-                }}>
+                <button className="filter-button" ref={filterButtonRef}>
                     <span className="pi pi-filter-fill filter-icon"></span>FILTER
                 </button>
 
                 {filterOpen &&
-                    <form className="filter-dropdown">
+                    <form className="filter-dropdown" ref={filterOpen ? filterDropdownRef : false}>
                         {Object.keys(buildingNames).map(abbrev => (
                             <div key={abbrev}>
                                 <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
