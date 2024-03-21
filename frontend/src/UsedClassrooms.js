@@ -11,6 +11,13 @@ export default function UsedClassrooms() {
     const [classroomsData, setClassroomsData] = useState(null);
     const [classroomDropdownStatus, setClassroomDropdownStatus] = useState(null);
     const {day, buildingList, startTime, endTime} = useLocation().state;
+    const dayDict = {
+        "M": "MONDAY",
+        "T": "TUESDAY",
+        "W": "WEDNESDAY",
+        "th": "THURSDAY",
+        "F": "FRIDAY",
+    }
 
     useEffect(() => {
         async function fetchData() {
@@ -80,7 +87,7 @@ export default function UsedClassrooms() {
         const classrooms = classroomsData ? Object.entries(classroomsData) : [];
         const num_rows = classrooms.length / 2;
 
-        // Shows only one column if there is only one classroom to be displayed
+        // Shows only one larger column if there is only one classroom to be displayed
         if (Math.round(num_rows) === 1) {
             return (
                 classrooms.map(([classroom, data]) => (
@@ -149,7 +156,7 @@ export default function UsedClassrooms() {
     return (
         <div>
             <NavBar/>
-            <h1 className="classrooms-header">CLASSROOM USAGE REPORT <br/>({startTime} - {endTime})</h1>
+            <h1 className="classrooms-header">CLASSROOM USAGE REPORT <br/>({dayDict[day]}: {startTime} - {endTime})</h1>
 
             <div className="allClasses">
                 {renderCols().map((col, index) => (

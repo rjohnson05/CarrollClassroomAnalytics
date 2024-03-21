@@ -74,12 +74,12 @@
 .courses {
     width: 90%;
     margin: 0 auto;
-    height: 0;
-    transition: height 0.3s ease;
+    max-height: 0;
+    transition: max-height 0.3s ease;
 }
 
 .courses-visible {
-    height: 140px;
+    max-height: 280px;
 }
 
 .course {
