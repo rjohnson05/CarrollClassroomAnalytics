@@ -11,7 +11,7 @@ import Legend from "./Legend"
  * Displays the main page, showing the number of used classrooms during each time block throughout the week. Allows the
  * user to filter different buildings to view the number of used classrooms in any combination of buildings.
  *
- * @author Ryan Johnson, Adrian Rincon-Jimanez
+ * @author Ryan Johnson, Adrian Rincon Jimenez
  */
 export default function Home() {
     const [firstRender, setFirstRender] = useState(true);
