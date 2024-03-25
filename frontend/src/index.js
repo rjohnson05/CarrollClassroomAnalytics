@@ -6,6 +6,7 @@ import Calendar from './analytics_home/Calendar';
 import UsedClassrooms from "./UsedClassrooms";
 import reportWebVitals from './reportWebVitals';
 import ClassroomInfo from "./individual_classroom/ClassroomInfo";
+import FileUpload from "./FileUpload";
 
 const router = createBrowserRouter([
     {
@@ -13,10 +14,13 @@ const router = createBrowserRouter([
         element: <Calendar />
     }, {
         path: "/used_classrooms/",
-        element: <UsedClassrooms/>
+        element: <UsedClassrooms />
     }, {
         path: "/classrooms/:id",
         element: <ClassroomInfo />
+    }, {
+        path: "/upload",
+        element: <FileUpload />
     }
 ])
 const root = ReactDOM.createRoot(document.getElementById('root'));

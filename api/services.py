@@ -1,4 +1,4 @@
-from api.models import Course, Classroom
+from api.models import Course, Classroom, Instructor
 import logging
 
 logger = logging.getLogger("services")
@@ -77,8 +77,8 @@ def calculate_number_classes(buildings='all'):
             if buildings == 'all':
                 # Counts the number of courses (campus-wide) running between the current block's start/end times
                 block_num_classes = (Course.objects.all().filter(day__contains=day,
-                                                                start_time__lte=block_start_time,
-                                                                end_time__gte=block_end_time)
+                                                                 start_time__lte=block_start_time,
+                                                                 end_time__gte=block_end_time)
                                      .exclude(classroom__building="Unknown"))
             else:
                 # Counts the number of courses (within specified buildings) running between the current block's
@@ -206,3 +206,76 @@ def get_classroom_courses(classroom: str) -> {}:
         classroom_courses[day] = day_courses
     logger.debug(f"get_classroom_courses: Courses found in {classroom}: {classroom_courses}")
     return [time_blocks, classroom_courses]
+
+
+def calculate_day_string(row):
+    days = ""
+    if row['CSM_MONDAY'] == 'Y':
+        days += 'M'
+    if row['CSM_TUESDAY'] == 'Y':
+        days += 'T'
+    if row['CSM_WEDNESDAY'] == 'Y':
+        days += 'W'
+    if row['CSM_THURSDAY'] == 'Y':
+        days += 'th'
+    if row['CSM_FRIDAY'] == 'Y':
+        days += 'F'
+    Course.DAYS = days
+    return Course.DAYS
+
+
+def upload_classroom_data(df):
+    for index, row in df.iterrows():
+        instructor = Instructor.objects.get_or_create(
+            name=row['SEC_FACULTY_INFO'],
+        )
+
+        classroom = Classroom.objects.get_or_create(
+            name=row['CSM_BLDG'] + "-" + row['CSM_ROOM'],
+            building=row['CSM_BLDG'],
+            room_num=row['CSM_ROOM'],
+            type=row['SEC_SUBJECT'],
+        )
+
+        day_string = calculate_day_string(row)
+        course = Course.objects.create(
+            section_id=row['COURSE_SECTIONS_ID'],
+            course_num=row['SEC_COURSE_NO'],
+            section_num=row['SEC_NO'],
+            term=row['SEC_TERM'],
+            start_date=row['SEC_START_DATE'],
+            end_date=row['SEC_END_DATE'],
+            name=row['SEC_SHORT_TITLE'],
+            subject=row['SEC_SUBJECT'],
+            min_credits=row['SEC_MIN_CRED'],
+            status=row['SEC_STATUS'],
+            start_time=row['CSM_START_TIME'],
+            end_time=row['CSM_END_TIME'],
+            day=day_string,
+            classroom=classroom,
+            instruction_method=row['CSM_INSTR_METHOD'],
+            instructor=instructor,
+            enrolled=row['STUDENTS_AND_RESERVED_SEATS'],
+            capacity=row['SEC_CAPACITY'],
+        )
+
+
+def upload_schedule_data(df):
+    correct_bldg_names_dict = {
+        "SH": "SIMP",
+        "OC": "OCON",
+        "STCH": "STCH",
+        "CUBE": "CUBE",
+        "ENG": "CENG",
+        "ANZ": "PCCC",
+        "PE": "PECT",
+        "GUAD": "GUAD"
+    }
+
+    for index, row in df.iterrows():
+        classroom = Classroom.objects.create(
+            name=row['CSM_BLDG'] + "-" + row['CSM_ROOM'],
+            building=row['CSM_BLDG'],
+            room_num=row['CSM_ROOM'],
+            type=row['SEC_SUBJECT'],
+        )

@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from api import services
 
 import logging
+import pandas as pd
 
 logger = logging.getLogger("views")
 
@@ -70,3 +71,17 @@ def get_classroom_data(request):
     courses = services.get_classroom_courses(classroom_name)
     logger.debug(f"get_classroom_data: Found courses held in {classroom_name}: {courses}")
     return Response(courses)
+
+
+# @api_view(["POST"])
+# def upload_file(request):
+#     data_type = request.POST['dataType']
+#     file = request.FILES['file']
+#     df = pd.read_excel(file)
+#     logger.debug(f"Uploaded File: {df}")
+#     if data_type == "schedule":
+#         services.upload_schedule_data(df)
+#     else:
+#         services.upload_classroom_data(df)
+#
+#     return Response({"message": "File uploaded"})
