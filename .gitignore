@@ -10,3 +10,4 @@ __pycache__
 # React production files
 frontend/build/
 frontend/node_modules/
+api/migrations/0001_initial.py

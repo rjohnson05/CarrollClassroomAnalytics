@@ -1,7 +1,14 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from django.shortcuts import render
+from django.core import serializers
+from django.core.serializers import serialize
+from django.http import JsonResponse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from api.models import Classroom, Instructor, Course
+from api import services
 
 from api import services
 
@@ -85,6 +92,16 @@ def get_classroom_data(request):
     courses = services.get_classroom_courses(classroom_name)
     logger.debug(f"get_classroom_data: Found courses held in {classroom_name}: {courses}")
     return Response(courses)
+
+
+def get_classroom_table_data(request):
+    classroom_data = list(Classroom.objects.values())
+    return JsonResponse(classroom_data, safe=False)
+
+
+def get_course_table_data(request):
+    course_data = list(Course.objects.values())
+    return JsonResponse(course_data, safe=False)
 
 
 @api_view(["POST"])

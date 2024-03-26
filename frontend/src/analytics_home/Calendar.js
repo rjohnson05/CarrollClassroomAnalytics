@@ -6,14 +6,19 @@ import './Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
 import Legend from "./Legend"
+import * as d3 from "d3";
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 
 /**
  * Displays the main page, showing the number of used classrooms during each time block throughout the week. Allows the
  * user to filter different buildings to view the number of used classrooms in any combination of buildings.
  *
- * @author Ryan Johnson, Adrian Rincon-Jimanez
+ * @author Ryan Johnson, Adrian Rincon Jimenez
  */
 export default function Home() {
+    const [classrooms, setClassrooms] = useState([]);
+    const [courses, setCourses] = useState([]);
     const [firstRender, setFirstRender] = useState(true);
     const [timeBlocks, setTimeBlocks] = useState(false);
     const [numberClasses, setNumberClasses] = useState(false);
@@ -23,6 +28,20 @@ export default function Home() {
     const [buildingNames, setBuildingNames] = useState({});
     const filterButtonRef = useRef(null);
     const filterDropdownRef = useRef(false);
+    const [showTable, setShowTable] = useState(false); // State variable to toggle display
+
+
+    const columns = [
+        { field: 'name', header: 'Name' },
+        { field: 'room_num', header: 'Room Number' },
+    ];
+
+    const columns2 = [
+        { field: 'day', header: 'Day'},
+        { field: 'start_time', header: 'Start Time'},
+        { field: 'end_time', header: 'End Time'},
+        // { field: 'number_students', header: 'Number of Students'},
+    ];
 
     useEffect(() => {
         // Adds a mouse listener to the whole page for closing the filter with a click outside the filter
@@ -82,6 +101,44 @@ export default function Home() {
             console.error(error);
         }
     }
+
+    useEffect(() => {
+    const fetchData = async () => {
+        try {
+            // Fetch classroom data
+            const response = await axios.get('/api/get_classroom_table_data/');
+            const classroomsData = response.data;
+
+            // Fetch time data
+            const courseDataResponse = await axios.get("/api/get_course_table_data/");
+            const courseData = courseDataResponse.data;
+
+            console.log("course data was uploaded");
+
+            // Map number of classes to the classrooms data
+            const updatedClassrooms = classroomsData.map(classroom => {
+                return { ...classroom};
+            });
+
+            // Update Classrooms
+            const updatedCourses = courseData.map(course => {
+                return { ... course};
+            });
+
+            // Set the updated classrooms data to the state
+            setClassrooms(updatedClassrooms);
+
+            // Set the updated courses data to the state
+            setCourses(updatedCourses);
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+
+    };
+
+    fetchData();
+}, []);
 
     /**
      * Calculates the new maximum number of classrooms used within the current building filter, passed to the legend and
@@ -162,6 +219,11 @@ export default function Home() {
     }
 
 
+    const toggleTableDisplay = () => {
+    setShowTable(!showTable); // Toggle the state variable
+    };
+
+
     return (
         <div className="body">
             <NavBar/>
@@ -184,6 +246,52 @@ export default function Home() {
                     </form>
                 }
             </div>
+
+            <button onClick={toggleTableDisplay}>Toggle Table</button>
+
+        {/* Display either the heatmap or the table based on the showTable state */}
+        {showTable ? (
+            <div className="card">
+                <div className="table-container">
+                    <table className="table" style={{minWidth: '50rem'}}>
+                        <thead>
+                        <tr>
+                            {/* Render table headers for classroom data */}
+                            {columns.map((col, i) => (
+                                <th key={i}>{col.header}</th>
+                            ))}
+                            {/* Render table headers for course data */}
+                            {columns2.map((col, i) => (
+                                <th key={i + columns.length}>{col.header}</th>
+                            ))}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {/* Render rows for classroom and course data */}
+                        {classrooms.map((classroom, i) => (
+                            <tr key={i}>
+                                {/* Render cells for classroom data */}
+                                {columns.map((col, j) => (
+                                    <td key={j}>{classroom[col.field]}</td>
+                                ))}
+                                {/* Render cells for course data */}
+                                {courses[i] ? ( // Check if course data exists for this index
+                                    columns2.map((col2, k) => (
+                                        <td key={k + columns.length}>{courses[i][col2.field]}</td>
+                                    ))
+                                ) : ( // Render empty cells if no course data for this index
+                                    columns2.map((col2, k) => (
+                                        <td key={k + columns.length}></td>
+                                    ))
+                                )}
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        ) : (
 
             <div className="heatmap-container">
                 <div className="legend-container">
@@ -293,6 +401,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+            )}
         </div>
-    );
-}
+    )
+};

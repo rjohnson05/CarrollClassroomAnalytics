@@ -9,5 +9,7 @@ urlpatterns = [
     path('get_building_names/', views.get_building_names, name="get_building_names"),
     path('get_used_classrooms/', views.get_used_classrooms, name="get_used_classrooms"),
     path('get_classroom_data/', views.get_classroom_data, name="get_classroom_data"),
+    path('get_course_table_data/', views.get_course_table_data, name="get_course_table_data"),
+    path('get_classroom_table_data/', views.get_course_table_data, name="get_course_table_data"),
     path('upload_file/', views.upload_file, name="upload_file"),
 ]
