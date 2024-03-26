@@ -101,7 +101,7 @@ def calculate_number_classes(buildings='all'):
                     unique_classrooms.append(course.classroom.name)
 
             day_num_classes[block_start_time] = len(unique_classrooms)
-            logger.info(f"calculate_number_classes: Unique classes found for block {block_start_time} on {day}: {unique_classrooms}")
+            logger.debug(f"calculate_number_classes: Unique classes found for block {block_start_time} on {day}: {unique_classrooms}")
         logger.debug(f"calculate_number_classes: Number of classes for time blocks during {day}: {day_num_classes}")
         all_num_classes[day] = day_num_classes
     logger.debug(f"calculate_number_classes: Number of classes calculated for time blocks in {buildings}")
