@@ -1,5 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 
 from api import services
 
@@ -38,8 +40,8 @@ def get_building_names(request):
     Returns a dictionary of all buildings holding classes that are currently in the database. The keys in this
     dictionary are the four-letter abbreviations for the building, while the values are the full names for the buildings.
 
-    @param request: HTTP request object
-    @return: HTTP response object containing a dictionary of all the buildings currently holding classes
+    :param request: HTTP request object
+    :return: HTTP response object containing a dictionary of all the buildings currently holding classes
     """
     buildings_list = services.get_all_buildings()
     return Response(buildings_list)
@@ -47,6 +49,12 @@ def get_building_names(request):
 
 @api_view(["GET"])
 def get_used_classrooms(request):
+    """
+    Returns a dictionary of all classrooms and their corresponding data that are used within a specified time period
+
+    :param request: HTTP request object
+    :return: HTTP response object containing a dictionary of all the classrooms and their data that are used within a specified time
+    """
     day = request.GET.get("day")
     start_time = request.GET.get("startTime")
     end_time = request.GET.get("endTime")
@@ -56,7 +64,7 @@ def get_used_classrooms(request):
         used_classrooms = services.get_used_classrooms(day, start_time, end_time)
         logger.debug(f"get_used_classrooms: Found used classrooms across all-campus - {used_classrooms}")
     else:
-        buildings_list = buildings.split(",")
+        buildings_list = buildings.split(", ")
         # Get data for only specified buildings
         used_classrooms = services.get_used_classrooms(day, start_time, end_time, buildings_list)
         logger.debug(f"get_used_classrooms: Found used classrooms for {buildings_list} - {used_classrooms}")
@@ -66,22 +74,35 @@ def get_used_classrooms(request):
 
 @api_view(["GET"])
 def get_classroom_data(request):
+    """
+    Returns a list containing two dictionaries, the first storing time blocks and the second the courses running during
+    those time blocks
+
+    :param request: HTTP request object
+    :return: HTTP response object containing a list of time blocks and courses running during those time blocks
+    """
     classroom_name = request.GET.get("classroom")
-    logger.info(f"views.get_classroom_data: Classroom Name: {classroom_name}")
     courses = services.get_classroom_courses(classroom_name)
     logger.debug(f"get_classroom_data: Found courses held in {classroom_name}: {courses}")
     return Response(courses)
 
 
-# @api_view(["POST"])
-# def upload_file(request):
-#     data_type = request.POST['dataType']
-#     file = request.FILES['file']
-#     df = pd.read_excel(file)
-#     logger.debug(f"Uploaded File: {df}")
-#     if data_type == "schedule":
-#         services.upload_schedule_data(df)
-#     else:
-#         services.upload_classroom_data(df)
-#
-#     return Response({"message": "File uploaded"})
+@api_view(["POST"])
+@ensure_csrf_cookie
+def upload_file(request):
+    """
+    Uploads data from a file to the database.
+
+    :param request: HTTP request object
+
+    """
+    data_type = request.POST['dataType']
+    file = request.FILES['file']
+
+    logger.info(f"Uploaded File: {file}")
+    if data_type == "schedule":
+        services.upload_schedule_data(file)
+    else:
+        services.upload_classroom_data(file)
+
+    return Response({"message": "File uploaded"})

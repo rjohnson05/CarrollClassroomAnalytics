@@ -1,3 +1,4 @@
+import csrf from "csrf";
 import Calendar from './analytics_home/Calendar';
 import './App.css';
 
