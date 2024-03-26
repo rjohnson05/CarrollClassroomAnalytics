@@ -12,6 +12,7 @@ import { Column } from 'primereact/column';
 
 export default function Home() {
     const [classrooms, setClassrooms] = useState([]);
+    const [courses, setCourses] = useState([]);
     const [firstRender, setFirstRender] = useState(true);
     const [timeBlocks, setTimeBlocks] = useState(false);
     const [numberClasses, setNumberClasses] = useState(false);
@@ -24,8 +25,22 @@ export default function Home() {
     const columns = [
         { field: 'name', header: 'Name' },
         { field: 'room_num', header: 'Room Number' },
-        { field: 'building', header: 'Building' },
-        { field: 'numberOfClasses', header: 'Number of Classes' }
+        // { field: 'start_time', header: 'Start Time'},
+        // { field: 'building', header: 'Building' },
+        // { field: 'numberOfClasses', header: 'Number of Classes' }
+    ];
+
+    const columns2 = [
+        // { field: 'name', header: 'Name' },
+        // { field: 'room_num', header: 'Room Number' },
+        { field: 'day', header: 'Day'},
+        { field: 'start_time', header: 'Start Time'},
+        { field: 'end_time', header: 'End Time'},
+        { field: 'number_students', header: 'Number of Students'},
+
+
+        // { field: 'building', header: 'Building' },
+        // { field: 'numberOfClasses', header: 'Number of Classes' }
     ];
 
 
@@ -70,29 +85,44 @@ export default function Home() {
             const classroomsData = response.data;
 
             // Fetch number of classes data
-            const classesData = await axios.get("http://localhost:8000/api/get_number_classes", {
-                params: { buildings: Object.keys(buildingFilter) }
-            });
-            const numberClassesData = classesData.data[1];
+            // const classesData = await axios.get("http://localhost:8000/api/get_number_classes", {
+            //     params: { buildings: Object.keys(buildingFilter) }
+            // });
+            // const numberClassesData = classesData.data[1];
+
+            // Fetch time data
+            const courseDataResponse = await axios.get("/api/get_course_data/");
+            const courseData = courseDataResponse.data;
 
             // Map number of classes to the classrooms data
             const updatedClassrooms = classroomsData.map(classroom => {
-                const identifier = classroom.room_num;
-                const numberOfClasses = numberClassesData[identifier] || 0;
-                return { ...classroom, numberOfClasses };
+                // const identifier = classroom.room_num;
+                // const numberOfClasses = numberClassesData[identifier] || 0;
+                return { ...classroom};
             });
+
+            // Update Classrooms
+            const updatedCourses = courseData.map(course => {
+                // const course_identifier = courses.start_time;
+                // const time = courseData[course_identifier];
+                return { ... course};
+            });
+            //
 
             // Set the updated classrooms data to the state
             setClassrooms(updatedClassrooms);
 
+            // Set the updated courses data to the state
+            setCourses(updatedCourses);
+
             // Calculate maxNumClasses
-            let maxNumberClasses = 0;
-            Object.values(numberClassesData).forEach(numClasses => {
-                if (numClasses > maxNumberClasses) {
-                    maxNumberClasses = numClasses;
-                }
-            });
-            setMaxNumClasses(maxNumberClasses);
+            // let maxNumberClasses = 0;
+            // Object.values(numberClassesData).forEach(numClasses => {
+            //     if (numClasses > maxNumberClasses) {
+            //         maxNumberClasses = numClasses;
+            //     }
+            // });
+            // setMaxNumClasses(maxNumberClasses);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -212,27 +242,47 @@ return (
         {showTable ? (
             <div className="card">
                 <div className="table-container">
-                    <table className="table" style={{ minWidth: '50rem' }}>
+                    <table className="table" style={{minWidth: '50rem'}}>
                         <thead>
-                            <tr>
-                                {columns.map((col, i) => (
-                                    <th key={i}>{col.header}</th>
-                                ))}
-                            </tr>
+                        <tr>
+                            {/* Render table headers for classroom data */}
+                            {columns.map((col, i) => (
+                                <th key={i}>{col.header}</th>
+                            ))}
+                            {/* Render table headers for course data */}
+                            {columns2.map((col, i) => (
+                                <th key={i + columns.length}>{col.header}</th>
+                            ))}
+                        </tr>
                         </thead>
                         <tbody>
-                            {classrooms.map((classroom, i) => (
-                                <tr key={i}>
-                                    {columns.map((col, j) => (
-                                        <td key={j}>{classroom[col.field]}</td>
-                                    ))}
-                                </tr>
-                            ))}
+                        {/* Render rows for classroom and course data */}
+                        {classrooms.map((classroom, i) => (
+                            <tr key={i}>
+                                {/* Render cells for classroom data */}
+                                {columns.map((col, j) => (
+                                    <td key={j}>{classroom[col.field]}</td>
+                                ))}
+                                {/* Render cells for course data */}
+                                {courses[i] ? ( // Check if course data exists for this index
+                                    columns2.map((col2, k) => (
+                                        <td key={k + columns.length}>{courses[i][col2.field]}</td>
+                                    ))
+                                ) : ( // Render empty cells if no course data for this index
+                                    columns2.map((col2, k) => (
+                                        <td key={k + columns.length}></td>
+                                    ))
+                                )}
+                            </tr>
+                        ))}
                         </tbody>
                     </table>
+
                 </div>
             </div>
         ) : (
+
+
             <div className="heatmap-container">
                 <div className="legend-container">
                     {Object.keys(numberClasses).length > 0 && maxNumClasses ?

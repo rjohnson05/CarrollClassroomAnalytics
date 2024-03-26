@@ -11,8 +11,12 @@ import logging
 logger = logging.getLogger("views")
 
 def get_classroom_data(request):
-    data = list(Classroom.objects.values())
-    return JsonResponse(data, safe=False)
+    classroom_data = list(Classroom.objects.values())
+    return JsonResponse(classroom_data, safe=False)
+
+def get_course_data(request):
+    course_data = list(Course.objects.values())
+    return JsonResponse(course_data, safe=False)
 
 @api_view(["GET"])
 def get_number_classes(request):
