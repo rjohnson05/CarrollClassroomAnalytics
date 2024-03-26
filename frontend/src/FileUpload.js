@@ -2,6 +2,8 @@ import NavBar from "./analytics_home/NavBar";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import "./FileUpload.css";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 
 /**
@@ -13,6 +15,10 @@ import "./FileUpload.css";
 export default function FileUpload() {
     const [dataType, setDataType] = useState();
     const [file, setFile] = useState();
+    const [uploadOptionDropdownStatus, setUploadOptionDropdownStatus] = useState({
+        "schedule": false,
+        "classroom": false,
+    });
 
     useEffect(() => {
         console.log("File", file);
@@ -55,11 +61,74 @@ export default function FileUpload() {
         }).then(r => console.log(r.data));
     }
 
+    /**
+     * Toggles whether the given classroom is showing its course(s).
+     *
+     * @param classroomName  Name of the classroom being toggled
+     */
+    const dropdownToggle = (classroomName) => {
+        setUploadOptionDropdownStatus(prevState => {
+            const updatedStatus = {...prevState};
+            updatedStatus[classroomName] = !updatedStatus[classroomName];
+            return updatedStatus;
+        });
+    }
+
+    /**
+     * Determine whether a given classroom is currently showing its course(s).
+     *
+     * @param uploadOption  Name of the classroom in question
+     */
+    const isClicked = (uploadOption) => {
+        return uploadOptionDropdownStatus[uploadOption];
+    }
+
 
     return (
         <div>
             <NavBar />
             <h1 className="title-font">UPLOAD DATA</h1>
+
+            <div className={`upload-option ${uploadOptionDropdownStatus && isClicked("schedule") ? 'upload-option-square' : ''}`}
+                 onClick={() => dropdownToggle("schedule")}>
+                {/*Creates the main block that houses the dropdown*/}
+                <div className="upload-option-dropdown">
+                    {uploadOptionDropdownStatus && isClicked("schedule") ?
+                            <KeyboardArrowUpIcon className="dropdown-icon"/> :
+                            <KeyboardArrowDownIcon className="dropdown-icon"/>}
+                    <p className="option-title">Upload Schedule Data</p>
+                </div>
+                <div className={`dropdown ${uploadOptionDropdownStatus && isClicked("schedule") ? 'dropdown-visible' : ''}`}>
+                    {uploadOptionDropdownStatus && uploadOptionDropdownStatus["schedule"] ?
+                            <div className="upload-area">
+                                <div>Choose File</div>
+                                <div>Upload File</div>
+                            </div>
+                        : <div></div>
+                    }
+                </div>
+            </div>
+
+            <div
+                className={`upload-option ${uploadOptionDropdownStatus && isClicked("classroom") ? 'upload-option-square' : ''}`}
+                onClick={() => dropdownToggle("classroom")}>
+                <div className="upload-option-dropdown">
+                    {uploadOptionDropdownStatus && isClicked("classroom") ?
+                        <KeyboardArrowUpIcon className="dropdown-icon"/> :
+                        <KeyboardArrowDownIcon className="dropdown-icon"/>}
+                    <p className="option-title">Upload Classroom Data</p>
+                </div>
+                <div
+                    className={`dropdown ${uploadOptionDropdownStatus && isClicked("classroom") ? 'dropdown-visible' : ''}`}>
+                    {uploadOptionDropdownStatus && uploadOptionDropdownStatus["classroom"] ?
+                        <div className="upload-area">
+                            <div>Choose File</div>
+                            <div>Upload File</div>
+                        </div>
+                        : <div></div>
+                    }
+                </div>
+            </div>
 
             <form onSubmit={handleSubmit} method="POST">
                 <input type="radio" id="classroom" name="data_type" onChange={handleRadioChange}/>

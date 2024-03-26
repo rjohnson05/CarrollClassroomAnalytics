@@ -47,12 +47,12 @@ export default function DayCalendar({ day, timeBlockList, courseData }) {
                                 <div>
                                     <p className="tooltip-line">Course: {contentParts[2]}</p>
                                     <p className="tooltip-line">Instructor: {contentParts[3]}</p>
-                                    <p className="tooltip-line">Enrollment: {contentParts[4]}</p>
+                                    <p className="tooltip-line">Students Enrolled: {contentParts[4]}</p>
                                 </div> :
                                 <div>
                                     <p className="tooltip-line">Course: N/A</p>
                                     <p className="tooltip-line">Instructor: N/A</p>
-                                    <p className="tooltip-line">Enrollment: N/A</p>
+                                    <p className="tooltip-line">Students Enrolled: N/A</p>
                                 </div>
                             }
                         </div>

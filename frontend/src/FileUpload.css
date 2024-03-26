@@ -4,3 +4,26 @@
     margin-top: 2em;
     text-align: center;
 }
+
+.upload-option {
+    background-color: #cfb988;
+    width: 60%;
+    margin: 10px auto;
+    height: 4em;
+}
+
+.upload-option:hover {
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s;
+}
+
+.upload-option-dropdown {
+    display: flex;
+    justify-content: center;
+}
+
+.option-title {
+    font-size: 20px;
+    font-weight: bold;
+}
