@@ -4,6 +4,7 @@ import axios from "axios";
 import React, {useEffect, useState} from "react";
 import './ClassroomInfo.css'
 import DayCalendar from "../individual_classroom/DayCalendar";
+import HeatMap from "../analytics_home/Heatmap";
 
 export default function ClassroomInfo() {
     const classroomName = useParams().id
@@ -82,43 +83,48 @@ export default function ClassroomInfo() {
                             <h3 className="day-header">MONDAY</h3>
                             {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                  Loading text is displayed */}
-                            {(Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
+                            {timeBlocks && courseData && (Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
                                 <div className="heatmap">
                                     <DayCalendar day="M" timeBlockList={timeBlocks['M']} courseData={courseData}/>
                                 </div>
-                                : <p>Loading...</p>}
+                                : timeBlocks && courseData ?
+                                    <p>No course data available</p> : <p>Loading...</p>}
                         </div>
                         <div className="day">
                             <h3 className="day-header">TUESDAY</h3>
-                            {(Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
+                            {timeBlocks && courseData && (Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
                                 <div className="heatmap">
                                     <DayCalendar day="T" timeBlockList={timeBlocks['T']} courseData={courseData}/>
                                 </div>
-                                : <p>Loading...</p>}
+                                : timeBlocks && courseData ?
+                                    <p>No course data available</p> : <p>Loading...</p>}
                         </div>
                         <div className="day">
                             <h3 className="day-header">WEDNESDAY</h3>
-                            {(Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
+                            {timeBlocks && courseData && (Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
                                 <div className="heatmap">
                                     <DayCalendar day="W" timeBlockList={timeBlocks['W']} courseData={courseData}/>
                                 </div>
-                                : <p>Loading...</p>}
+                                : timeBlocks && courseData ?
+                                    <p>No course data available</p> : <p>Loading...</p>}
                         </div>
                         <div className="day">
                             <h3 className="day-header">THURSDAY</h3>
-                            {(Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
+                            {timeBlocks && courseData && (Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
                                 <div className="heatmap">
                                     <DayCalendar day="th" timeBlockList={timeBlocks['th']} courseData={courseData}/>
                                 </div>
-                                : <p>Loading...</p>}
+                                : timeBlocks && courseData ?
+                                    <p>No course data available</p> : <p>Loading...</p>}
                         </div>
                         <div className="day">
                             <h3 className="day-header">FRIDAY</h3>
-                            {(Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
+                            {timeBlocks && courseData && (Object.keys(timeBlocks).length > 0 && Object.keys(courseData).length > 0) ?
                                 <div className="heatmap">
                                     <DayCalendar day="F" timeBlockList={timeBlocks['F']} courseData={courseData}/>
                                 </div>
-                                : <p>Loading...</p>}
+                                : timeBlocks && courseData ?
+                                    <p>No course data available</p> : <p>Loading...</p>}
                         </div>
                     </div>
                 </div>
