@@ -92,8 +92,7 @@ export default function UsedClassrooms() {
             return (
                 classrooms.map(([classroom, data]) => (
                 <div className="class-group" key={classroom}>
-                    <div
-                        className={`classroom ${classroomDropdownStatus && isClicked(classroom) ? 'classroom-square' : ''}`}
+                    <div className={`classroom ${classroomDropdownStatus && isClicked(classroom) ? 'classroom-square' : ''}`}
                         onClick={() => dropdownToggle(classroom)}>
                         <div className="dropdown-title">
                             {classroomDropdownStatus && isClicked(classroom) ?
@@ -104,8 +103,7 @@ export default function UsedClassrooms() {
                         <Link className="info-icon" to={`/classrooms/${classroom}`}><InfoIcon /></Link>
                     </div>
                     {/*Displays the list of courses held within the classroom when clicked on*/}
-                    <div
-                        className={`courses ${classroomDropdownStatus && isClicked(classroom) ? 'courses-visible' : ''}`}>
+                    <div className={`courses ${classroomDropdownStatus && isClicked(classroom) ? 'courses-visible' : ''}`}>
                         {classroomDropdownStatus && classroomDropdownStatus[classroom] ?
                             data.map((course) => (
                                 <div className="course" key={course}>

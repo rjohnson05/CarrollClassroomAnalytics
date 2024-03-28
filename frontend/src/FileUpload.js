@@ -4,6 +4,7 @@ import axios from "axios";
 import "./FileUpload.css";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 
 /**
@@ -13,31 +14,29 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
  * @author Ryan Johnson
  */
 export default function FileUpload() {
-    const [dataType, setDataType] = useState();
-    const [file, setFile] = useState();
+    const [fileErrorShowing, setFileErrorShowing] = useState(false);
+    const [successText, setSuccessText] = useState(false);
+    const [uploadingText, setUploadingText] = useState(false);
+    const [scheduleFile, setScheduleFile] = useState();
+    const [classroomFile, setClassroomFile] = useState();
     const [uploadOptionDropdownStatus, setUploadOptionDropdownStatus] = useState({
         "schedule": false,
         "classroom": false,
     });
 
     useEffect(() => {
-        console.log("File", file);
-    }, [file]);
-
-    /**
-     * Changes the type of spreadsheet data being uploaded whenever the radio buttons are changed.
-     * @param e Event determining which radio button was clicked
-     */
-    const handleRadioChange = (e) => {
-        setDataType(e.target.id);
-    }
+    }, [scheduleFile, classroomFile]);
 
     /**
      * Changes the file being uploaded whenever the file browser is used.
      * @param e Event determining which file was chosen
      */
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        if (e.target.id === "classroom-chooser") {
+            setClassroomFile(e.target.files[0]);
+        } else {
+            setScheduleFile(e.target.files[0]);
+        }
     }
 
     /**
@@ -48,28 +47,55 @@ export default function FileUpload() {
      */
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Handling submit");
         const formData = new FormData();
-        formData.append('dataType', dataType);
-        formData.append('file', file);
-        formData.append("fileName", file.name);
+        formData.append('dataType', e.target.id);
 
-        axios.post("http://localhost:8000/api/upload_file/", formData, {
+        if (e.target.id === "classroom") {
+            formData.append('file', classroomFile);
+            formData.append("fileName", classroomFile.name);
+        } else {
+            formData.append('file', scheduleFile);
+            formData.append("fileName", scheduleFile.name);
+        }
+
+        // Only show the uploading text while the file is uploading to the database
+        setUploadingText(true);
+        setSuccessText(false);
+        setFileErrorShowing(false);
+
+        const uploadSuccess = axios.post("http://localhost:8000/api/upload_file/", formData, {
             headers: {
                 'content-type': 'multipart/form-data',
             }
-        }).then(r => console.log(r.data));
+        }).then(r => {
+                // Shows the success text upon a successful file upload
+                setUploadingText(false);
+                setSuccessText(true);
+                setFileErrorShowing(false);
+                console.log(r.data)})
+            .catch(error => {
+                // Shows the error message if the file has invalid column names
+                setUploadingText(false);
+                setSuccessText(false);
+                setFileErrorShowing(true)});
+
+        // After uploading the files, reset them to empty
+        if (e.target.id === "classroom") {
+            setClassroomFile(null);
+        } else {
+            setScheduleFile(null);
+        }
     }
 
     /**
-     * Toggles whether the given classroom is showing its course(s).
+     * Toggles whether the given data type displays its form for uploading a spreadsheet.
      *
-     * @param classroomName  Name of the classroom being toggled
+     * @param dataType  Type of spreadsheet being uploaded: accepts either schedule or classroom data
      */
-    const dropdownToggle = (classroomName) => {
+    const dropdownToggle = (dataType) => {
         setUploadOptionDropdownStatus(prevState => {
             const updatedStatus = {...prevState};
-            updatedStatus[classroomName] = !updatedStatus[classroomName];
+            updatedStatus[dataType] = !updatedStatus[dataType];
             return updatedStatus;
         });
     }
@@ -88,11 +114,17 @@ export default function FileUpload() {
         <div>
             <NavBar />
             <h1 className="title-font">UPLOAD DATA</h1>
+            {uploadingText &&
+                <p className="info-text">Uploading...</p>}
+            {successText &&
+                <p className="info-text">File successfully uploaded.</p>}
+            {fileErrorShowing &&
+                <p className="info-text">This file has improper formatting. Fix this and then try uploading again.</p>}
 
-            <div className={`upload-option ${uploadOptionDropdownStatus && isClicked("schedule") ? 'upload-option-square' : ''}`}
-                 onClick={() => dropdownToggle("schedule")}>
+            {/*Creates the dropdown for uploading schedule data*/}
+            <div className={`upload-option ${uploadOptionDropdownStatus && isClicked("schedule") ? 'upload-option-square' : ''}`}>
                 {/*Creates the main block that houses the dropdown*/}
-                <div className="upload-option-dropdown">
+                <div className="upload-option-dropdown" onClick={() => dropdownToggle("schedule")}>
                     {uploadOptionDropdownStatus && isClicked("schedule") ?
                             <KeyboardArrowUpIcon className="dropdown-icon"/> :
                             <KeyboardArrowDownIcon className="dropdown-icon"/>}
@@ -100,19 +132,29 @@ export default function FileUpload() {
                 </div>
                 <div className={`dropdown ${uploadOptionDropdownStatus && isClicked("schedule") ? 'dropdown-visible' : ''}`}>
                     {uploadOptionDropdownStatus && uploadOptionDropdownStatus["schedule"] ?
-                            <div className="upload-area">
-                                <div>Choose File</div>
-                                <div>Upload File</div>
-                            </div>
+                        <div>
+                            <form className="upload-area"  id="schedule" onSubmit={handleSubmit} method="POST">
+                                <div className="file-chooser-block">
+                                    <input id="schedule-chooser" type="file" accept=".xls, .xlsx" onChange={handleFileChange} hidden />
+                                    <label htmlFor="schedule-chooser" className="file-chooser">
+                                        <CloudUploadIcon />
+                                        <p className="upload-label">Choose Schedule Spreadsheet</p>
+                                    </label>
+                                    {scheduleFile ? <p className="file-name-preview"><b>File Name: </b>{scheduleFile.name}</p> : <p></p>}
+                                </div>
+
+                                <button className="submit-button" type="submit">Upload File</button>
+                            </form>
+                        </div>
                         : <div></div>
                     }
                 </div>
             </div>
 
+            {/*Creates the dropdown for uploading classroom data*/}
             <div
-                className={`upload-option ${uploadOptionDropdownStatus && isClicked("classroom") ? 'upload-option-square' : ''}`}
-                onClick={() => dropdownToggle("classroom")}>
-                <div className="upload-option-dropdown">
+                className={`upload-option ${uploadOptionDropdownStatus && isClicked("classroom") ? 'upload-option-square' : ''}`}>
+                <div className="upload-option-dropdown" onClick={() => dropdownToggle("classroom")}>
                     {uploadOptionDropdownStatus && isClicked("classroom") ?
                         <KeyboardArrowUpIcon className="dropdown-icon"/> :
                         <KeyboardArrowDownIcon className="dropdown-icon"/>}
@@ -121,23 +163,25 @@ export default function FileUpload() {
                 <div
                     className={`dropdown ${uploadOptionDropdownStatus && isClicked("classroom") ? 'dropdown-visible' : ''}`}>
                     {uploadOptionDropdownStatus && uploadOptionDropdownStatus["classroom"] ?
-                        <div className="upload-area">
-                            <div>Choose File</div>
-                            <div>Upload File</div>
+                        <div>
+                            <form className="upload-area"  id="classroom" onSubmit={handleSubmit} method="POST">
+                                <div className="file-chooser-block">
+                                    <input id="classroom-chooser" type="file" accept=".xls, .xlsx" onChange={handleFileChange} hidden/>
+                                    <label htmlFor="classroom-chooser" className="file-chooser">
+                                        <CloudUploadIcon/>
+                                        <p className="upload-label">Choose Classroom Spreadsheet</p>
+                                    </label>
+                                    {classroomFile ? <p className="file-name-preview"><b>File Name: </b>{classroomFile.name}</p> :
+                                        <p></p>}
+                                </div>
+
+                                <button className="submit-button" type="submit">Upload File</button>
+                            </form>
                         </div>
                         : <div></div>
                     }
                 </div>
             </div>
-
-            <form onSubmit={handleSubmit} method="POST">
-                <input type="radio" id="classroom" name="data_type" onChange={handleRadioChange}/>
-                <label form="classroom">Upload Classroom Data</label><br/>
-                <input type="radio" id="schedule" name="data_type" onChange={handleRadioChange}/>
-                <label form="schedule">Upload Schedule Data</label><br/>
-                <input type="file" onChange={handleFileChange}/><br/>
-                <button type="submit">Upload File</button>
-            </form>
         </div>
     );
 }

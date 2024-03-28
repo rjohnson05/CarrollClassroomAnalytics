@@ -105,4 +105,4 @@ def upload_file(request):
     else:
         services.upload_classroom_data(file)
 
-    return Response({"message": "File uploaded"})
+    return Response({"message": "success"})
