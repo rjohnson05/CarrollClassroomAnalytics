@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-
 from api import services
 
 import logging
@@ -88,7 +87,6 @@ def get_classroom_data(request):
 
 
 @api_view(["POST"])
-@ensure_csrf_cookie
 def upload_file(request):
     """
     Uploads data from a file to the database.
@@ -106,3 +104,29 @@ def upload_file(request):
         services.upload_classroom_data(file)
 
     return Response({"message": "success"})
+
+
+@api_view(["GET"])
+def get_next_time(request):
+    day = request.GET.get("day")
+    current_end_time = request.GET.get("currentEndTime")
+    buildings = request.GET.get("buildings")
+    if buildings.__len__() == 0:
+        next_end_time = services.get_next_time(day, current_end_time)
+    else:
+        next_end_time = services.get_next_time(day, current_end_time, buildings)
+
+    return Response(next_end_time)
+
+
+@api_view(["GET"])
+def get_past_time(request):
+    day = request.GET.get("day")
+    current_end_time = request.GET.get("currentStartTime")
+    buildings = request.GET.get("buildings")
+    if buildings.__len__() == 0:
+        next_end_time = services.get_past_time(day, current_end_time)
+    else:
+        next_end_time = services.get_past_time(day, current_end_time, buildings)
+
+    return Response(next_end_time)

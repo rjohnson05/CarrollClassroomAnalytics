@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from api.models import Course, Classroom, Instructor
 import logging
@@ -84,7 +84,8 @@ def calculate_number_classes(buildings='all'):
                 block_num_classes = (Course.objects.all().filter(day__contains=day,
                                                                  start_time__lte=block_start_time,
                                                                  end_time__gte=block_end_time)
-                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(classroom__building="OFCP"))
+                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
+                    classroom__building="OFCP"))
             else:
                 # Counts the number of courses (within specified buildings) running between the current block's
                 # start/end times for a subset of buildings
@@ -92,7 +93,8 @@ def calculate_number_classes(buildings='all'):
                                                                  start_time__lte=block_start_time,
                                                                  end_time__gte=block_end_time,
                                                                  classroom__building__in=buildings)
-                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(classroom__building="OFCP"))
+                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
+                    classroom__building="OFCP"))
             # Account for the possibility of several courses in a single classrooms by only counting the unique
             # classrooms in use
             unique_classrooms = []
@@ -101,7 +103,8 @@ def calculate_number_classes(buildings='all'):
                     unique_classrooms.append(course.classroom.name)
 
             day_num_classes[block_start_time] = len(unique_classrooms)
-            logger.debug(f"calculate_number_classes: Unique classes found for block {block_start_time} on {day}: {unique_classrooms}")
+            logger.debug(
+                f"calculate_number_classes: Unique classes found for block {block_start_time} on {day}: {unique_classrooms}")
         logger.debug(f"calculate_number_classes: Number of classes for time blocks during {day}: {day_num_classes}")
         all_num_classes[day] = day_num_classes
     logger.debug(f"calculate_number_classes: Number of classes calculated for time blocks in {buildings}")
@@ -150,7 +153,8 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
         else:
             classrooms_dict[classroom] += [course_data]
 
-    logger.debug(f"get_used_classrooms: Classroom data found for {buildings} from {start_time} to {end_time} on {day}: {classrooms_dict}")
+    logger.debug(
+        f"get_used_classrooms: Classroom data found for {buildings} from {start_time} to {end_time} on {day}: {classrooms_dict}")
     return classrooms_dict
 
 
@@ -222,6 +226,36 @@ def get_classroom_courses(classroom: str) -> {}:
         classroom_courses[day] = day_courses
     logger.debug(f"get_classroom_courses: Courses found in {classroom}: {classroom_courses}")
     return [time_blocks, classroom_courses]
+
+
+def get_past_time(day, current_time, buildings='all'):
+    """
+    Finds the starting time given an ending time for a given day and list of buildings. This is used when paging through
+    different times while viewing the used classroom lists.
+
+    :param day: String specifying which day to look within for time blocks
+    :param  buildings        List of buildings to look within for possible time blocks
+    :param current_time: String specifying the end time for a block; the paired start time is the desired output
+    """
+    time_blocks = calculate_time_blocks(buildings)
+    for block in time_blocks[day]:
+        if datetime.strptime(block[1], "%H:%M:%S").time() == datetime.strptime(current_time, "%H:%M").time():
+            return block[0][:-3]
+
+
+def get_next_time(day, current_time, buildings='all'):
+    """
+    Finds the ending time given a start time for a given day and list of buildings. This is used when paging through
+    different times while viewing the used classroom lists.
+
+    :param day: String specifying which day to look within for time blocks
+    :param  buildings        List of buildings to look within for possible time blocks
+    :param current_time: String specifying the start time which starts the block; the paired end time is the desired output
+    """
+    time_blocks = calculate_time_blocks(buildings)
+    for block in time_blocks[day]:
+        if datetime.strptime(block[0], "%H:%M:%S").time() == datetime.strptime(current_time, "%H:%M").time():
+            return block[1][:-3]
 
 
 def calculate_day_string(row):

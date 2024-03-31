@@ -1,6 +1,7 @@
 from django.db import models
 
-"""Contains all ORM models for the Carroll College classroom analytics software. The models for Classes, Courses, 
+"""
+Contains all ORM models for the Carroll College classroom analytics software. The models for Classes, Courses, 
 and Instructors are all included here.
 
 Author: Adrian Rincon-Jimanez, Ryan Johnson

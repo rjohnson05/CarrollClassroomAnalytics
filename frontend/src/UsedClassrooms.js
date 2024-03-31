@@ -10,6 +10,8 @@ import "./UsedClassrooms.css"
 export default function UsedClassrooms() {
     const [classroomsData, setClassroomsData] = useState(null);
     const [classroomDropdownStatus, setClassroomDropdownStatus] = useState(null);
+    const [pastStartTime, setPastStartTime] = useState(null);
+    const [nextEndTime, setNextEndTime] = useState(null);
     const {day, buildingList, startTime, endTime} = useLocation().state;
     const dayDict = {
         "M": "MONDAY",
@@ -29,6 +31,13 @@ export default function UsedClassrooms() {
         setDropdownInitialStatus();
     }, [classroomsData]);
 
+    useEffect(() => {
+        async function fetchData() {
+            await loadData();
+        }
+        fetchData();
+    }, [startTime]);
+
     /**
      * Loads the list of classrooms used during the specified time block on a given day.
      */
@@ -36,7 +45,13 @@ export default function UsedClassrooms() {
         try {
             const usedClassroomsData = await axios.get("http://localhost:8000/api/get_used_classrooms/",
                 {params: {day: day, buildings: buildingList, startTime: startTime, endTime: endTime}});
+            const pastStartTimeData = await axios.get("http://localhost:8000/api/get_past_time/",
+                {params: {day: day, buildings: buildingList, currentStartTime: startTime}});
+            const nextEndTimeData = await axios.get("http://localhost:8000/api/get_next_time/",
+                {params: {day: day, buildings: buildingList, currentEndTime: endTime}});
             setClassroomsData(usedClassroomsData.data);
+            setPastStartTime(pastStartTimeData.data);
+            setNextEndTime(nextEndTimeData.data);
         } catch (error) {
             console.error(error);
         }
@@ -157,6 +172,21 @@ export default function UsedClassrooms() {
         <div>
             <NavBar/>
             <h1 className="classrooms-header">CLASSROOM USAGE REPORT <br/>({dayDict[day]}: {startTime} - {endTime})</h1>
+
+                <Link className="back-button" to={`/used_classrooms`}
+                                      state={{
+                                          day: day,
+                                          buildingList: buildingList,
+                                          startTime: pastStartTime,
+                                          endTime: startTime}}>
+                                    Previous Time Block</Link>
+            <Link className="next-button" to={`/used_classrooms`}
+                                  state={{
+                                      day: day,
+                                      buildingList: buildingList,
+                                      startTime: endTime,
+                                      endTime: nextEndTime}}>
+                                Next Time Block</Link>
 
             <div className="allClasses">
                 {renderCols().map((col, index) => (
