@@ -3,6 +3,8 @@ import {useEffect, useState} from "react";
 import {useLocation, Link} from "react-router-dom";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import InfoIcon from '@mui/icons-material/Info';
 import NavBar from "./analytics_home/NavBar";
 import "./UsedClassrooms.css"
@@ -134,7 +136,7 @@ export default function UsedClassrooms() {
             )))
         }
 
-        // Displays the classrooms in several independent columns
+        // Displays the classrooms in 2 independent columns
         const cols = [];
         for (let i = 0; i < classrooms.length; i += num_rows) {
             const col = classrooms.slice(i, i + num_rows).map(([classroom, data]) => (
@@ -173,20 +175,27 @@ export default function UsedClassrooms() {
             <NavBar/>
             <h1 className="classrooms-header">CLASSROOM USAGE REPORT <br/>({dayDict[day]}: {startTime} - {endTime})</h1>
 
-                <Link className="back-button" to={`/used_classrooms`}
-                                      state={{
-                                          day: day,
-                                          buildingList: buildingList,
-                                          startTime: pastStartTime,
-                                          endTime: startTime}}>
-                                    Previous Time Block</Link>
+            <Link className="back-button" to={`/used_classrooms`}
+              state={{
+                  day: day,
+                  buildingList: buildingList,
+                  startTime: pastStartTime,
+                  endTime: startTime
+              }}>
+                <NavigateBeforeIcon />
+                <p>Previous Time Block</p>
+            </Link>
+
             <Link className="next-button" to={`/used_classrooms`}
-                                  state={{
-                                      day: day,
-                                      buildingList: buildingList,
-                                      startTime: endTime,
-                                      endTime: nextEndTime}}>
-                                Next Time Block</Link>
+                  state={{
+                      day: day,
+                      buildingList: buildingList,
+                      startTime: endTime,
+                      endTime: nextEndTime
+                  }}>
+                <NavigateNextIcon />
+                <p>Next Time Block</p>
+            </Link>
 
             <div className="allClasses">
                 {renderCols().map((col, index) => (

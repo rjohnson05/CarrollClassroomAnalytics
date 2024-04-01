@@ -92,7 +92,7 @@ def upload_file(request):
     Uploads data from a file to the database.
 
     :param request: HTTP request object
-
+    :return: HTTP response object containing a success message if the method completes without error
     """
     data_type = request.POST['dataType']
     file = request.FILES['file']
@@ -108,6 +108,13 @@ def upload_file(request):
 
 @api_view(["GET"])
 def get_next_time(request):
+    """
+    Given the start time of a time block, finds the corresponding end time for the block. Used for paging when viewing
+    the used classrooms for a specific time block.
+
+    :param request: HTTP request object containing the day, start time, and building list for the desired block
+    :return: HTTP response object containing the end time for the specified time block
+    """
     day = request.GET.get("day")
     current_end_time = request.GET.get("currentEndTime")
     buildings = request.GET.get("buildings")
@@ -121,6 +128,13 @@ def get_next_time(request):
 
 @api_view(["GET"])
 def get_past_time(request):
+    """
+    Given the end time of a time block, finds the corresponding start time for the block. Used for paging when viewing
+    the used classrooms for a specific time block.
+
+    :param request: HTTP request object containing the day, end time, and building list for the desired block
+    :return: HTTP response object containing the start time for the specified time block
+    """
     day = request.GET.get("day")
     current_end_time = request.GET.get("currentStartTime")
     buildings = request.GET.get("buildings")

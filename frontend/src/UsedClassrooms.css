@@ -5,6 +5,29 @@
     margin-top: 2em;
 }
 
+.back-button, .next-button {
+    background-color: #cfb988;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    width: 13%;
+    margin-top: -6em;
+    margin-left: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+}
+
+.back-button {
+    float: left;
+}
+
+.next-button {
+    float: right;
+    margin-right: 2em;
+}
+
 .allClasses {
     display: flex;
     width: 95%;
