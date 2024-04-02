@@ -19,12 +19,12 @@ def calculate_time_blocks(buildings) -> []:
     :return all_time_blocks  Dictionary containing every possible time block in which there could be a different
     number of utilized classrooms
     """
-    all_times = []
     days_list = ['M', 'T', 'W', 'th', 'F']
     building_time_blocks = {}
     for day in days_list:
         if buildings == 'all':
-            # Finds all start/end times on the current day from ALL buildings and converts them from datetime objects to strings
+            # Finds all start/end times on the current day from ALL buildings and converts them from datetime objects
+            # to strings
             start_times = [time[0].strftime("%H:%M:%S") for time in
                            Course.objects.filter(day__contains=day).values_list(
                                'start_time').distinct().exclude(start_time__isnull=True).exclude(
@@ -35,13 +35,11 @@ def calculate_time_blocks(buildings) -> []:
         else:
             # Finds all start/end times in the specified building on the current day
             start_times = [time[0].strftime("%H:%M:%S") for time in
-                           Course.objects.filter(classroom__building__in=buildings, day__contains=day).values_list(
-                               'start_time').distinct().exclude(start_time__isnull=True)]
+                           Course.objects.all().filter(classroom__building__in=buildings, day__contains=day).
+                           values_list('start_time').distinct().exclude(start_time__isnull=True)]
             end_times = [time[0].strftime("%H:%M:%S") for time in
-                         Course.objects.values_list('end_time').filter(classroom__building__in=buildings,
-                                                                       day__contains=day).distinct().exclude(
-                             end_time__isnull=True)]
-        # all_times.append(start_times + end_times + ['6:00:00', '21:15:00'])
+                         Course.objects.all().filter(classroom__building__in=buildings, day__contains=day).
+                         values_list('end_time').distinct().exclude(end_time__isnull=True)]
         all_times = start_times + end_times + ['06:00:00', '23:59:00']
         start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
         logger.debug(f"calculate_time_blocks: Possible Start/End Times: {start_end_times}")
@@ -84,7 +82,7 @@ def calculate_number_classes(buildings='all'):
                 block_num_classes = (Course.objects.all().filter(day__contains=day,
                                                                  start_time__lte=block_start_time,
                                                                  end_time__gte=block_end_time)
-                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
+                .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
                     classroom__building="OFCP"))
             else:
                 # Counts the number of courses (within specified buildings) running between the current block's
@@ -93,7 +91,7 @@ def calculate_number_classes(buildings='all'):
                                                                  start_time__lte=block_start_time,
                                                                  end_time__gte=block_end_time,
                                                                  classroom__building__in=buildings)
-                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
+                .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
                     classroom__building="OFCP"))
             # Account for the possibility of several courses in a single classrooms by only counting the unique
             # classrooms in use
@@ -253,8 +251,10 @@ def get_next_time(day, current_time, buildings='all'):
     :param current_time: String specifying the start time which starts the block; the paired end time is the desired output
     """
     time_blocks = calculate_time_blocks(buildings)
+    logger.debug(f"get_next_time: Time Blocks: {time_blocks}")
     for block in time_blocks[day]:
         if datetime.strptime(block[0], "%H:%M:%S").time() == datetime.strptime(current_time, "%H:%M").time():
+            logger.debug(f"get_next_time: Next Time Found: {block[1][:-3]}")
             return block[1][:-3]
 
 

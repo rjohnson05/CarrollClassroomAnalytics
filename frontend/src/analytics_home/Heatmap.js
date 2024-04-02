@@ -54,8 +54,8 @@ export default function Heatmap({ day, buildingList, timeBlockList, numClassroom
                             <Link className="link" to={`/used_classrooms`}
                                   state={{
                                       day: contentParts[3],
-                                      buildingList: Object.entries(buildingList).filter(([key, value]) => key && value)
-                                          .map(([key]) => key).join(', '),
+                                      buildingList: [Object.entries(buildingList).filter(([key, value]) => key && value)
+                                          .map(([key]) => key).join(', ')],
                                       startTime: contentParts[0]?.substring(0,5),
                                       endTime: contentParts[1]?.substring(0,5)}}>
                                 View Used Classrooms</Link>
