@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import 'primeicons/primeicons.css'
 import axios from "axios";
 
-import './Calendar.css';
+import '../css/Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
 import Legend from "./Legend"

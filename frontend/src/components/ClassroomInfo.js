@@ -1,10 +1,10 @@
 import {useParams} from "react-router-dom";
-import NavBar from "../analytics_home/NavBar";
+import NavBar from "./NavBar";
 import axios from "axios";
 import React, {useEffect, useState} from "react";
-import './ClassroomInfo.css'
-import DayCalendar from "../individual_classroom/DayCalendar";
-import HeatMap from "../analytics_home/Heatmap";
+import '../css/ClassroomInfo.css'
+import DayCalendar from "./DayCalendar";
+import HeatMap from "./Heatmap";
 
 export default function ClassroomInfo() {
     const classroomName = useParams().id

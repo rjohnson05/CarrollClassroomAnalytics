@@ -1,13 +1,18 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import ensure_csrf_cookie
-
+from django.shortcuts import render
 from api import services
 
 import logging
-import pandas as pd
 
 logger = logging.getLogger("views")
+
+
+def index(request):
+    """
+    Returns the index page of the React front end, serving the Django backend and React frontend together
+    """
+    return render(request, "build/index.html")
 
 
 @api_view(["GET"])

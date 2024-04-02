@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import { Tooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
-import './Heatmap.css'
+import '../css/Heatmap.css'
 import {Link} from "react-router-dom";
 
 

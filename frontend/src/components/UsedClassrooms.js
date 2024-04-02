@@ -6,9 +6,14 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import InfoIcon from '@mui/icons-material/Info';
-import NavBar from "./analytics_home/NavBar";
-import "./UsedClassrooms.css"
+import NavBar from "./NavBar";
+import "../css/UsedClassrooms.css"
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function UsedClassrooms() {
     const [classroomsData, setClassroomsData] = useState(null);
     const [classroomDropdownStatus, setClassroomDropdownStatus] = useState(null);

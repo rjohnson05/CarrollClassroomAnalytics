@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'core',
+    # 'core',
 ]
 
 MIDDLEWARE = [
@@ -134,6 +134,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s - %(levelname)s - %(message)s"
+        },
+    },
     "handlers": {
         "console": {
             "level": "INFO",
@@ -141,14 +146,22 @@ LOGGING = {
         },
         "file": {
             "level": "INFO",
-            "class": "logging.handlers.TimedRotatingFileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "logs/classrooms_analytics.log",
-            "when": "midnight",
+            "maxBytes": 1024 * 1024,
             "backupCount": 100,
+            "formatter": "standard",
         },
     },
     "root": {
         "handlers": ["console", "file"],
         "level": "INFO",
     },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": True,
+        }
+    }
 }

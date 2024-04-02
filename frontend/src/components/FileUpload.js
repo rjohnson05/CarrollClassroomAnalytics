@@ -1,7 +1,7 @@
-import NavBar from "./analytics_home/NavBar";
+import NavBar from "./NavBar";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import "./FileUpload.css";
+import "../css/FileUpload.css";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';

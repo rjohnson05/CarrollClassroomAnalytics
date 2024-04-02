@@ -1,6 +1,6 @@
 import { Tooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
-import './DayCalendar.css'
+import '../css/DayCalendar.css'
 
 
 /**

@@ -1,5 +1,5 @@
-import logo from './images/carroll_logo.png';
-import './Navbar.css';
+import logo from '../images/carroll_logo.png';
+import '../css/Navbar.css';
 import {Link} from "react-router-dom";
 import AddIcon from '@mui/icons-material/Add';
 
