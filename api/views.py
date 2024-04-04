@@ -1,3 +1,4 @@
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.shortcuts import render
@@ -7,19 +8,26 @@ import logging
 
 logger = logging.getLogger("views")
 
+"""
+Contains all views for the Carroll College analytics software. These methods receive HTTP requests and return a response
+to the front end.
+
+Author: Ryan Johnson
+"""
+
 
 @api_view(["GET"])
-def get_number_classes(request):
+def get_number_classes(request: Request) -> Response:
     """
-    Queries the number of courses running during each time block and then stores this information in a dictionary.
+    Queries the number of classrooms being used during each time block and then stores this information in a dictionary.
     Returns an HTTP request containing two dictionaries, the first of which containing the time blocks and the second
-    containing the recently calculated number of courses running during each time block.
+    containing the recently calculated number of classrooms used during each time block.
 
-    :param request: HTTP request object
-    :return: HTTP response object containing an array with two dictionaries: time_blocks and all_num_classes
+    :param request: HTTP request object containing the list of buildings in which to search for used classrooms
+    :return: HTTP response object containing an array with two dictionaries: the first storing the time blocks and the
+             second storing the number of used classrooms during each time block
     """
     buildings = request.GET.getlist("buildings[]")
-    number_classes = None
     if buildings.__len__() == 0:
         # Get data for all buildings campus-wide
         number_classes = services.calculate_number_classes()
@@ -32,7 +40,7 @@ def get_number_classes(request):
 
 
 @api_view(["GET"])
-def get_building_names(request):
+def get_building_names(request: Request) -> Response:
     """
     Returns a dictionary of all buildings holding classes that are currently in the database. The keys in this
     dictionary are the four-letter abbreviations for the building, while the values are the full names for the buildings.
@@ -45,12 +53,13 @@ def get_building_names(request):
 
 
 @api_view(["GET"])
-def get_used_classrooms(request):
+def get_used_classrooms(request: Request) -> Response:
     """
-    Returns a dictionary of all classrooms and their corresponding data that are used within a specified time period
+    Used for listing all classrooms used during a specific time block. Returns a dictionary of all classrooms and their
+    corresponding data that are used within a specified time block.
 
-    :param request: HTTP request object
-    :return: HTTP response object containing a dictionary of all the classrooms and their data that are used within a specified time
+    :param request: HTTP request object containing the desired day, start/end times, and buildings in which to search for used classrooms
+    :return: HTTP response object containing a dictionary of all the classrooms and their data that are used within a specified time block
     """
     day = request.GET.get("day")
     start_time = request.GET.get("startTime")
@@ -70,13 +79,13 @@ def get_used_classrooms(request):
 
 
 @api_view(["GET"])
-def get_classroom_data(request):
+def get_classroom_data(request: Request) -> Response:
     """
-    Returns a list containing two dictionaries, the first storing time blocks and the second the courses running during
-    those time blocks
+    Used for displaying the weekly schedule for a single classroom. Returns a list containing two dictionaries, the
+    first storing time blocks and the second the courses running during those time blocks.
 
-    :param request: HTTP request object
-    :return: HTTP response object containing a list of time blocks and courses running during those time blocks
+    :param request: HTTP request object containing the classroom name to find data for
+    :return: HTTP response object containing a list of time blocks and courses running during those time blocks for a single classroom
     """
     classroom_name = request.GET.get("classroom")
     courses = services.get_classroom_courses(classroom_name)
@@ -85,11 +94,11 @@ def get_classroom_data(request):
 
 
 @api_view(["POST"])
-def upload_file(request):
+def upload_file(request: Request) -> Response:
     """
-    Uploads data from a file to the database.
+    Creates model objects using the data from a file and moves them into the database.
 
-    :param request: HTTP request object
+    :param request: HTTP request object containing the data file and the type of file being uploaded
     :return: HTTP response object containing a success message if the method completes without error
     """
     data_type = request.POST['dataType']
@@ -105,7 +114,7 @@ def upload_file(request):
 
 
 @api_view(["GET"])
-def get_next_time(request):
+def get_next_time(request: Request) -> Response:
     """
     Given the start time of a time block, finds the corresponding end time for the block. Used for paging when viewing
     the used classrooms for a specific time block.
@@ -126,7 +135,7 @@ def get_next_time(request):
 
 
 @api_view(["GET"])
-def get_past_time(request):
+def get_past_time(request: Request) -> Response:
     """
     Given the end time of a time block, finds the corresponding start time for the block. Used for paging when viewing
     the used classrooms for a specific time block.
@@ -146,7 +155,7 @@ def get_past_time(request):
     return Response(next_end_time)
 
 
-def index(request):
+def index(request: Request) -> Response:
     """
     Returns the index page of the React front end, serving the Django backend and React frontend together
     """

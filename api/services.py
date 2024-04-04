@@ -1,13 +1,19 @@
-from datetime import datetime, time
-
+from datetime import datetime
 from api.models import Course, Classroom, Instructor
 import logging
 import pandas as pd
 
 logger = logging.getLogger("services")
 
+"""
+Contains all business logic for the Carroll College classroom analytics software. Conducts all database queries and 
+returns the results to the corresponding view.
 
-def calculate_time_blocks(buildings) -> []:
+Author: Ryan Johnson
+"""
+
+
+def calculate_time_blocks(buildings):
     """
     Given a set of buildings, calculates every block of time in which there could be a different number of utilized
     classrooms and then returns this information in a dictionary. This dictionary uses the abbreviation for every
@@ -15,9 +21,9 @@ def calculate_time_blocks(buildings) -> []:
     many sub-arrays containing the start and end times for the block. If no time blocks are found for the specified
     buildings, an empty dictionary is returned.
 
-    :param  buildings        List of buildings to look within for possible time blocks
-    :return all_time_blocks  Dictionary containing every possible time block in which there could be a different
-    number of utilized classrooms
+    :param  buildings:       list of buildings to look within for possible time blocks
+    :return                  dictionary containing every possible time block in which there could be a different
+                             number of utilized classrooms
     """
     days_list = ['M', 'T', 'W', 'th', 'F']
     building_time_blocks = {}
@@ -57,15 +63,15 @@ def calculate_time_blocks(buildings) -> []:
 
 def calculate_number_classes(buildings='all'):
     """
-    Queries the number of courses running during each time block and then stores this information in a dictionary.
+    Queries the number of classrooms used during each time block and then stores this information in a dictionary.
     Returns an array containing two dictionaries, the first of which containing the time blocks in which a course is
-    running inside the specified building and the second containing the recently calculated number of courses running
+    running inside the specified building and the second containing the recently calculated number of classrooms used
     during each time block.
 
-    :param buildings: Specifies which building(s) to return the number of courses for ('all' includes all
+    :param buildings: specifies which building(s) to return the number of courses for ('all' includes all
     buildings)
-    :return [time_blocks, all_num_classes] Array holding two dictionaries, the first storing time blocks
-    and the second the number of courses running during those time blocks
+    :return           array holding two dictionaries, the first storing time blocks
+                      and the second the number of courses running during those time blocks
     """
     time_blocks = calculate_time_blocks(buildings)
     if not time_blocks:
@@ -111,7 +117,7 @@ def calculate_number_classes(buildings='all'):
 
 def get_all_buildings():
     """
-    Returns a dictionary storing the names of all buildings in the current list of courses.
+    Returns a dictionary storing the names of all buildings in the Classroom model.
     """
     buildings_list = Classroom.BUILDINGS
     return buildings_list
@@ -120,20 +126,22 @@ def get_all_buildings():
 def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str = "all") -> {}:
     """
     Returns a list of all classrooms used during a specified time block and data about the course being held in the
-    classroom during the specified time block.
+    classroom during that specified time block.
 
-    :param day: String specifying which day to search within for used classrooms
-    :param start_time: String specifying the start time in which to search for used classrooms
-    :param end_time: String specifying the time in which searching for used classrooms stops
-    :param buildings: String indicating which buildings should be searched for used classrooms
-    :return Dictionary containing the data for every classroom being used within the specified time block and building
+    :param day: string specifying which day to search within for used classrooms
+    :param start_time: string specifying the start time in which to search for used classrooms
+    :param end_time:   string specifying the time in which searching for used classrooms stops
+    :param buildings:  string indicating which buildings should be searched for used classrooms
+    :return            dictionary containing the data for every classroom being used within the specified time block and building
     """
     if buildings == 'all':
+        # Searches for used classrooms within all buildings
         current_courses = (Course.objects.all().filter(day__contains=day,
                                                        start_time__lte=start_time,
                                                        end_time__gte=end_time)
                            .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
     else:
+        # Searches for used classrooms within only buildings specified by the filter
         current_courses = (Course.objects.all().filter(day__contains=day,
                                                        start_time__lte=start_time,
                                                        end_time__gte=end_time,
@@ -143,6 +151,7 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
         [course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrolled]
         for course in current_courses]
 
+    # Attach the course data to the classroom it is hosted in
     classrooms_dict = {}
     for course_data in courses_data:
         classroom = course_data.pop(1)
@@ -156,15 +165,15 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
     return classrooms_dict
 
 
-def calculate_classroom_time_blocks(classroom: str) -> []:
+def calculate_classroom_time_blocks(classroom):
     """
     Finds all possible time blocks used in the specified classroom and then returns this information in a dictionary.
     This dictionary uses the abbreviation for every weekday ('M', 'T', etc.) as the keys and an array of arrays as
     the values. Each of these value arrays contains many sub-arrays containing the start and end times for the block.
     If no time blocks are found for the specified classroom, an empty dictionary is returned.
 
-    :param  classroom        String representing the name of the classroom to be queried
-    :return  Dictionary containing every possible time block in which there could be a different course
+    :param  classroom: string representing the name of the classroom to be queried
+    :return            dictionary containing every possible time block in which there could be a different course
     """
     logger.debug(f"services.calculate_classroom_time_blocks: Classroom Name: {classroom}")
     days_list = ['M', 'T', 'W', 'th', 'F']
@@ -198,8 +207,8 @@ def get_classroom_courses(classroom: str) -> {}:
     time periods used as the keys and the name of the course being held during the time block being the value. If there
     are no courses being held in the classroom during a time block, the value for the time block is an empty string.
 
-    :param classroom: String representing the name of the classroom to be queried
-    :returns: List holding two dictionaries, the first storing time blocks and the second the courses running during
+    :param classroom: string representing the name of the classroom to be queried
+    :return           list holding two dictionaries, the first storing time blocks and the second the courses running during
     those time blocks
     """
     time_blocks = calculate_classroom_time_blocks(classroom)
@@ -231,9 +240,10 @@ def get_past_time(day, current_time, buildings='all'):
     Finds the starting time given an ending time for a given day and list of buildings. This is used when paging through
     different times while viewing the used classroom lists.
 
-    :param day: String specifying which day to look within for time blocks
-    :param  buildings        List of buildings to look within for possible time blocks
-    :param current_time: String specifying the end time for a block; the paired start time is the desired output
+    :param day:          string specifying which day to look within for time blocks
+    :param buildings:    list of buildings to look within for possible time blocks
+    :param current_time: string specifying the end time for a block; the paired start time is the desired output
+    :return              string detailing the start time associated with the specified end time
     """
     time_blocks = calculate_time_blocks(buildings)
     for block in time_blocks[day]:
@@ -246,9 +256,10 @@ def get_next_time(day, current_time, buildings='all'):
     Finds the ending time given a start time for a given day and list of buildings. This is used when paging through
     different times while viewing the used classroom lists.
 
-    :param day: String specifying which day to look within for time blocks
-    :param  buildings        List of buildings to look within for possible time blocks
-    :param current_time: String specifying the start time which starts the block; the paired end time is the desired output
+    :param day:          string specifying which day to look within for time blocks
+    :param  buildings    list of buildings to look within for possible time blocks
+    :param current_time: string specifying the start time which starts the block; the paired end time is the desired output
+    :return              string detailing the end time associated with the specified start time
     """
     time_blocks = calculate_time_blocks(buildings)
     logger.debug(f"get_next_time: Time Blocks: {time_blocks}")
@@ -262,7 +273,7 @@ def calculate_day_string(row):
     """
     Creates a string representing the days a class is held on.
 
-    :param row: Row of data that represents the course that the day string is calculated for
+    :param row: row of data that represents the course that the day string is calculated for
     """
     days = ""
     if row['CSM_MONDAY'] == 'Y':
@@ -303,6 +314,7 @@ def upload_schedule_data(file):
         logger.debug(f"Instructor {instructor} present")
 
         classroom = None
+        # Create a classroom object if the current building name is not null
         if not pd.isna(row['CSM_BLDG']):
             classroom, _ = Classroom.objects.get_or_create(
                 name=row['CSM_BLDG'] + "-" + str(row['CSM_ROOM']),
@@ -311,6 +323,7 @@ def upload_schedule_data(file):
             )
             logger.debug(f"Classroom {classroom} present")
 
+        # Create the course object
         day_string = calculate_day_string(row)
         course = Course.objects.create(
             section_id=None if pd.isna(row['COURSE_SECTIONS_ID']) else row['COURSE_SECTIONS_ID'],

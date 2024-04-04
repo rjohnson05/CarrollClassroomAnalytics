@@ -2,8 +2,11 @@ from django.urls import path
 from . import views
 
 """
-Provides URL patterns for sending HTTP requests to the respective methods in the views.py file.
+Contains URL patterns for forwarding HTTP requests to the respective methods in the views.py file.
+
+Author: Ryan Johnson
 """
+
 urlpatterns = [
     path('', views.index, name="index"),
     path('get_number_classes/', views.get_number_classes, name="get_number_classes"),

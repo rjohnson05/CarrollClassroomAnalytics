@@ -13,8 +13,7 @@ class Classroom(models.Model):
     Holds data for a classroom object. Classrooms must have both a building and room number (which makes up the name).
     All other information is optional. Occupancy describes the number of seats in the room, and length/width describe
     the size of the room in feet. Projector_num describes the number of projectors available in the room. Features and
-    notes provide any further things that should be known about the room, such as the presence of white boards or video,
-    , that the room is near a fire exit, etc.
+    notes provide any further description that should be known about the room (white boards, video, near a fire exit, etc.)
     """
     BUILDINGS = {
         "": "",
@@ -65,8 +64,8 @@ class Instructor(models.Model):
 class Course(models.Model):
     """
     Holds data for a course object. Course objects contain much information about a specific section of a Carroll
-    College course. The ID is generated automatically by the ORM, while the section ID is provided by the Carroll
-    registrars. The course/section number contains the numbers usually seen in the course catalog.Each course must
+    College course. The ID is generated automatically, while the section ID is provided by the Carroll
+    registrars. The course/section number contains the numbers usually seen in the course catalog. Each course must
     contain a term, start date, and end date. The course must also have a name, subject, and status. Since not all
     courses have a defined time slot or meeting location, the start/end times and meeting location (classroom) are
     optional, as are the number of credits assigned to the course. The days of the week that the course is held on are
