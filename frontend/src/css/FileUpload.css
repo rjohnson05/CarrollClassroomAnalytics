@@ -1,3 +1,10 @@
+/*
+Stylesheet for the component displaying the page for uploading Excel spreadsheets (either for course schedule or
+classroom data). The data from the uploaded spreadsheet replaces any data currently in the database.
+
+Author: Ryan Johnson
+ */
+
 .title-font {
     color: #3c1952;
     font-family: Helvetica, sans-serif;

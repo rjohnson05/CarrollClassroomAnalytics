@@ -2,22 +2,23 @@ import React, {useEffect, useRef} from "react";
 import * as d3 from "d3";
 
 /**
- * Creates the legend on the main page for showing how many classrooms are in use during a specific time block during the day.
- * Takes a dictionary containing the number of classrooms occupied during each time block during the week to adjust the
- * scaling for the colors.
+ * Creates an .svg image for the legend on the main page for showing how many classrooms are in use during a specific time
+ * block during the day. This legend correlates each color used within the heatmap to a number of used classrooms. Takes
+ * a dictionary detailing the number of classrooms occupied during each time block during the week and adjusts the color
+ * scale accordingly.
  *
- * @param numClassroomsList dictionary containing the number of classrooms occupied during each time block during the week
- * @returns {Element} svg image containing the legend with a title and x-axis
+ * @param maxNumberClasses integer describing the maximum number of classes used during any one time block throughout the week
+ *
  * @author Ryan Johnson
  */
-export default function Legend({numClassroomsList, maxNumberClasses}) {
+export default function Legend({maxNumberClasses}) {
     const svgRef = React.useRef(null);
-    const numClasses = Object.values(numClassroomsList);
 
     const margin = {top: 20, bottom: 10, left: 5, right: 4};
     const width = 400;
     const height = 50;
 
+    // This legend is recreated every time the max number of classes changes as the building filter is modified
     useEffect(() => {
         // Creates the base image
         const svg = d3.select(svgRef.current);
@@ -37,10 +38,10 @@ export default function Legend({numClassroomsList, maxNumberClasses}) {
             .tickSize(0)
         svg.append("g")
             .call(xAxisGenerator)
-            .attr("transform",`translate(${0}, ${height + margin.top})`)
+            .attr("transform", `translate(${0}, ${height + margin.top})`)
 
         // Creates the color range for the legend
-        const colors = ['white','#fcf881', '#eb0000', 'purple']
+        const colors = ['white', '#fcf881', '#eb0000', 'purple']
         const colorRange = d3.range(0, 1, 1.0 / (colors.length - 1))
         colorRange.push(1)
 
@@ -70,11 +71,11 @@ export default function Legend({numClassroomsList, maxNumberClasses}) {
         // Adding the title
         svg.append("text")
             .attr("x", width / 2)
-            .attr("y", 3*margin.top/4)
+            .attr("y", 3 * margin.top / 4)
             .attr("text-anchor", "middle")
             .attr("font-weight", "bold")
             .text("Number of Classrooms Used");
     }, [maxNumberClasses]);
 
-    return <svg ref={svgRef} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom} />;
+    return <svg ref={svgRef} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}/>;
 }

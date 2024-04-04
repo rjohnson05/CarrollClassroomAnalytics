@@ -8,13 +8,6 @@ import logging
 logger = logging.getLogger("views")
 
 
-def index(request):
-    """
-    Returns the index page of the React front end, serving the Django backend and React frontend together
-    """
-    return render(request, "build/index.html")
-
-
 @api_view(["GET"])
 def get_number_classes(request):
     """
@@ -151,3 +144,10 @@ def get_past_time(request):
         next_end_time = services.get_past_time(day, current_end_time, buildings_list)
 
     return Response(next_end_time)
+
+
+def index(request):
+    """
+    Returns the index page of the React front end, serving the Django backend and React frontend together
+    """
+    return render(request, "build/index.html")

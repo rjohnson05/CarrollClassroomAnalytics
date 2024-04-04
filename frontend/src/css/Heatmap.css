@@ -1,3 +1,12 @@
+/*
+Stylesheet for the component to display the number of classrooms in use for each time block during throughout a day. These numbers are
+coded by color, with time blocks with large number of classrooms in use being represented by a darker purple color and time
+blocks with fewer classrooms in use being represented by a lighter yellow color. If the time blocks are hovered over by the
+mouse, a tooltip displays the number of classrooms in use.
+
+Author: Ryan Johnson
+ */
+
 .light {
     background-color: var(--rt-color-white);
     color: var(--rt-color-dark);

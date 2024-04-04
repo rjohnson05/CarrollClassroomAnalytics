@@ -1,3 +1,11 @@
+/*
+Stylesheet for displaying the individual classroom pages, showing the weekly schedule for a single classroom. The times during which
+the classroom is used are colored. Hovering over these colored blocks shows a tooltip with information about the
+course taking place in the classroom during that time block.
+
+Author: Ryan Johnson
+ */
+
 .header {
     color: #3c1952;
     font-family: Helvetica, sans-serif;

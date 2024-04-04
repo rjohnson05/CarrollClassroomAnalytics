@@ -1,3 +1,15 @@
+/*
+Stylesheet for the component that displays the main page, showing a heat map to illustrate the number of used classrooms
+during each time block throughout the week. Each block of time is given a color depending upon the number of classrooms
+being used during that time block. Darker purple indicates blocks where more classrooms are used, while lighter yellow
+colors indicate less classroom usage. The user is able to filter different buildings to view the number of used
+classrooms in any combination of buildings. Hovering over any one of these time blocks shows a tooltip displaying the
+number of classrooms in use as well as a link to view each classroom being used during the selected (or hovered over)
+time block.
+
+Author: Ryan Johnson
+*/
+
 body {
     background-color: #f2f2f2;
 }

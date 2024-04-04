@@ -1,3 +1,9 @@
+/*
+Stylesheet for the component to display each classroom being used during a specific time block on a given day.
+
+Author: Ryan Johnson
+ */
+
 .classrooms-header {
     color: #3c1952;
     font-family: Helvetica, sans-serif;

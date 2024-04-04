@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { Tooltip } from 'react-tooltip'
+import {Tooltip} from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import '../css/Heatmap.css'
 import {Link} from "react-router-dom";
@@ -7,22 +7,30 @@ import {Link} from "react-router-dom";
 
 /**
  * Component to display the number of classrooms in use for each time block during throughout a day. These numbers are
- * coded by color, with time blocks with large number of classrooms in use being represented by a darker color and time
- * blocks with less classrooms in use being represented by a lighter color. If the time blocks are hovered over by the
+ * coded by color, with time blocks with large number of classrooms in use being represented by a darker purple color and time
+ * blocks with fewer classrooms in use being represented by a lighter yellow color. If the time blocks are hovered over by the
  * mouse, a tooltip displays the number of classrooms in use.
  *
- * @param timeBlockList dictionary containing each possible block of time during the day
- * @param numClassroomsList dictionary containing the number of classrooms used during each time block throughout the day
+ * @param day string specifying which weekday the component should display data for (M, T, W, th, F)
+ * @param buildingList list containing the names of each building used for housing courses on the Carroll College campus
+ * @param timeBlockList dictionary containing each possible block of time during the day. The keys of this dictionary
+ *                      are strings indicating the weekday, and the values are doubly-indexed arrays, with each subarray containing a single
+ *                       time block for the day.
+ * @param numClassroomsList dictionary holding the data about the number of classrooms used during each time block throughout the week. The keys are
+ *                   the start time of the time block, and the values are integers describing the number of classrooms used during that time block.
+ * @param maxNumberClasses integer describing the maximum number of classes used during any one time block throughout the week
  *
  * @author Ryan Johnson
  */
-export default function Heatmap({ day, buildingList, timeBlockList, numClassroomsList, maxNumberClasses }) {
+export default function Heatmap({day, buildingList, timeBlockList, numClassroomsList, maxNumberClasses}) {
     const colorScale = d3.scaleLinear()
-        .domain([0, 1*maxNumberClasses / 3, 2 *maxNumberClasses / 3,  maxNumberClasses])
+        .domain([0, 1 * maxNumberClasses / 3, 2 * maxNumberClasses / 3, maxNumberClasses])
         .range(['white', '#fcf881', '#eb0000', 'purple'])
 
+
     /**
-     * Calculates the number of minutes between a start and end time for display purposes.
+     * Calculates the number of minutes between a start/end time. This is used for forming the size of the colored
+     * blocks of the heatmap.
      *
      * @param startTime   String representing the starting time for the block
      * @param endTime     String representing the ending time for the block
@@ -34,47 +42,45 @@ export default function Heatmap({ day, buildingList, timeBlockList, numClassroom
         const minutes = endTime[1] - startTime[1];
         // Accounts for the noonday hour change from 12 to 1
         if ((parseInt(startTime[0]) > 1 && endTime[0] === '1')) {
-            return (60 + minutes)/(1.6);
+            return (60 + minutes) / (1.6);
         }
         // Handles all other hour changes
-        const hourMinutes = 60*(endTime[0] - startTime[0]);
-        return (hourMinutes + minutes)/5;
+        const hourMinutes = 60 * (endTime[0] - startTime[0]);
+        return (hourMinutes + minutes) / 5;
     }
 
 
-    return (
-        <div>
-            <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" clickable={true} render={({content}) => {
-                if (content) {
-                    const contentParts = content.split(",");
-                    return (
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span>Time: {contentParts[0]?.substring(0,5)} - {contentParts[1]?.substring(0,5)}</span>
-                            <span>Classrooms in Use: {contentParts[2]}</span>
-                            <Link className="link" to={`/used_classrooms`}
-                                  state={{
-                                      day: contentParts[3],
-                                      buildingList: [Object.entries(buildingList).filter(([key, value]) => key && value)
-                                          .map(([key]) => key).join(', ')],
-                                      startTime: contentParts[0]?.substring(0,5),
-                                      endTime: contentParts[1]?.substring(0,5)}}>
-                                View Used Classrooms</Link>
-                        </div>
-                    );
-                } else {
-                    return null;
-                }
-            }}></Tooltip>
-            {timeBlockList ?
-                timeBlockList.map((timeBlock) => (
-                    <svg key={timeBlock} viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
-                         style={{display: "block"}}>
-                        <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1]) + 1}
-                              fill={colorScale(numClassroomsList[timeBlock[0]])}
-                              className="tooltip-target" data-tooltip-content={[timeBlock[0], timeBlock[1],
-                            numClassroomsList[timeBlock[0]], day, buildingList]} />
-                    </svg>
-                )) : <p>No heatmap data available</p>}
-        </div>
-    );
+    return (<div>
+            {/*A tooltip appears when hovering over the colored blocks, showing how many classrooms are in use*/}
+            <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" clickable={true}
+                     render={({content}) => {
+                         if (content) {
+                             const contentParts = content.split(",");
+                             return (<div style={{display: 'flex', flexDirection: 'column'}}>
+                                     <span>Time: {contentParts[0]?.substring(0, 5)} - {contentParts[1]?.substring(0, 5)}</span>
+                                     <span>Classrooms in Use: {contentParts[2]}</span>
+                                     {/*Link to show which classrooms are used during a specific time block*/}
+                                     <Link className="link" to={`/used_classrooms`}
+                                           state={{
+                                               day: contentParts[3],
+                                               buildingList: [Object.entries(buildingList).filter(([key, value]) => key && value)
+                                                   .map(([key]) => key).join(', ')],
+                                               startTime: contentParts[0]?.substring(0, 5),
+                                               endTime: contentParts[1]?.substring(0, 5)
+                                           }}>
+                                         View Used Classrooms</Link>
+                                 </div>);
+                         } else {
+                             return null;
+                         }
+                     }}></Tooltip>
+            {timeBlockList ? timeBlockList.map((timeBlock) => (
+                <svg key={timeBlock} viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
+                     style={{display: "block"}}>
+                    <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1]) + 1}
+                          fill={colorScale(numClassroomsList[timeBlock[0]])}
+                          className="tooltip-target"
+                          data-tooltip-content={[timeBlock[0], timeBlock[1], numClassroomsList[timeBlock[0]], day, buildingList]}/>
+                </svg>)) : <p>No heatmap data available</p>}
+        </div>);
 }

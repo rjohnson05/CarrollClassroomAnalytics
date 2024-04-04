@@ -1,3 +1,9 @@
+/*
+Stylesheet for the component that renders the purple navigation bar at the top of the application.
+
+Author: Ryan Johnson
+ */
+
 .navbar {
     background-color: #3c1952;
 }

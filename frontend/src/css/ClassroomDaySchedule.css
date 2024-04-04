@@ -1,0 +1,12 @@
+/*
+Stylesheet for the component that displays the course being used during a specific time block during the day. A time
+block is considered as the period between each course start/end time. This component is similar to the heatmap component
+shown on the main page, except that only one color is used to show when the classroom contains a course. When a time
+block is hovered over, a tooltip shows information about the course using the classroom during the time block.
+
+Author: Ryan Johnson
+ */
+
+.tooltip-line {
+    margin: 0;
+}

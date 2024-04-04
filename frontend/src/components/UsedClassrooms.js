@@ -10,9 +10,9 @@ import NavBar from "./NavBar";
 import "../css/UsedClassrooms.css"
 
 /**
+ * Component to display each classroom being used during a specific time block on a given day.
  *
- * @returns {JSX.Element}
- * @constructor
+ * @author Ryan Johnson
  */
 export default function UsedClassrooms() {
     const [classroomsData, setClassroomsData] = useState(null);
@@ -21,41 +21,60 @@ export default function UsedClassrooms() {
     const [nextEndTime, setNextEndTime] = useState(null);
     const {day, buildingList, startTime, endTime} = useLocation().state;
     const dayDict = {
-        "M": "MONDAY",
-        "T": "TUESDAY",
-        "W": "WEDNESDAY",
-        "th": "THURSDAY",
-        "F": "FRIDAY",
+        "M": "MONDAY", "T": "TUESDAY", "W": "WEDNESDAY", "th": "THURSDAY", "F": "FRIDAY",
     }
 
+    // Loads the data for the used classrooms and ensures that each classroom dropdown is initially closed
     useEffect(() => {
         async function fetchData() {
             await loadData();
         }
+
         if (classroomsData == null) {
             fetchData();
         }
         setDropdownInitialStatus();
     }, [classroomsData]);
 
+    // Whenever the start time is changed (when paging through time blocks for the classroom), the classroom data must
+    // be reloaded
     useEffect(() => {
         async function fetchData() {
             await loadData();
         }
+
         fetchData();
     }, [startTime]);
 
     /**
-     * Loads the list of classrooms used during the specified time block on a given day.
+     * Loads the list of classrooms used during the specified time block on a given day. The time block on either side
+     * of the one being currently viewed is stored for paging purposes, allowing the user to page through previous or
+     * future time blocks in the same classroom without leaving the page.
      */
     const loadData = async () => {
         try {
-            const usedClassroomsData = await axios.get("http://localhost:8000/api/get_used_classrooms/",
-                {params: {day: day, buildings: buildingList, startTime: startTime, endTime: endTime}});
-            const pastStartTimeData = await axios.get("http://localhost:8000/api/get_past_time/",
-                {params: {day: day, buildings: buildingList, currentStartTime: startTime}});
-            const nextEndTimeData = await axios.get("http://localhost:8000/api/get_next_time/",
-                {params: {day: day, buildings: buildingList, currentEndTime: endTime}});
+            const usedClassroomsData = await axios.get("/api/get_used_classrooms/", {
+                params: {
+                    day: day,
+                    buildings: buildingList,
+                    startTime: startTime,
+                    endTime: endTime
+                }
+            });
+            const pastStartTimeData = await axios.get("/api/get_past_time/", {
+                params: {
+                    day: day,
+                    buildings: buildingList,
+                    currentStartTime: startTime
+                }
+            });
+            const nextEndTimeData = await axios.get("/api/get_next_time/", {
+                params: {
+                    day: day,
+                    buildings: buildingList,
+                    currentEndTime: endTime
+                }
+            });
             setClassroomsData(usedClassroomsData.data);
             setPastStartTime(pastStartTimeData.data);
             setNextEndTime(nextEndTimeData.data);
@@ -81,7 +100,7 @@ export default function UsedClassrooms() {
     }
 
     /**
-     * Toggles whether the given classroom is showing its course(s).
+     * Toggles whether the specified classroom block is showing its course(s).
      *
      * @param classroomName  Name of the classroom being toggled
      */
@@ -103,7 +122,8 @@ export default function UsedClassrooms() {
     }
 
     /**
-     * Displays the list of classrooms and its corresponding courses in an orderly format, using several columns.
+     * Displays the list of classrooms and its corresponding courses in an orderly format, using two columns if there
+     * is more than one classroom and a single column otherwise.
      */
     const renderCols = () => {
         const classrooms = classroomsData ? Object.entries(classroomsData) : [];
@@ -111,10 +131,9 @@ export default function UsedClassrooms() {
 
         // Shows only one larger column if there is only one classroom to be displayed
         if (Math.round(num_rows) === 1) {
-            return (
-                classrooms.map(([classroom, data]) => (
-                <div className="class-group" key={classroom}>
-                    <div className={`classroom ${classroomDropdownStatus && isClicked(classroom) ? 'classroom-square' : ''}`}
+            return (classrooms.map(([classroom, data]) => (<div className="class-group" key={classroom}>
+                    <div
+                        className={`classroom ${classroomDropdownStatus && isClicked(classroom) ? 'classroom-square' : ''}`}
                         onClick={() => dropdownToggle(classroom)}>
                         <div className="dropdown-title">
                             {classroomDropdownStatus && isClicked(classroom) ?
@@ -122,23 +141,20 @@ export default function UsedClassrooms() {
                                 <KeyboardArrowDownIcon className="dropdown-icon"/>}
                             <p className="classroom-title">{classroom}</p>
                         </div>
-                        <Link className="info-icon" to={`/classrooms/${classroom}`}><InfoIcon /></Link>
+                        <Link className="info-icon" to={`/classrooms/${classroom}`}><InfoIcon/></Link>
                     </div>
                     {/*Displays the list of courses held within the classroom when clicked on*/}
-                    <div className={`courses ${classroomDropdownStatus && isClicked(classroom) ? 'courses-visible' : ''}`}>
-                        {classroomDropdownStatus && classroomDropdownStatus[classroom] ?
-                            data.map((course) => (
-                                <div className="course" key={course}>
-                                    <p className="course-title">{course[0]}</p>
-                                    <p className="course-instructor"><b>Instructor: </b>{course[1]}</p>
-                                    <p className="course-seats"><b>Empty Seats: </b> {(course[2] > 0) ?
-                                        course[2] - course[3] + '/' + course[2] : "N/A"}</p>
-                                </div>
-                            )) : <div></div>
-                        }
+                    <div
+                        className={`courses ${classroomDropdownStatus && isClicked(classroom) ? 'courses-visible' : ''}`}>
+                        {classroomDropdownStatus && classroomDropdownStatus[classroom] ? data.map((course) => (
+                            <div className="course" key={course}>
+                                <p className="course-title">{course[0]}</p>
+                                <p className="course-instructor"><b>Instructor: </b>{course[1]}</p>
+                                <p className="course-seats"><b>Empty
+                                    Seats: </b> {(course[2] > 0) ? course[2] - course[3] + '/' + course[2] : "N/A"}</p>
+                            </div>)) : <div></div>}
                     </div>
-                </div>
-            )))
+                </div>)))
         }
 
         // Displays the classrooms in 2 independent columns
@@ -146,7 +162,8 @@ export default function UsedClassrooms() {
         for (let i = 0; i < classrooms.length; i += num_rows) {
             const col = classrooms.slice(i, i + num_rows).map(([classroom, data]) => (
                 <div className="class-group" key={classroom}>
-                    <div className={`classroom ${classroomDropdownStatus && isClicked(classroom) ? 'classroom-square' : ''}`}
+                    <div
+                        className={`classroom ${classroomDropdownStatus && isClicked(classroom) ? 'classroom-square' : ''}`}
                         onClick={() => dropdownToggle(classroom)}>
                         <div className="dropdown-title">
                             {classroomDropdownStatus && isClicked(classroom) ?
@@ -154,69 +171,58 @@ export default function UsedClassrooms() {
                                 <KeyboardArrowDownIcon className="dropdown-icon"/>}
                             <p className="classroom-title">{classroom}</p>
                         </div>
-                        <Link className="info-icon" to={`/classrooms/${classroom}`}><InfoIcon /></Link>
+                        <Link className="info-icon" to={`/classrooms/${classroom}`}><InfoIcon/></Link>
                     </div>
-                    <div className={`courses ${classroomDropdownStatus && isClicked(classroom) ? 'courses-visible' : ''}`}>
-                        {classroomDropdownStatus && classroomDropdownStatus[classroom] ?
-                            data.map((course) => (
-                                <div className="course" key={course}>
-                                    <p className="course-title">{course[0]}</p>
-                                    <p className="course-instructor"><b>Instructor: </b>{course[1]}</p>
-                                    <p className="course-seats"><b>Empty Seats: </b>{(course[2] > 0) ?
-                                        (course[2] - course[3]) + '/' + course[2] : "N/A"}</p>
-                                </div>
-                            )) : <div></div>
-                        }
+                    {/*Displays the list of courses held within the classroom when clicked on*/}
+                    <div
+                        className={`courses ${classroomDropdownStatus && isClicked(classroom) ? 'courses-visible' : ''}`}>
+                        {classroomDropdownStatus && classroomDropdownStatus[classroom] ? data.map((course) => (
+                            <div className="course" key={course}>
+                                <p className="course-title">{course[0]}</p>
+                                <p className="course-instructor"><b>Instructor: </b>{course[1]}</p>
+                                <p className="course-seats"><b>Empty
+                                    Seats: </b>{(course[2] > 0) ? (course[2] - course[3]) + '/' + course[2] : "N/A"}</p>
+                            </div>)) : <div></div>}
                     </div>
-                </div>
-            ))
+                </div>))
             cols.push(col);
         }
         return cols;
     };
 
-    return (
-        <div>
+    return (<div>
             <NavBar/>
             <h1 className="classrooms-header">CLASSROOM USAGE REPORT <br/>({dayDict[day]}: {startTime} - {endTime})</h1>
 
             {/*Only allows user to move back a time slot if there is a previous time slot available*/}
-            {startTime === '06:00' ?
-                <div></div> :
-                <Link className="back-button" to={`/used_classrooms`}
-                      state={{
-                          day: day,
-                          buildingList: buildingList,
-                          startTime: pastStartTime,
-                          endTime: startTime
-                      }}>
-                    <NavigateBeforeIcon/>
-                    <p>Previous Time Block</p>
-                </Link>
-            }
+            {startTime === '06:00' ? <div></div> : <Link className="back-button" to={`/used_classrooms`}
+                                                         state={{
+                                                             day: day,
+                                                             buildingList: buildingList,
+                                                             startTime: pastStartTime,
+                                                             endTime: startTime
+                                                         }}>
+                <NavigateBeforeIcon/>
+                <p>Previous Time Block</p>
+            </Link>}
 
             {/*Only allows user to move forward a time slot if there is a future time slot available*/}
-            {endTime === '23:59' ?
-                <div></div> :
-                <Link className="next-button" to={`/used_classrooms`}
-                      state={{
-                          day: day,
-                          buildingList: buildingList,
-                          startTime: endTime,
-                          endTime: nextEndTime
-                      }}>
-                    <NavigateNextIcon />
-                    <p>Next Time Block</p>
-                </Link>
-            }
+            {endTime === '23:59' ? <div></div> : <Link className="next-button" to={`/used_classrooms`}
+                                                       state={{
+                                                           day: day,
+                                                           buildingList: buildingList,
+                                                           startTime: endTime,
+                                                           endTime: nextEndTime
+                                                       }}>
+                <NavigateNextIcon/>
+                <p>Next Time Block</p>
+            </Link>}
 
+            {/*Renders the classroom blocks*/}
             <div className="allClasses">
-                {renderCols().map((col, index) => (
-                    <div className="classroomsCol" key={index}>
+                {renderCols().map((col, index) => (<div className="classroomsCol" key={index}>
                         {col}
-                    </div>
-                ))}
+                    </div>))}
             </div>
-        </div>
-    );
+        </div>);
 }
