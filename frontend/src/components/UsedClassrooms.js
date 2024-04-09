@@ -209,7 +209,7 @@ export default function UsedClassrooms() {
             }
 
             {/*Only allows user to move forward a time slot if there is a future time slot available*/}
-            {endTime === '23:59' ? <div></div> : <Link className="next-button" to={{pathname: `/used_classrooms`, search: `?day=${day}&buildingList=${buildingList}&startTime=${endTime}&endTime=${nextEndTime}`}}>
+                {endTime === '23:59' ? <div></div> : <Link className="next-button" to={{pathname: `/used_classrooms`, search: `?day=${day}&buildingList=${buildingList}&startTime=${endTime}&endTime=${nextEndTime}`}}>
                     <NavigateNextIcon/>
                     <p>Next Time Block</p>
                 </Link>
