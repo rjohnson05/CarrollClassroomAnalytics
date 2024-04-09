@@ -4,7 +4,6 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import './index.css';
 import Calendar from './components/HeatmapSchedule';
 import UsedClassrooms from "./components/UsedClassrooms";
-import reportWebVitals from './reportWebVitals';
 import ClassroomInfo from "./components/ClassroomInfo";
 import FileUpload from "./components/FileUpload";
 

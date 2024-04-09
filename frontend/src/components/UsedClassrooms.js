@@ -19,7 +19,14 @@ export default function UsedClassrooms() {
     const [classroomDropdownStatus, setClassroomDropdownStatus] = useState(null);
     const [pastStartTime, setPastStartTime] = useState(null);
     const [nextEndTime, setNextEndTime] = useState(null);
-    const {day, buildingList, startTime, endTime} = useLocation().state;
+
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const day = searchParams.get("day");
+    const buildingList = searchParams.get("buildingList").split(", ");
+    const startTime = searchParams.get("startTime");
+    const endTime = searchParams.get("endTime");
+
     const dayDict = {
         "M": "MONDAY", "T": "TUESDAY", "W": "WEDNESDAY", "th": "THURSDAY", "F": "FRIDAY",
     }
@@ -195,28 +202,18 @@ export default function UsedClassrooms() {
             <h1 className="classrooms-header">CLASSROOM USAGE REPORT <br/>({dayDict[day]}: {startTime} - {endTime})</h1>
 
             {/*Only allows user to move back a time slot if there is a previous time slot available*/}
-            {startTime === '06:00' ? <div></div> : <Link className="back-button" to={`/used_classrooms`}
-                                                         state={{
-                                                             day: day,
-                                                             buildingList: buildingList,
-                                                             startTime: pastStartTime,
-                                                             endTime: startTime
-                                                         }}>
-                <NavigateBeforeIcon/>
-                <p>Previous Time Block</p>
-            </Link>}
+            {startTime === '06:00' ? <div></div> : <Link className="back-button" to={{pathname: `/used_classrooms`, search: `?day=${day}&buildingList=${buildingList}&startTime=${pastStartTime}&endTime=${startTime}`}}>
+                    <NavigateBeforeIcon/>
+                    <p>Previous Time Block</p>
+                </Link>
+            }
 
             {/*Only allows user to move forward a time slot if there is a future time slot available*/}
-            {endTime === '23:59' ? <div></div> : <Link className="next-button" to={`/used_classrooms`}
-                                                       state={{
-                                                           day: day,
-                                                           buildingList: buildingList,
-                                                           startTime: endTime,
-                                                           endTime: nextEndTime
-                                                       }}>
-                <NavigateNextIcon/>
-                <p>Next Time Block</p>
-            </Link>}
+            {endTime === '23:59' ? <div></div> : <Link className="next-button" to={{pathname: `/used_classrooms`, search: `?day=${day}&buildingList=${buildingList}&startTime=${endTime}&endTime=${nextEndTime}`}}>
+                    <NavigateNextIcon/>
+                    <p>Next Time Block</p>
+                </Link>
+            }
 
             {/*Renders the classroom blocks*/}
             <div className="allClasses">

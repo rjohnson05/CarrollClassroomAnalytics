@@ -56,18 +56,16 @@ export default function Heatmap({day, buildingList, timeBlockList, numClassrooms
                      render={({content}) => {
                          if (content) {
                              const contentParts = content.split(",");
+                             const day = contentParts[3];
+                             const buildingListArray = Object.entries(buildingList).filter(([key, value]) => key && value)
+                                                   .map(([key]) => key).join(', ');
+                             const startTime = contentParts[0]?.substring(0, 5);
+                             const endTime = contentParts[1]?.substring(0, 5);
                              return (<div style={{display: 'flex', flexDirection: 'column'}}>
                                      <span>Time: {contentParts[0]?.substring(0, 5)} - {contentParts[1]?.substring(0, 5)}</span>
                                      <span>Classrooms in Use: {contentParts[2]}</span>
                                      {/*Link to show which classrooms are used during a specific time block*/}
-                                     <Link className="link" to={`/used_classrooms`}
-                                           state={{
-                                               day: contentParts[3],
-                                               buildingList: [Object.entries(buildingList).filter(([key, value]) => key && value)
-                                                   .map(([key]) => key).join(', ')],
-                                               startTime: contentParts[0]?.substring(0, 5),
-                                               endTime: contentParts[1]?.substring(0, 5)
-                                           }}>
+                                     <Link className="link" to={{pathname: `/used_classrooms`, search: `?day=${day}&buildingList=${buildingListArray}&startTime=${startTime}&endTime=${endTime}`}} target="_blank" rel="noopener noreferrer">
                                          View Used Classrooms</Link>
                                  </div>);
                          } else {
