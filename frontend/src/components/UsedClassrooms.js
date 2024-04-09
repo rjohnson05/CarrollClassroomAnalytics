@@ -157,8 +157,8 @@ export default function UsedClassrooms() {
                             <div className="course" key={course}>
                                 <p className="course-title">{course[0]}</p>
                                 <p className="course-instructor"><b>Instructor: </b>{course[1]}</p>
-                                <p className="course-seats"><b>Empty
-                                    Seats: </b> {(course[2] > 0) ? course[2] - course[3] + '/' + course[2] : "N/A"}</p>
+                                <p className="course-seats"><b>
+                                    Seats Utilized: </b> {(course[2] > 0) ? course[3] + ' Students / ' + course[2] + ' Seats' : "N/A"}</p>
                             </div>)) : <div></div>}
                     </div>
                 </div>)))
