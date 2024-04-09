@@ -1,8 +1,9 @@
 from datetime import datetime
-
+# from views import get_classroom_table_data, get_course_table_data
 from api.models import Course, Classroom, Instructor
 import logging
 import pandas as pd
+import itertools
 
 logger = logging.getLogger("services")
 
@@ -84,7 +85,8 @@ def calculate_number_classes(buildings='all'):
                 block_num_classes = (Course.objects.all().filter(day__contains=day,
                                                                  start_time__lte=block_start_time,
                                                                  end_time__gte=block_end_time)
-                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(classroom__building="OFCP"))
+                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
+                    classroom__building="OFCP"))
             else:
                 # Counts the number of courses (within specified buildings) running between the current block's
                 # start/end times for a subset of buildings
@@ -92,7 +94,8 @@ def calculate_number_classes(buildings='all'):
                                                                  start_time__lte=block_start_time,
                                                                  end_time__gte=block_end_time,
                                                                  classroom__building__in=buildings)
-                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(classroom__building="OFCP"))
+                                     .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
+                    classroom__building="OFCP"))
             # Account for the possibility of several courses in a single classrooms by only counting the unique
             # classrooms in use
             unique_classrooms = []
@@ -101,7 +104,8 @@ def calculate_number_classes(buildings='all'):
                     unique_classrooms.append(course.classroom.name)
 
             day_num_classes[block_start_time] = len(unique_classrooms)
-            logger.debug(f"calculate_number_classes: Unique classes found for block {block_start_time} on {day}: {unique_classrooms}")
+            logger.debug(
+                f"calculate_number_classes: Unique classes found for block {block_start_time} on {day}: {unique_classrooms}")
         logger.debug(f"calculate_number_classes: Number of classes for time blocks during {day}: {day_num_classes}")
         all_num_classes[day] = day_num_classes
     logger.debug(f"calculate_number_classes: Number of classes calculated for time blocks in {buildings}")
@@ -150,7 +154,8 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
         else:
             classrooms_dict[classroom] += [course_data]
 
-    logger.debug(f"get_used_classrooms: Classroom data found for {buildings} from {start_time} to {end_time} on {day}: {classrooms_dict}")
+    logger.debug(
+        f"get_used_classrooms: Classroom data found for {buildings} from {start_time} to {end_time} on {day}: {classrooms_dict}")
     return classrooms_dict
 
 
@@ -347,3 +352,34 @@ def upload_classroom_data(file):
             notes=row['Notes'] if not pd.isna(row['Notes']) else None,
         )
         logger.debug(f"Classroom {classroom} created/updated")
+
+
+
+
+def unique_times():
+    start_time = Course.objects.values('start_time').distinct()
+    end_time = Course.objects.values('end_time').distinct()
+    start_time_list = list(start_time)
+    end_time_list = list(end_time)
+    combined_times = sorted(start_time_list + end_time_list)
+    return combined_times
+
+
+# def link_models():
+#     class_list = list(Classroom.objects.values())
+#     course_list = list(Course.objects.values())
+#     classes = Classroom
+#     courses = Course
+#     classes_and_courses = {}
+#     # for i in classes.id:
+#     #    logger.info("i from link_models is:", i)
+#     #     # for j in courses.classroom:
+#     #     # if i == j:
+#     #     #     links = {i:  }
+#     for i in classes.id:
+#         for j in courses.classroom:
+#         if i == j:
+#             links = {i:  }
+
+
+

@@ -5,7 +5,8 @@ import axios from "axios";
 import './Calendar.css';
 import HeatMap from "./Heatmap";
 import NavBar from "./NavBar";
-import Legend from "./Legend"
+import Legend from "./Legend";
+import Table from "./Table"
 import * as d3 from "d3";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -17,8 +18,8 @@ import { Column } from 'primereact/column';
  * @author Ryan Johnson, Adrian Rincon Jimenez
  */
 export default function Home() {
-    const [classrooms, setClassrooms] = useState([]);
-    const [courses, setCourses] = useState([]);
+    // const [classrooms, setClassrooms] = useState([]);
+    // const [courses, setCourses] = useState([]);
     const [firstRender, setFirstRender] = useState(true);
     const [timeBlocks, setTimeBlocks] = useState(false);
     const [numberClasses, setNumberClasses] = useState(false);
@@ -32,14 +33,15 @@ export default function Home() {
 
 
     const columns = [
-        { field: 'name', header: 'Name' },
-        { field: 'room_num', header: 'Room Number' },
+        { field: 'name', header: 'Classroom' },
     ];
 
     const columns2 = [
+        { field: 'name', header: 'Course Name'},
         { field: 'day', header: 'Day'},
         { field: 'start_time', header: 'Start Time'},
         { field: 'end_time', header: 'End Time'},
+        // { field: 'classroom', header: 'Classroom'},
         // { field: 'number_students', header: 'Number of Students'},
     ];
 
@@ -102,43 +104,47 @@ export default function Home() {
         }
     }
 
-    useEffect(() => {
-    const fetchData = async () => {
-        try {
-            // Fetch classroom data
-            const response = await axios.get('/api/get_classroom_table_data/');
-            const classroomsData = response.data;
-
-            // Fetch time data
-            const courseDataResponse = await axios.get("/api/get_course_table_data/");
-            const courseData = courseDataResponse.data;
-
-            console.log("course data was uploaded");
-
-            // Map number of classes to the classrooms data
-            const updatedClassrooms = classroomsData.map(classroom => {
-                return { ...classroom};
-            });
-
-            // Update Classrooms
-            const updatedCourses = courseData.map(course => {
-                return { ... course};
-            });
-
-            // Set the updated classrooms data to the state
-            setClassrooms(updatedClassrooms);
-
-            // Set the updated courses data to the state
-            setCourses(updatedCourses);
-
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-
-    };
-
-    fetchData();
-}, []);
+//     useEffect(() => {
+//     const fetchData = async () => {
+//         try {
+//             // Fetch classroom data
+//             const response = await axios.get('/api/get_classroom_table_data/');
+//             console.log("this is response in useEffect:", response);
+//             const classroomsData = response.data;
+//
+//
+//             // Fetch time data
+//             const courseDataResponse = await axios.get("/api/get_course_table_data/");
+//             const courseData = courseDataResponse.data;
+//
+//             console.log("course data was uploaded");
+//
+//             // Map classroom data to updatedClassrooms
+//             const updatedClassrooms = classroomsData.map(classroom => {
+//                 return { ...classroom};
+//             });
+//
+//             // Update Classrooms
+//             const updatedCourses = courseData.map(course => {
+//                 return { ... course};
+//             });
+//
+//             // Set the updated classrooms data to the state
+//             setClassrooms(updatedClassrooms);
+//
+//             // Set the updated courses data to the state
+//             setCourses(updatedCourses);
+//
+//             // setClassrooms(updatedCourses);
+//
+//         } catch (error) {
+//             console.error('Error fetching data:', error);
+//         }
+//
+//     };
+//
+//     fetchData();
+// }, []);
 
     /**
      * Calculates the new maximum number of classrooms used within the current building filter, passed to the legend and
@@ -249,45 +255,63 @@ export default function Home() {
 
             <button onClick={toggleTableDisplay}>Toggle Table</button>
 
-        {/* Display either the heatmap or the table based on the showTable state */}
+        {/*/!* Display either the heatmap or the table based on the showTable state *!/*/}
+        {/*{showTable ? (*/}
+        {/*    <div className="card">*/}
+        {/*        <div className="table-container">*/}
+        {/*            <table className="table" style={{minWidth: '50rem'}}>*/}
+        {/*                <thead>*/}
+        {/*                <tr>*/}
+        {/*                    /!* Render table headers for classroom data *!/*/}
+        {/*                    {columns.map((col, i) => (*/}
+        {/*                        <th key={i}>{col.header}</th>*/}
+        {/*                    ))}*/}
+        {/*                    /!* Render table headers for course data *!/*/}
+        {/*                    {columns2.map((col, i) => (*/}
+        {/*                        <th key={i + columns.length}>{col.header}</th>*/}
+        {/*                    ))}*/}
+        {/*                </tr>*/}
+        {/*                </thead>*/}
+        {/*                <tbody>*/}
+        {/*                /!* Render rows for classroom and course data *!/*/}
+        {/*                {classrooms.map((classroom, i) => (*/}
+        {/*                    <tr key={i}>*/}
+        {/*                        /!* Render cells for classroom data *!/*/}
+        {/*                        {columns.map((col, j) => (*/}
+        {/*                            <td key={j}>{classroom[col.field]}</td>*/}
+        {/*                        ))}*/}
+        {/*                        /!* Render cells for course data *!/*/}
+        {/*                        {courses[i] ? ( // Check if course data exists for this index*/}
+        {/*                            columns2.map((col2, k) => (*/}
+        {/*                                <td key={k + columns.length}>{courses[i][col2.field]}</td>*/}
+        {/*                            ))*/}
+        {/*                        ) : ( // Render empty cells if no course data for this index*/}
+        {/*                            columns2.map((col2, k) => (*/}
+        {/*                                <td key={k + columns.length}></td>*/}
+        {/*                            ))*/}
+        {/*                        )}*/}
+        {/*                    </tr>*/}
+        {/*                ))}*/}
+        {/*                </tbody>*/}
+        {/*            </table>*/}
+
+        {/*        </div>*/}
+        {/*    </div>*/}
+             {/* Display either the heatmap or the table based on the showTable state */}
         {showTable ? (
             <div className="card">
                 <div className="table-container">
-                    <table className="table" style={{minWidth: '50rem'}}>
-                        <thead>
-                        <tr>
-                            {/* Render table headers for classroom data */}
-                            {columns.map((col, i) => (
-                                <th key={i}>{col.header}</th>
-                            ))}
-                            {/* Render table headers for course data */}
-                            {columns2.map((col, i) => (
-                                <th key={i + columns.length}>{col.header}</th>
-                            ))}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {/* Render rows for classroom and course data */}
-                        {classrooms.map((classroom, i) => (
-                            <tr key={i}>
-                                {/* Render cells for classroom data */}
-                                {columns.map((col, j) => (
-                                    <td key={j}>{classroom[col.field]}</td>
-                                ))}
-                                {/* Render cells for course data */}
-                                {courses[i] ? ( // Check if course data exists for this index
-                                    columns2.map((col2, k) => (
-                                        <td key={k + columns.length}>{courses[i][col2.field]}</td>
-                                    ))
-                                ) : ( // Render empty cells if no course data for this index
-                                    columns2.map((col2, k) => (
-                                        <td key={k + columns.length}></td>
-                                    ))
-                                )}
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                    {(Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
+
+                    <Table
+                    day = "M"
+                    buildingList={buildingNames}
+                    timeBlockList={timeBlocks}
+                    numClassroomsList={numberClasses}
+                    maxNumberClasses={maxNumClasses}
+                    />
+
+                        :<p> Loading </p>}
 
                 </div>
             </div>

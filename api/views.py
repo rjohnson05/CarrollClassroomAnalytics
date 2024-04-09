@@ -94,6 +94,8 @@ def get_classroom_data(request):
     return Response(courses)
 
 
+
+
 def get_classroom_table_data(request):
     classroom_data = list(Classroom.objects.values())
     return JsonResponse(classroom_data, safe=False)
@@ -102,6 +104,14 @@ def get_classroom_table_data(request):
 def get_course_table_data(request):
     course_data = list(Course.objects.values())
     return JsonResponse(course_data, safe=False)
+
+
+
+
+def link_tables(request):
+    classroom_id = list(Classroom.id)
+    class_in_course = list(Course.classroom)
+    return JsonResponse(classroom_id, class_in_course, safe=False)
 
 
 @api_view(["POST"])
