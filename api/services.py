@@ -124,7 +124,7 @@ def get_all_buildings():
     return buildings_list
 
 
-def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str = "all") -> {}:
+def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] = "all") -> {}:
     """
     Returns a list of all classrooms used during a specified time block and data about the course being held in the
     classroom during that specified time block.
@@ -135,6 +135,7 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
     :param buildings:  string indicating which buildings should be searched for used classrooms
     :return            dictionary containing the data for every classroom being used within the specified time block and building
     """
+    logger.info(f"Day: {day}, StartTime: {start_time}, EndTime: {end_time}, Buildings: {buildings}")
     if buildings == 'all':
         # Searches for used classrooms within all buildings
         current_courses = (Course.objects.all().filter(day__contains=day,
@@ -143,11 +144,13 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
                            .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
     else:
         # Searches for used classrooms within only buildings specified by the filter
+        logger.info(f"BuildingsLegit: {Course.objects.all().filter(classroom__building__in=buildings)}")
         current_courses = (Course.objects.all().filter(day__contains=day,
                                                        start_time__lte=start_time,
                                                        end_time__gte=end_time,
                                                        classroom__building__in=buildings)
                            .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
+        logger.info(f"Current Courses: {current_courses}")
     courses_data = [
         [course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrolled]
         for course in current_courses]
@@ -166,7 +169,7 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: str
     return classrooms_dict
 
 
-def calculate_classroom_time_blocks(classroom):
+def calculate_classroom_time_blocks(classroom: str):
     """
     Finds all possible time blocks used in the specified classroom and then returns this information in a dictionary.
     This dictionary uses the abbreviation for every weekday ('M', 'T', etc.) as the keys and an array of arrays as
@@ -339,7 +342,7 @@ def upload_schedule_data(file):
             status=None if pd.isna(row['SEC_STATUS']) else row['SEC_STATUS'],
             start_time=None if pd.isna(row['CSM_START_TIME']) else datetime.strptime(row['CSM_START_TIME'],
                                                                                      '%I:%M%p').time(),
-            end_time=None if pd.isna(row['CSM_START_TIME']) else datetime.strptime(row['CSM_END_TIME'],
+            end_time=None if pd.isna(row['CSM_END_TIME']) else datetime.strptime(row['CSM_END_TIME'],
                                                                                    '%I:%M%p').time(),
             day=day_string,
             classroom=classroom if classroom is not None else None,
