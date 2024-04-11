@@ -299,6 +299,11 @@ def upload_schedule_data(file):
 
     :param file: Excel spreadsheet containing the scheduled course data for populating the database
     """
+    # Delete all data to prevent different semesters being present in the DB
+    Course.objects.all().delete()
+    Classroom.objects.all().delete()
+    Instructor.objects.all().delete()
+
     logger.info("New schedule file uploading")
     df = pd.read_excel(file)
 
