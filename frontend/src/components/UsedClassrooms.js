@@ -23,7 +23,7 @@ export default function UsedClassrooms() {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const day = searchParams.get("day");
-    const buildingList = searchParams.get("buildingList").split(", ");
+    const buildingList = searchParams.get("buildingList");
     const startTime = searchParams.get("startTime");
     const endTime = searchParams.get("endTime");
 
@@ -60,6 +60,7 @@ export default function UsedClassrooms() {
      */
     const loadData = async () => {
         try {
+            console.log("Building List: ", buildingList);
             const usedClassroomsData = await axios.get("/api/get_used_classrooms/", {
                 params: {
                     day: day,

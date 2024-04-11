@@ -277,47 +277,6 @@ export default function HeatmapSchedule() {
                             <p className="hour-label">11 PM</p>
                             <hr className="hour-line"/>
                         </div>
-                        {/*<div className="hour-labels">*/}
-                        {/*    <p>6 AM</p>*/}
-                        {/*    <p>7 AM</p>*/}
-                        {/*    <p>8 AM</p>*/}
-                        {/*    <p>9 AM</p>*/}
-                        {/*    <p>10 AM</p>*/}
-                        {/*    <p>11 AM</p>*/}
-                        {/*    <p>12 PM</p>*/}
-                        {/*    <p>1 PM</p>*/}
-                        {/*    <p>2 PM</p>*/}
-                        {/*    <p>3 PM</p>*/}
-                        {/*    <p>4 PM</p>*/}
-                        {/*    <p>5 PM</p>*/}
-                        {/*    <p>6 PM</p>*/}
-                        {/*    <p>7 PM</p>*/}
-                        {/*    <p>8 PM</p>*/}
-                        {/*    <p>9 PM</p>*/}
-                        {/*    <p>10 PM</p>*/}
-                        {/*    <p>11 PM</p>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="hour-lines">*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*    <hr className="hour-line"/>*/}
-                        {/*</div>*/}
                     </div>
 
                     <div className="days-container">
