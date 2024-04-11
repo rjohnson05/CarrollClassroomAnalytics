@@ -43,10 +43,12 @@ def calculate_time_blocks(buildings):
             # Finds all start/end times in the specified building on the current day
             start_times = [time[0].strftime("%H:%M:%S") for time in
                            Course.objects.all().filter(classroom__building__in=buildings, day__contains=day).
-                           values_list('start_time').distinct().exclude(start_time__isnull=True)]
+                           values_list('start_time').distinct().exclude(start_time__isnull=True)
+                           .exclude(classroom__building__in=["Unknown", "OFCP"])]
             end_times = [time[0].strftime("%H:%M:%S") for time in
                          Course.objects.all().filter(classroom__building__in=buildings, day__contains=day).
-                         values_list('end_time').distinct().exclude(end_time__isnull=True)]
+                         values_list('end_time').distinct().exclude(end_time__isnull=True)
+                         .exclude(classroom__building__in=["Unknown", "OFCP"])]
 
         all_times = start_times + end_times + ['06:00:00', '23:59:00']
         start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
