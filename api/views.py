@@ -66,7 +66,7 @@ def get_used_classrooms(request: Request) -> Response:
     day = request.GET.get("day")
     start_time = request.GET.get("startTime")
     end_time = request.GET.get("endTime")
-    buildings = request.GET.get("buildings[]")
+    buildings = request.GET.get("buildings")
     if buildings == "":
         # Get data for all buildings campus-wide
         used_classrooms = services.get_used_classrooms(day, start_time, end_time)
@@ -126,7 +126,7 @@ def get_next_time(request: Request) -> Response:
     """
     day = request.GET.get("day")
     current_end_time = request.GET.get("currentEndTime")
-    buildings = request.GET.get("buildings[]")
+    buildings = request.GET.get("buildings")
     buildings_list = buildings.split(", ")
     if buildings.__len__() == 0:
         next_end_time = services.get_next_time(day, current_end_time)
@@ -147,7 +147,7 @@ def get_past_time(request: Request) -> Response:
     """
     day = request.GET.get("day")
     current_end_time = request.GET.get("currentStartTime")
-    buildings = request.GET.get("buildings[]")
+    buildings = request.GET.get("buildings")
     buildings_list = buildings.split(", ")
     if buildings.__len__() == 0:
         next_end_time = services.get_past_time(day, current_end_time)

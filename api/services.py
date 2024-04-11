@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from api.models import Course, Classroom, Instructor
 import logging
@@ -133,9 +134,14 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] 
     :param start_time: string specifying the start time in which to search for used classrooms
     :param end_time:   string specifying the time in which searching for used classrooms stops
     :param buildings:  string indicating which buildings should be searched for used classrooms
-    :return            dictionary containing the data for every classroom being used within the specified time block and building
+    :return            dictionary containing the data for every classroom being used within the specified time block and
+                       building
     """
-    logger.info(f"Day: {day}, StartTime: {start_time}, EndTime: {end_time}, Buildings: {buildings}")
+    # Start/end times must be in HH:MM:SS format
+    if not re.match(r'^\d{2}:\d{2}$', start_time) or not re.match(r'^\d{2}:\d{2}$', end_time):
+        logger.debug("Returning empty dictionary due to invalid start/end times")
+        return {}
+
     if buildings == 'all':
         # Searches for used classrooms within all buildings
         current_courses = (Course.objects.all().filter(day__contains=day,
@@ -144,13 +150,11 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] 
                            .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
     else:
         # Searches for used classrooms within only buildings specified by the filter
-        logger.info(f"BuildingsLegit: {Course.objects.all().filter(classroom__building__in=buildings)}")
         current_courses = (Course.objects.all().filter(day__contains=day,
                                                        start_time__lte=start_time,
                                                        end_time__gte=end_time,
                                                        classroom__building__in=buildings)
                            .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
-        logger.info(f"Current Courses: {current_courses}")
     courses_data = [
         [course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrolled]
         for course in current_courses]
@@ -249,10 +253,25 @@ def get_past_time(day, current_time, buildings='all'):
     :param current_time: string specifying the end time for a block; the paired start time is the desired output
     :return              string detailing the start time associated with the specified end time
     """
+    # The day must be M,T,W,th, or F
+    if day not in ['M', 'T', 'W', 'th', 'F']:
+        logger.debug(f"{day} is not a valid day")
+        return ''
+    # Convert HH:MM format to HH:MM:SS format
+    if re.match(r'^\d{2}:\d{2}$', current_time):
+        logger.debug("Time format changed to HH:MM:SS")
+        current_time = f"{current_time}:00"
+    # The time must be in HH:MM:SS format for comparison with the times from calculate_time_blocks()
+    if not re.match(r'^\d{2}:\d{2}:\d{2}$', current_time):
+        logger.debug(f"{current_time} is not a valid time")
+        return ''
     time_blocks = calculate_time_blocks(buildings)
     for block in time_blocks[day]:
-        if datetime.strptime(block[1], "%H:%M:%S").time() == datetime.strptime(current_time, "%H:%M").time():
+        if block[1] == current_time:
             return block[0][:-3]
+    # If the time is not found within the time blocks list, return empty string
+    logger.debug(f"{current_time} not found within the specified time blocks")
+    return ''
 
 
 def get_next_time(day, current_time, buildings='all'):
@@ -265,12 +284,27 @@ def get_next_time(day, current_time, buildings='all'):
     :param current_time: string specifying the start time which starts the block; the paired end time is the desired output
     :return              string detailing the end time associated with the specified start time
     """
+    # The day must be M,T,W,th, or F
+    if day not in ['M', 'T', 'W', 'th', 'F']:
+        logger.debug(f"{day} is not a valid day")
+        return ''
+    # Convert HH:MM format to HH:MM:SS format
+    if re.match(r'^\d{2}:\d{2}$', current_time):
+        logger.debug("Time format changed to HH:MM:SS")
+        current_time = f"{current_time}:00"
+    # The time must be in HH:MM:SS format for comparison with the times from calculate_time_blocks()
+    if not re.match(r'^\d{2}:\d{2}:\d{2}$', current_time):
+        logger.debug(f"{current_time} is not a valid time")
+        return ''
     time_blocks = calculate_time_blocks(buildings)
     logger.debug(f"get_next_time: Time Blocks: {time_blocks}")
     for block in time_blocks[day]:
-        if datetime.strptime(block[0], "%H:%M:%S").time() == datetime.strptime(current_time, "%H:%M").time():
+        if block[0] == current_time:
             logger.debug(f"get_next_time: Next Time Found: {block[1][:-3]}")
             return block[1][:-3]
+    # If the time is not found within the time blocks list, return empty string
+    logger.debug(f"{current_time} not found within the specified time blocks")
+    return ''
 
 
 def calculate_day_string(row):
@@ -302,6 +336,10 @@ def upload_schedule_data(file):
 
     :param file: Excel spreadsheet containing the scheduled course data for populating the database
     """
+    # The file must be an Excel spreadsheet
+    if file[-5:] != '.xlsx':
+        return
+
     logger.info("New schedule file uploading")
     df = pd.read_excel(file)
 
@@ -343,7 +381,7 @@ def upload_schedule_data(file):
             start_time=None if pd.isna(row['CSM_START_TIME']) else datetime.strptime(row['CSM_START_TIME'],
                                                                                      '%I:%M%p').time(),
             end_time=None if pd.isna(row['CSM_END_TIME']) else datetime.strptime(row['CSM_END_TIME'],
-                                                                                   '%I:%M%p').time(),
+                                                                                 '%I:%M%p').time(),
             day=day_string,
             classroom=classroom if classroom is not None else None,
             instruction_method=row['CSM_INSTR_METHOD'],
@@ -361,6 +399,11 @@ def upload_classroom_data(file):
 
     :param file: Excel spreadsheet containing the classroom specification data for populating the database
     """
+    # The file must be an Excel spreadsheet
+    if file[-5:] != '.xlsx':
+        logger.debug("Wrong file type entered")
+        return
+
     logger.info("New classroom data uploading")
     df = pd.read_excel(file)
 
@@ -384,7 +427,7 @@ def upload_classroom_data(file):
         logger.debug(f"upload_classroom_data: Classroom Features: {features}")
 
         # Create the new updated classroom object
-        classroom = Classroom.objects.update_or_create(
+        classroom, _ = Classroom.objects.update_or_create(
             name=correct_bldg_names_dict[row['Building Information']] + "-" + str(row['Room Number']),
             building=correct_bldg_names_dict[row['Building Information']],
             room_num=row['Room Number'],
