@@ -339,7 +339,7 @@ def upload_schedule_data(file):
     :param file: Excel spreadsheet containing the scheduled course data for populating the database
     """
     # The file must be an Excel spreadsheet to be uploaded to the DB
-    if file[-5:] != '.xlsx':
+    if file.name[-5:] != '.xlsx':
         return
 
     # Delete all data to prevent different semesters being present in the DB
