@@ -337,19 +337,32 @@ def upload_schedule_data(file):
     Any data already present within the database for the term being currently uploaded is replaced.
 
     :param file: Excel spreadsheet containing the scheduled course data for populating the database
+    :return: True if the specified file was successfully uploaded into the DB; False if the file was not a .xlsx file;
+             and (False, missing_columns), where missing_columns is a list of necessary columns that are  missing from
+             the spreadsheet
     """
     # The file must be an Excel spreadsheet to be uploaded to the DB
     if file.name[-5:] != '.xlsx':
         logger.debug(f"Attempt to upload file with invalid type: {file.name}")
-        return
+        return False
+
+    df = pd.read_excel(file)
+
+    # Make sure all the necessary columns are in the uploaded spreadsheet
+    necessary_columns = ['SEC_FACULTY_INFO', 'CSM_BLDG', 'CSM_ROOM', 'COURSE_SECTIONS_ID', 'SEC_COURSE_NO', 'SEC_NO',
+                         'SEC_TERM', 'SEC_START_DATE', 'SEC_END_DATE', 'SEC_SHORT_TITLE', 'SEC_SUBJECT', 'SEC_MIN_CRED',
+                         'SEC_STATUS', 'CSM_START_TIME', 'CSM_END_TIME', 'CSM_INSTR_METHOD',
+                         'STUDENTS_AND_RESERVED_SEATS', 'SEC_CAPACITY']
+    missing_columns = []
+    for column_name in necessary_columns:
+        if column_name not in df.columns:
+            missing_columns.append(column_name)
+    if len(missing_columns) > 0:
+        logger.error(f"SCHEDULE UPLOAD ABORTED - Schedule spreadsheet upload ({file.name}) was missing columns: {missing_columns}")
+        return False, missing_columns
 
     # Delete all data to prevent different semesters being present in the DB
     Course.objects.all().delete()
-    Classroom.objects.all().delete()
-    Instructor.objects.all().delete()
-
-    logger.info("New schedule file uploading")
-    df = pd.read_excel(file)
 
     # Create new courses from the uploaded file
     for index, row in df.iterrows():
@@ -359,14 +372,15 @@ def upload_schedule_data(file):
         logger.debug(f"Instructor {instructor} present")
 
         classroom = None
-        # Create a classroom object if the current building name is not null
+        # Create a classroom object if it doesn't already exist
         if not pd.isna(row['CSM_BLDG']):
-            classroom, _ = Classroom.objects.get_or_create(
+            classroom, created = Classroom.objects.get_or_create(
                 name=row['CSM_BLDG'] + "-" + str(row['CSM_ROOM']),
                 building=row['CSM_BLDG'],
                 room_num=row['CSM_ROOM'],
             )
-            logger.debug(f"Classroom {classroom} present")
+            if created:
+                logger.debug(f"Classroom {classroom} created")
 
         # Create the course object
         day_string = calculate_day_string(row)
@@ -393,6 +407,8 @@ def upload_schedule_data(file):
             capacity=None if pd.isna(row['SEC_CAPACITY']) else row['SEC_CAPACITY'],
         )
         logger.debug(f"Course {course} created")
+    logger.info(f"New Course Schedule Spreadsheet Uploaded: {file.name}")
+    return True
 
 
 def upload_classroom_data(file):
@@ -401,25 +417,44 @@ def upload_classroom_data(file):
     in uploaded Excel spreadsheet replace the classroom data currently in the database.
 
     :param file: Excel spreadsheet containing the classroom specification data for populating the database
+    :return: True if the specified file was successfully uploaded into the DB; False if the file was not a .xlsx file,
+             or if there were necessary columns missing from the spreadsheet
     """
+    # File cannot be empty
+    if file is None:
+        return False
+
     # The file must be an Excel spreadsheet
     if file.name[-5:] != '.xlsx':
         logger.debug(f"Attempt to upload file with invalid type: {file.name}")
-        return
+        return False
 
-    logger.info("New classroom data uploading")
     df = pd.read_excel(file)
 
-    correct_bldg_names_dict = {
-        "SH": "SIMP",
-        "OC": "OCON",
-        "STCH": "STCH",
-        "CUBE": "CUBE",
-        "ENG": "CENG",
-        "ANZ": "PCCC",
-        "PE": "PECT",
-        "GUAD": "GUAD"
-    }
+    # Make sure all the necessary columns are in the uploaded spreadsheet
+    necessary_columns = ['Building Information', 'Room Number', 'Number of Student Seats in Room', 'Width of Room',
+                         'Length of Room', 'Number of Projectors in Room', 'Does room have any of the following?',
+                         'Any other things of note in Room (TV or Periodic Table poster)', 'Notes']
+    missing_columns = []
+    for column_name in necessary_columns:
+        if column_name not in df.columns:
+            missing_columns.append(column_name)
+    logger.info(f"Missing Columns: {missing_columns}")
+    if len(missing_columns) > 0:
+        logger.error(
+            f"CLASSROOM UPLOAD ABORTED - Classroom spreadsheet upload ({file.name}) was missing columns: {missing_columns}")
+        return False, missing_columns
+
+    # correct_bldg_names_dict = {
+    #     "SH": "SIMP",
+    #     "OC": "OCON",
+    #     "STCH": "STCH",
+    #     "CUBE": "CUBE",
+    #     "ENG": "CENG",
+    #     "ANZ": "PCCC",
+    #     "PE": "PECT",
+    #     "GUAD": "GUAD"
+    # }
 
     for index, row in df.iterrows():
         features = ""
@@ -431,8 +466,8 @@ def upload_classroom_data(file):
 
         # Create the new updated classroom object
         classroom, _ = Classroom.objects.update_or_create(
-            name=correct_bldg_names_dict[row['Building Information']] + "-" + str(row['Room Number']),
-            building=correct_bldg_names_dict[row['Building Information']],
+            name=row['Building Information'] + "-" + str(row['Room Number']),
+            building=row['Building Information'].strip(),
             room_num=row['Room Number'],
             occupancy=row['Number of Student Seats in Room'] if not pd.isna(
                 row['Number of Student Seats in Room']) else None,
@@ -444,3 +479,6 @@ def upload_classroom_data(file):
             notes=row['Notes'] if not pd.isna(row['Notes']) else None,
         )
         logger.debug(f"Classroom {classroom} created/updated")
+
+    logger.info(f"Classroom spreadsheet uploaded successfully: {file.name}")
+    return True

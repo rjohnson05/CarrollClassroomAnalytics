@@ -14,7 +14,10 @@ Author: Ryan Johnson
 
 .info-text {
     color: red;
+    width: 90%;
     text-align: center;
+    word-wrap: break-word;
+    margin: auto;
 }
 
 .upload-option {

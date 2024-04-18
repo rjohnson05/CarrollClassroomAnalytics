@@ -14,6 +14,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
  * @author Ryan Johnson
  */
 export default function FileUpload() {
+    const [missingColumns, setMissingColumns] = useState("");
     const [fileErrorShowing, setFileErrorShowing] = useState(false);
     const [successText, setSuccessText] = useState(false);
     const [uploadingText, setUploadingText] = useState(false);
@@ -43,7 +44,8 @@ export default function FileUpload() {
     /**
      * Sends the uploaded file to the Django endpoint '/upload_file/', where the ORM is used to create objects with the
      * file data and populate the database. Depending on the success of loading the data into the database, a
-     * success/error message is shown on the screen before the file is reset, ready for another upload.
+     * success/error message is shown on the screen before the file is reset, ready for another upload. Should the upload
+     * result in an error, the missing columns resulting in the error are displayed.
      *
      * @param e Event indicating that the form has been submitted
      */
@@ -55,10 +57,18 @@ export default function FileUpload() {
         if (e.target.id === "classroom") {
             // Sends the uploaded classroom data file
             formData.append('file', classroomFile);
+            // Hitting the upload button with no file attached shows no difference on page
+            if (classroomFile === undefined) {
+                return;
+            }
             formData.append("fileName", classroomFile.name);
         } else {
             // Sends the uploaded course schedule file
             formData.append('file', scheduleFile);
+            // Hitting the upload button with no file attached shows no difference on page
+            if (scheduleFile === undefined) {
+                return;
+            }
             formData.append("fileName", scheduleFile.name);
         }
 
@@ -68,23 +78,26 @@ export default function FileUpload() {
         setFileErrorShowing(false);
 
         // Displays a success/error message, depending on the success of loading the data into the database.
-        const uploadSuccess = axios.post("/api/upload_file/", formData, {
+        axios.post("/api/upload_file/", formData, {
             headers: {
                 'content-type': 'multipart/form-data',
             }
-        }).then(r => {
-            // Shows the success text upon a successful file upload
-            setUploadingText(false);
-            setSuccessText(true);
-            setFileErrorShowing(false);
-            console.log(r.data)
-        })
-            .catch(error => {
-                // Shows the error message if the file has invalid column names
+        }).then(res => {
+            if (!res.data['success']) {
+                // Shows the error message if the file has invalid column names or isn't a .xlsx file
                 setUploadingText(false);
                 setSuccessText(false);
-                setFileErrorShowing(true)
-            });
+                setFileErrorShowing(true);
+                setMissingColumns(res.data['missingColumns'].join(', '));
+            }
+            else {
+                // Shows the success text upon a successful file upload
+                setUploadingText(false);
+                setSuccessText(true);
+                setFileErrorShowing(false);
+                setMissingColumns("");
+            }
+        });
 
         // After uploading the files, reset them to empty
         if (e.target.id === "classroom") {
@@ -125,11 +138,16 @@ export default function FileUpload() {
             {uploadingText && <p className="info-text">Uploading...</p>}
             {successText && <p className="info-text">File successfully uploaded.</p>}
             {fileErrorShowing &&
-                <p className="info-text">This file has improper formatting. Fix this and then try uploading again.</p>}
+                <div>
+                    <p className="info-text">This file has improper formatting. Add the following columns and then try
+                        again:</p> <br/>
+                    <p className="info-text">{missingColumns}</p>
+                </div>
+            }
 
-            {/*Creates the dropdown for uploading schedule data*/}
-            <div
-                className={`upload-option ${uploadOptionDropdownStatus && isClicked("schedule") ? 'upload-option-square' : ''}`}>
+        {/*Creates the dropdown for uploading schedule data*/}
+        <div
+            className={`upload-option ${uploadOptionDropdownStatus && isClicked("schedule") ? 'upload-option-square' : ''}`}>
                 {/*Creates the main block that houses the dropdown*/}
                 <div className="upload-option-dropdown" onClick={() => dropdownToggle("schedule")}>
                     {uploadOptionDropdownStatus && isClicked("schedule") ?

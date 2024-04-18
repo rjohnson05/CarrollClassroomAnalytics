@@ -106,13 +106,22 @@ def upload_file(request: Request) -> Response:
     data_type = request.POST['dataType']
     file = request.FILES['file']
 
-    logger.info(f"Uploaded File: {file}")
+    missing_columns = None
     if data_type == "schedule":
-        services.upload_schedule_data(file)
+        success_message = services.upload_schedule_data(file)
+        success = success_message
+        if type(success_message) is tuple:
+            success = False
+            missing_columns = success_message[1]
     else:
-        services.upload_classroom_data(file)
+        success_message = services.upload_classroom_data(file)
+        success = success_message
+        if type(success_message) is tuple:
+            success = False
+            missing_columns = success_message[1]
 
-    return Response({"message": "success"})
+    logger.debug(f"Upload Status: {success}, Missing Columns: {missing_columns}, File Name: {file.name}")
+    return Response({"success": success, "missingColumns": missing_columns})
 
 
 @api_view(["GET"])
