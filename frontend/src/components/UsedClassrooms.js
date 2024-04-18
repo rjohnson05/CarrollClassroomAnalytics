@@ -60,7 +60,6 @@ export default function UsedClassrooms() {
      */
     const loadData = async () => {
         try {
-            console.log("Building List: ", buildingList);
             const usedClassroomsData = await axios.get("/api/get_used_classrooms/", {
                 params: {
                     day: day,

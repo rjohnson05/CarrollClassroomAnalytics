@@ -41,17 +41,34 @@ export default function ClassroomDaySchedule({day, timeBlockList, courseData}) {
         return (hourMinutes + minutes) / 5;
     }
 
+    /**
+     * Selects the course data for a specific time block. This is used when displaying course data in the tooltip. This
+     * course data includes the name, instructors, number of students enrolled, and day of the week.
+     *
+     * @param timeBlock Array of two strings: the start/end times of the block
+     * @returns         Array containing the data for the course being held during the specified time block
+     */
+    const selectData = (timeBlock) => {
+        const startTime = timeBlock[0];
+        const endTime = timeBlock[1];
+        const courseName = courseData[day][timeBlock[0]][0][0];
+        const instructors = courseData[day][timeBlock[0]][0][1];
+        const studentsEnrolled = courseData[day][timeBlock[0]][0][2];
+
+        return [startTime, endTime, courseName, instructors, studentsEnrolled, day]
+    }
+
     return (<div>
         <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" clickable={true}
                  render={({content}) => {
                      if (content) {
-                         const contentParts = content.split(",");
+                         const contentsArray = JSON.parse(content);
                          return (<div style={{display: 'flex', flexDirection: 'column'}}>
-                             <span>Time: {contentParts[0]?.substring(0, 5)} - {contentParts[1]?.substring(0, 5)}</span>
-                             {contentParts[2] !== "" ? <div>
-                                 <p className="tooltip-line">Course: {contentParts[2]}</p>
-                                 <p className="tooltip-line">Instructor: {contentParts[3]}</p>
-                                 <p className="tooltip-line">Students Enrolled: {contentParts[4]}</p>
+                             <span>Time: {contentsArray[0]?.substring(0, 5)} - {contentsArray[1]?.substring(0, 5)}</span>
+                             {contentsArray[2] ? <div>
+                                 <p className="tooltip-line">Course: {contentsArray[2]}</p>
+                                 <p className="tooltip-line">Instructor(s): {contentsArray[3]}</p>
+                                 <p className="tooltip-line">Students Enrolled: {contentsArray[4]}</p>
                              </div> : <div>
                                  <p className="tooltip-line">Course: N/A</p>
                                  <p className="tooltip-line">Instructor: N/A</p>
@@ -68,7 +85,7 @@ export default function ClassroomDaySchedule({day, timeBlockList, courseData}) {
                 <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1]) + 1}
                       fill={courseData[day][timeBlock[0]][0][0] === undefined ? "#ffffff" : "#cfb988"}
                       className="tooltip-target"
-                      data-tooltip-content={[timeBlock[0], timeBlock[1], courseData[day][timeBlock[0]][0][0], courseData[day][timeBlock[0]][0][1], courseData[day][timeBlock[0]][0][2], day]}/>
+                      data-tooltip-content={JSON.stringify(selectData(timeBlock))}/>
             </svg>)) : <p>No classroom data available</p>}
     </div>);
 }

@@ -340,6 +340,7 @@ def upload_schedule_data(file):
     """
     # The file must be an Excel spreadsheet to be uploaded to the DB
     if file.name[-5:] != '.xlsx':
+        logger.debug(f"Attempt to upload file with invalid type: {file.name}")
         return
 
     # Delete all data to prevent different semesters being present in the DB
@@ -402,8 +403,8 @@ def upload_classroom_data(file):
     :param file: Excel spreadsheet containing the classroom specification data for populating the database
     """
     # The file must be an Excel spreadsheet
-    if file[-5:] != '.xlsx':
-        logger.debug("Wrong file type entered")
+    if file.name[-5:] != '.xlsx':
+        logger.debug(f"Attempt to upload file with invalid type: {file.name}")
         return
 
     logger.info("New classroom data uploading")

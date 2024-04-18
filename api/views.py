@@ -159,6 +159,13 @@ def get_past_time(request: Request) -> Response:
 
 def index(request: Request) -> Response:
     """
-    Returns the index page of the React front end, serving the Django backend and React frontend together
+    Forwards the request to the React router, displaying the correct page.
     """
     return render(request, "build/index.html")
+
+
+def index_with_classroom(request: Request, classroom) -> Response:
+    """
+    Forwards the request to the React router, passing the classroom variable along.
+    """
+    return render(request, "build/index.html", {"classroom": classroom})
