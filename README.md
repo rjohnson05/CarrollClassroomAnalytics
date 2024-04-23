@@ -19,8 +19,8 @@ Before launching the application, a database must be created. Ensure that you ha
    ```
 4. Create a new user:
    ```
-   CREATE USER 'caroll_user'@'localhost' IDENTIFIED BY 'REPLACE_WITH_USER_PASSWORD';
-   CREATE USER 'caroll_user'@'%' IDENTIFIED BY 'REPLACE_WITH_USER_PASSWORD';
+   CREATE USER 'carroll_user'@'localhost' IDENTIFIED BY 'REPLACE_WITH_USER_PASSWORD';
+   CREATE USER 'carroll_user'@'%' IDENTIFIED BY 'REPLACE_WITH_USER_PASSWORD';
    ```
 6. Give this user privileges on the newly created database:
     ```
