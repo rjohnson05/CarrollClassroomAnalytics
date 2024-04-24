@@ -10,9 +10,6 @@ __pycache__
 # Environment Variable File
 .env
 
-# Django static production files
-static/
-
 # React production files
 frontend/build/
 frontend/node_modules/
