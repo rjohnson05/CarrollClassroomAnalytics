@@ -10,6 +10,9 @@ __pycache__
 # Environment Variable File
 .env
 
+# Static Production Files
+static/
+
 # React production files
 frontend/build/
 frontend/node_modules/
