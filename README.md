@@ -83,6 +83,6 @@ The database structure used by the application must now be moved into the create
 ### Launching the Application
 Finally, launch the program by running this command:
 ```
-py manage.py runserver
+python3 manage.py runserver
 ```
 The application should now be visible after navigating to `localhost:8000` within a web browser. 

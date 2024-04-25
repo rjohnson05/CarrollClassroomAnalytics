@@ -51,17 +51,19 @@ def calculate_time_blocks(buildings):
                          .exclude(classroom__building__in=["Unknown", "OFCP"])]
 
         all_times = start_times + end_times + ['06:00:00', '23:59:00']
-        start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
-        logger.debug(f"calculate_time_blocks: Possible Start/End Times: {start_end_times}")
+        start_end_times = sorted(set(all_times))  # Organizes unique times from earliest to latest
+        logger.debug(f"calculate_time_blocks - Day: {day}, Building(s): {buildings}, Possible Start/End Times: {start_end_times}")
         time_blocks = []  # Stores the time block tuples for a given day
 
         if len(start_end_times) > 0:
-            # Group the time blocks together
+            # Group the time blocks together if any courses take place on this day
             for i in range(0, len(start_end_times) - 1):
+                # Pair every time with the following time to create a series of time blocks
                 time_block = [start_end_times[i], start_end_times[i + 1]]
                 time_blocks.append(time_block)
             building_time_blocks[day] = time_blocks
-            logger.debug(f"List of Time Blocks for {buildings}: {building_time_blocks}")
+            logger.debug(f"calculate_time_blocks - List of Time Blocks for {buildings} on {day}: {building_time_blocks}")
+    logger.info(f"calculate_time_blocks - Time blocks calculated for {buildings} buildings")
     return building_time_blocks
 
 
@@ -79,11 +81,12 @@ def calculate_number_classes(buildings='all'):
     """
     time_blocks = calculate_time_blocks(buildings)
     if not time_blocks:
-        logger.debug(f"calculate_number_classes: No time blocks found for {buildings}")
+        logger.debug(f"calculate_number_classes - No time blocks found for {buildings}")
         return [{}, {}]
-    all_num_classes = {}  # Dictionary to hold ALL the class number data
+    logger.debug(f"calculate_number_classes - Time blocks found for {buildings}: {time_blocks}")
+    all_num_classes = {}  # Dictionary to hold ALL the classroom number data
     for day, day_block_list in time_blocks.items():
-        day_num_classes = {}  # Dictionary to hold the class number data for a single day
+        day_num_classes = {}  # Dictionary to hold the classroom number data for a single day
         for block in day_block_list:
             block_start_time = block[0]
             block_end_time = block[1]
@@ -103,7 +106,9 @@ def calculate_number_classes(buildings='all'):
                                                                  classroom__building__in=buildings)
                 .exclude(classroom__isnull=True).exclude(classroom__building="Unknown").exclude(
                     classroom__building="OFCP"))
-            # Account for the possibility of several courses in a single classrooms by only counting the unique
+            logger.debug(f"calculate_number_classes - Buildings: {buildings}, "
+                         f"Number of courses held from {block_start_time} - {block_end_time} on {day}: {block_num_classes}")
+            # Account for the possibility of several courses in a single classroom by only counting the unique
             # classrooms in use
             unique_classrooms = []
             for course in block_num_classes:
@@ -111,11 +116,12 @@ def calculate_number_classes(buildings='all'):
                     unique_classrooms.append(course.classroom.name)
 
             day_num_classes[block_start_time] = len(unique_classrooms)
-            logger.debug(
-                f"calculate_number_classes: Unique classes found for block {block_start_time} on {day}: {unique_classrooms}")
-        logger.debug(f"calculate_number_classes: Number of classes for time blocks during {day}: {day_num_classes}")
+            logger.debug(f"calculate_number_classes - Number of used classrooms found between "
+                         f"{block_start_time} - {block_end_time} on {day}: {unique_classrooms}")
+        logger.debug(f"calculate_number_classes - Number Classes List for {day} in {buildings} buildings: {day_num_classes}")
         all_num_classes[day] = day_num_classes
-    logger.debug(f"calculate_number_classes: Number of classes calculated for time blocks in {buildings}")
+    logger.debug(f"calculate_number_classes - Number of used classrooms calculated for time blocks in {buildings} buildings: {all_num_classes}")
+    logger.info(f"calculate_number_classes - Number of used classrooms calculated for {buildings} buildings")
     return [time_blocks, all_num_classes]
 
 
@@ -124,6 +130,7 @@ def get_all_buildings():
     Returns a dictionary storing the names of all buildings in the Classroom model.
     """
     buildings_list = Classroom.BUILDINGS
+    logger.debug(f"get_all_buildings - Possible Buildings: {buildings_list}")
     return buildings_list
 
 
@@ -141,7 +148,7 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] 
     """
     # Start/end times must be in HH:MM:SS format
     if not re.match(r'^\d{2}:\d{2}$', start_time) or not re.match(r'^\d{2}:\d{2}$', end_time):
-        logger.debug("Returning empty dictionary due to invalid start/end times")
+        logger.error(f"get_used_classrooms - No classrooms found: Either {start_time} or {end_time} are not in HH:MM:SS format")
         return {}
 
     if buildings == 'all':
@@ -157,9 +164,12 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] 
                                                        end_time__gte=end_time,
                                                        classroom__building__in=buildings)
                            .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
+    logger.debug(f"get_used_classrooms - Courses found running between {start_time} and {end_time} on {day} "
+                 f"within {buildings} buildings: {current_courses}")
     courses_data = [
         [course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrolled]
         for course in current_courses]
+    logger.debug(f"get_used_classrooms - Course Data: {courses_data}")
 
     # Attach the course data to the classroom it is hosted in
     classrooms_dict = {}
@@ -170,8 +180,9 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] 
         else:
             classrooms_dict[classroom] += [course_data]
 
-    logger.debug(
-        f"get_used_classrooms: Classroom data found for {buildings} from {start_time} to {end_time} on {day}: {classrooms_dict}")
+    logger.debug(f"get_used_classrooms - Classroom data found for {buildings} from {start_time} to {end_time} on {day}: "
+                 f"{classrooms_dict}")
+    logger.info(f"get_used_classrooms - Used Classrooms found from {start_time} to {end_time} on {day}")
     return classrooms_dict
 
 
@@ -185,7 +196,6 @@ def calculate_classroom_time_blocks(classroom: str):
     :param  classroom: string representing the name of the classroom to be queried
     :return            dictionary containing every possible time block in which there could be a different course
     """
-    logger.debug(f"services.calculate_classroom_time_blocks: Classroom Name: {classroom}")
     days_list = ['M', 'T', 'W', 'th', 'F']
     classroom_time_blocks = {}
 
@@ -199,16 +209,18 @@ def calculate_classroom_time_blocks(classroom: str):
                      .distinct().exclude(start_time=None)]
         all_times = start_times + end_times + ['06:00:00', '23:59:00']
         start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
-        logger.debug(f"calculate_classroom_time_blocks: Possible Start/End Times: {start_end_times}")
+        logger.debug(f"calculate_classroom_time_blocks - Start/End Times for courses in {classroom} on {day}: {start_end_times}")
         time_blocks = []  # Stores the time block tuples for a given day
 
-        if len(start_end_times) > 0:
-            # Group the time blocks together
-            for i in range(0, len(start_end_times) - 1):
-                time_block = [start_end_times[i], start_end_times[i + 1]]
-                time_blocks.append(time_block)
-            classroom_time_blocks[day] = time_blocks
-            logger.debug(f"List of Time Blocks for {classroom}: {classroom_time_blocks}")
+        # Group the time blocks together
+        for i in range(0, len(start_end_times) - 1):
+            time_block = [start_end_times[i], start_end_times[i + 1]]
+            time_blocks.append(time_block)
+        classroom_time_blocks[day] = time_blocks
+        logger.debug(f"calculate_classroom_time_blocks - Grouped time blocks for {classroom} on {day}: {time_blocks}")
+
+    logger.debug(f"calculate_classroom_time_blocks - List of Time Blocks for {classroom}: {classroom_time_blocks}")
+    logger.info(f"calculate_classroom_time_blocks - Time blocks calculated for {classroom}")
     return classroom_time_blocks
 
 
@@ -224,7 +236,7 @@ def get_classroom_courses(classroom: str) -> {}:
     """
     time_blocks = calculate_classroom_time_blocks(classroom)
     if not time_blocks:
-        logger.debug(f"get_classroom_courses: No time blocks found for {classroom}")
+        logger.debug(f"get_classroom_courses - No time blocks found for {classroom}")
         return [{}, {}]
     classroom_courses = {}  # Dictionary to hold all the courses data
     for day, day_block_list in time_blocks.items():
@@ -236,13 +248,16 @@ def get_classroom_courses(classroom: str) -> {}:
                                                          start_time__lte=block_start_time,
                                                          end_time__gte=block_end_time,
                                                          classroom__name=classroom)
-            courses_data = [[course.name, course.instructor, course.enrolled] for course in running_course]
             if len(running_course) == 0:
                 courses_data = ["", "", 0]
+            else:
+                courses_data = [[course.name, course.instructor, course.enrolled] for course in running_course]
             day_courses[block_start_time] = courses_data
-        logger.debug(f"get_classroom_courses: Courses for {classroom} on {day}: {day_courses}")
+        logger.debug(f"get_classroom_courses - Courses for {classroom} on {day}: {day_courses}")
         classroom_courses[day] = day_courses
-    logger.debug(f"get_classroom_courses: Courses found in {classroom}: {classroom_courses}")
+
+    logger.debug(f"get_classroom_courses - Courses found in {classroom}: {classroom_courses}")
+    logger.info(f"get_classroom_courses - Courses found in {classroom}")
     return [time_blocks, classroom_courses]
 
 
@@ -258,22 +273,24 @@ def get_past_time(day, current_time, buildings='all'):
     """
     # The day must be M,T,W,th, or F
     if day not in ['M', 'T', 'W', 'th', 'F']:
-        logger.debug(f"{day} is not a valid day")
+        logger.error(f"get_past_time - {day} is not a valid day")
         return ''
     # Convert HH:MM format to HH:MM:SS format
     if re.match(r'^\d{2}:\d{2}$', current_time):
-        logger.debug("Time format changed to HH:MM:SS")
+        logger.debug(f"Time format of {current_time} changed to HH:MM:SS")
         current_time = f"{current_time}:00"
     # The time must be in HH:MM:SS format for comparison with the times from calculate_time_blocks()
     if not re.match(r'^\d{2}:\d{2}:\d{2}$', current_time):
-        logger.debug(f"{current_time} is not a valid time")
+        logger.error(f"get_past_time - {current_time} is not in HH:MM:SS format")
         return ''
     time_blocks = calculate_time_blocks(buildings)
     for block in time_blocks[day]:
         if block[1] == current_time:
+            logger.debug(f"get_past_time - Start Time found: {block[0][:-3]}, Supplied End Time: {current_time}, "
+                         f"Day: {day}, Buildings: {buildings}")
             return block[0][:-3]
     # If the time is not found within the time blocks list, return empty string
-    logger.debug(f"{current_time} not found within the specified time blocks")
+    logger.debug(f"{current_time} not found on {day} in {buildings} buildings")
     return ''
 
 
@@ -289,24 +306,24 @@ def get_next_time(day, current_time, buildings='all'):
     """
     # The day must be M,T,W,th, or F
     if day not in ['M', 'T', 'W', 'th', 'F']:
-        logger.debug(f"{day} is not a valid day")
+        logger.debug(f"get_next_time - {day} is not a valid day")
         return ''
     # Convert HH:MM format to HH:MM:SS format
     if re.match(r'^\d{2}:\d{2}$', current_time):
-        logger.debug("Time format changed to HH:MM:SS")
+        logger.debug(f"get_next_time - Time format of {current_time} changed to HH:MM:SS")
         current_time = f"{current_time}:00"
     # The time must be in HH:MM:SS format for comparison with the times from calculate_time_blocks()
     if not re.match(r'^\d{2}:\d{2}:\d{2}$', current_time):
-        logger.debug(f"{current_time} is not a valid time")
+        logger.error(f"get_next_time - {current_time} is not in HH:MM:SS format")
         return ''
     time_blocks = calculate_time_blocks(buildings)
-    logger.debug(f"get_next_time: Time Blocks: {time_blocks}")
     for block in time_blocks[day]:
         if block[0] == current_time:
-            logger.debug(f"get_next_time: Next Time Found: {block[1][:-3]}")
+            logger.debug(f"get_next_time - End Time found: {block[1][:-3]}, Supplied Start Time: {current_time}, "
+                         f"Day: {day}, Buildings: {buildings}")
             return block[1][:-3]
     # If the time is not found within the time blocks list, return empty string
-    logger.debug(f"{current_time} not found within the specified time blocks")
+    logger.debug(f"{current_time} not found on {day} in {buildings} buildings")
     return ''
 
 
@@ -328,7 +345,7 @@ def calculate_day_string(row):
     if row['CSM_FRIDAY'] == 'Y':
         days += 'F'
 
-    logger.debug(f"calculate_day_string: Day String calculated for {row}: {days}")
+    logger.debug(f"calculate_day_string - Day String calculated for {row}: {days}")
     return days
 
 
@@ -338,14 +355,20 @@ def upload_schedule_data(file):
     Any data already present within the database for the term being currently uploaded is replaced.
 
     :param file: Excel spreadsheet containing the scheduled course data for populating the database
-    :return: True if the specified file was successfully uploaded into the DB; False if the file was not a .xlsx file;
-             and (False, missing_columns), where missing_columns is a list of necessary columns that are  missing from
-             the spreadsheet
+    :return: boolean specifying whether the upload was successful and a list of missing columns. If an invalid file is
+             provided or the upload is successful, the missing columns list will be empty.
     """
+    missing_columns = []
+
+    # File cannot be empty
+    if file is None:
+        logger.info("upload_schedule_data - Attempt to upload a schedule without specifying a file")
+        return False, missing_columns
+
     # The file must be an Excel spreadsheet to be uploaded to the DB
     if file.name[-5:] != '.xlsx':
-        logger.debug(f"Attempt to upload file with invalid type: {file.name}")
-        return False
+        logger.error(f"upload_schedule_data - Attempt to upload file that was not an .xlsx file: {file.name}")
+        return False, missing_columns
 
     df = pd.read_excel(file)
 
@@ -354,12 +377,12 @@ def upload_schedule_data(file):
                          'SEC_TERM', 'SEC_START_DATE', 'SEC_END_DATE', 'SEC_SHORT_TITLE', 'SEC_SUBJECT', 'SEC_MIN_CRED',
                          'SEC_STATUS', 'CSM_START_TIME', 'CSM_END_TIME', 'CSM_INSTR_METHOD',
                          'STUDENTS_AND_RESERVED_SEATS', 'SEC_CAPACITY']
-    missing_columns = []
+
     for column_name in necessary_columns:
         if column_name not in df.columns:
             missing_columns.append(column_name)
     if len(missing_columns) > 0:
-        logger.error(f"SCHEDULE UPLOAD ABORTED - Schedule spreadsheet upload ({file.name}) was missing columns: {missing_columns}")
+        logger.error(f"upload_schedule_data - SCHEDULE UPLOAD ABORTED - Schedule spreadsheet upload ({file.name}) was missing columns: {missing_columns}")
         return False, missing_columns
 
     # Delete all data to prevent different semesters being present in the DB
@@ -408,8 +431,9 @@ def upload_schedule_data(file):
             capacity=None if pd.isna(row['SEC_CAPACITY']) else row['SEC_CAPACITY'],
         )
         logger.debug(f"Course {course} created")
+
     logger.info(f"New Course Schedule Spreadsheet Uploaded: {file.name}")
-    return True
+    return True, None
 
 
 def upload_classroom_data(file):
@@ -421,14 +445,17 @@ def upload_classroom_data(file):
     :return: True if the specified file was successfully uploaded into the DB; False if the file was not a .xlsx file,
              or if there were necessary columns missing from the spreadsheet
     """
+    missing_columns = []
+
     # File cannot be empty
     if file is None:
-        return False
+        logger.info("upload_classroom_data - Attempt to upload a schedule without specifying a file")
+        return False, missing_columns
 
     # The file must be an Excel spreadsheet
     if file.name[-5:] != '.xlsx':
-        logger.debug(f"Attempt to upload file with invalid type: {file.name}")
-        return False
+        logger.error(f"upload_classroom_data - Attempt to upload file that was not an .xlsx file: {file.name}")
+        return False, missing_columns
 
     df = pd.read_excel(file)
 
@@ -436,26 +463,13 @@ def upload_classroom_data(file):
     necessary_columns = ['Building Information', 'Room Number', 'Number of Student Seats in Room', 'Width of Room',
                          'Length of Room', 'Number of Projectors in Room', 'Does room have any of the following?',
                          'Any other things of note in Room (TV or Periodic Table poster)', 'Notes']
-    missing_columns = []
+
     for column_name in necessary_columns:
         if column_name not in df.columns:
             missing_columns.append(column_name)
-    logger.info(f"Missing Columns: {missing_columns}")
     if len(missing_columns) > 0:
-        logger.error(
-            f"CLASSROOM UPLOAD ABORTED - Classroom spreadsheet upload ({file.name}) was missing columns: {missing_columns}")
+        logger.error(f"CLASSROOM UPLOAD ABORTED - Classroom spreadsheet upload ({file.name}) was missing columns: {missing_columns}")
         return False, missing_columns
-
-    # correct_bldg_names_dict = {
-    #     "SH": "SIMP",
-    #     "OC": "OCON",
-    #     "STCH": "STCH",
-    #     "CUBE": "CUBE",
-    #     "ENG": "CENG",
-    #     "ANZ": "PCCC",
-    #     "PE": "PECT",
-    #     "GUAD": "GUAD"
-    # }
 
     for index, row in df.iterrows():
         features = ""

@@ -10,6 +10,12 @@ from api.services import calculate_day_string, calculate_number_classes, get_all
     calculate_classroom_time_blocks, get_classroom_courses, get_past_time, get_next_time, upload_schedule_data, \
     upload_classroom_data
 
+"""
+Contains unit tests for every method in services.py.
+
+Author: Ryan Johnson
+"""
+
 
 class CalculateTimeBlocks(TestCase):
     # Creates a MWF course in SIMP at the designated start/end time
@@ -765,7 +771,7 @@ class CalculateNumberClasses(TestCase):
         self.assertEqual(actual_num_classes, predicted_num_classes)
 
 
-class TestGetAllBuildings(TestCase):
+class GetAllBuildings(TestCase):
     def test_get_all_buildings(self):
         actual_buildings_list = get_all_buildings()
         predicted_buildings_list = {
@@ -788,7 +794,7 @@ class TestGetAllBuildings(TestCase):
         self.assertEqual(actual_buildings_list, predicted_buildings_list)
 
 
-class TestGetUsedClassrooms(TestCase):
+class GetUsedClassrooms(TestCase):
     # Creates a MWF course in SIMP at the designated start/end time
     @classmethod
     def create_simp_course(cls, start_time=None, end_time=None, building="SIMP", room_num="120"):

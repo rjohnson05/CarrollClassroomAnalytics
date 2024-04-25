@@ -33,11 +33,11 @@ def get_number_classes(request: Request) -> Response:
     if buildings.__len__() == 0:
         # Get data for all buildings campus-wide
         number_classes = services.calculate_number_classes()
-        logger.debug(f"get_number_classes: Calculated class numbers for all-campus - {number_classes}")
+        logger.debug(f"get_number_classes - Calculated class numbers for all-campus: {number_classes}")
     else:
         # Get data for only specified buildings
         number_classes = services.calculate_number_classes(buildings)
-        logger.debug(f"get_building_classes: Calculated class numbers for {buildings} - {number_classes}")
+        logger.debug(f"get_building_classes - Calculated class numbers for {buildings}: {number_classes}")
     return Response(number_classes)
 
 
@@ -51,6 +51,7 @@ def get_building_names(request: Request) -> Response:
     :return: HTTP response object containing a dictionary of all the buildings currently holding classes
     """
     buildings_list = services.get_all_buildings()
+    logger.debug(f"get_building_names - Buildings list: {buildings_list}")
     return Response(buildings_list)
 
 
@@ -70,12 +71,12 @@ def get_used_classrooms(request: Request) -> Response:
     if buildings == "":
         # Get data for all buildings campus-wide
         used_classrooms = services.get_used_classrooms(day, start_time, end_time)
-        logger.debug(f"get_used_classrooms: Found used classrooms across all-campus - {used_classrooms}")
+        logger.debug(f"get_used_classrooms - Found used classrooms across all-campus: {used_classrooms}")
     else:
         buildings_list = buildings.split(", ")
         # Get data for only specified buildings
         used_classrooms = services.get_used_classrooms(day, start_time, end_time, buildings_list)
-        logger.debug(f"get_used_classrooms: Found used classrooms for {buildings_list} - {used_classrooms}")
+        logger.debug(f"get_used_classrooms - Found used classrooms for {buildings_list}: {used_classrooms}")
 
     return Response(used_classrooms)
 
@@ -91,7 +92,7 @@ def get_classroom_data(request: Request) -> Response:
     """
     classroom_name = request.GET.get("classroom")
     courses = services.get_classroom_courses(classroom_name)
-    logger.debug(f"get_classroom_data: Found courses held in {classroom_name}: {courses}")
+    logger.debug(f"get_classroom_data - Found courses held in {classroom_name}: {courses}")
     return Response(courses)
 
 
@@ -101,26 +102,23 @@ def upload_file(request: Request) -> Response:
     Creates model objects using the data from a file and moves them into the database.
 
     :param request: HTTP request object containing the data file and the type of file being uploaded
-    :return: HTTP response object containing a success message if the method completes without error
+    :return: HTTP response object containing a boolean specifying whether the upload was successful and a list of any
+             missing columns in the .csv file. If the upload is successful, the missing columns is a NoneType.
     """
     data_type = request.POST['dataType']
     file = request.FILES['file']
 
-    missing_columns = None
     if data_type == "schedule":
+        # Handles schedule data .csv file uploads
         success_message = services.upload_schedule_data(file)
-        success = success_message
-        if type(success_message) is tuple:
-            success = False
-            missing_columns = success_message[1]
     else:
+        # Handles classroom data .csv file uploads
         success_message = services.upload_classroom_data(file)
-        success = success_message
-        if type(success_message) is tuple:
-            success = False
-            missing_columns = success_message[1]
 
-    logger.debug(f"Upload Status: {success}, Missing Columns: {missing_columns}, File Name: {file.name}")
+    success = success_message[0]
+    missing_columns = success_message[1]
+
+    logger.debug(f"upload_file - Upload Status: {success}, Missing Columns: {missing_columns}, File Name: {file.name}")
     return Response({"success": success, "missingColumns": missing_columns})
 
 
@@ -128,19 +126,21 @@ def upload_file(request: Request) -> Response:
 def get_next_time(request: Request) -> Response:
     """
     Given the start time of a time block, finds the corresponding end time for the block. Used for paging when viewing
-    the used classrooms for a specific time block.
+    the used classrooms for a specific time block, displaying the next time block.
 
     :param request: HTTP request object containing the day, start time, and building list for the desired block
     :return: HTTP response object containing the end time for the specified time block
     """
     day = request.GET.get("day")
-    current_end_time = request.GET.get("currentEndTime")
+    start_time = request.GET.get("currentEndTime")
     buildings = request.GET.get("buildings")
     buildings_list = buildings.split(", ")
     if buildings.__len__() == 0:
-        next_end_time = services.get_next_time(day, current_end_time)
+        next_end_time = services.get_next_time(day, start_time)
+        logger.debug(f"get_next_time - End time for block starting at {start_time} on {day} (in all buildings): {next_end_time}")
     else:
-        next_end_time = services.get_next_time(day, current_end_time, buildings_list)
+        next_end_time = services.get_next_time(day, start_time, buildings_list)
+        logger.debug(f"get_next_time - End time for block starting at {start_time} on {day} (in {buildings_list}): {next_end_time}")
 
     return Response(next_end_time)
 
@@ -149,27 +149,32 @@ def get_next_time(request: Request) -> Response:
 def get_past_time(request: Request) -> Response:
     """
     Given the end time of a time block, finds the corresponding start time for the block. Used for paging when viewing
-    the used classrooms for a specific time block.
+    the used classrooms for a specific time block, displaying the previous time block.
 
     :param request: HTTP request object containing the day, end time, and building list for the desired block
     :return: HTTP response object containing the start time for the specified time block
     """
     day = request.GET.get("day")
-    current_end_time = request.GET.get("currentStartTime")
+    end_time = request.GET.get("currentStartTime")
     buildings = request.GET.get("buildings")
     buildings_list = buildings.split(", ")
     if buildings.__len__() == 0:
-        next_end_time = services.get_past_time(day, current_end_time)
+        past_start_time = services.get_past_time(day, end_time)
+        logger.debug(f"get_past_time - Start time for block ending at {end_time} on {day} (in all buildings): "
+                     f"{past_start_time}")
     else:
-        next_end_time = services.get_past_time(day, current_end_time, buildings_list)
+        past_start_time = services.get_past_time(day, end_time, buildings_list)
+        logger.debug(f"get_past_time - Start time for next block ending at {end_time} on {day} "
+                     f"(in {buildings_list}): {past_start_time}")
 
-    return Response(next_end_time)
+    return Response(past_start_time)
 
 
 def index(request: Request) -> Response:
     """
     Forwards the request to the React router, displaying the correct page.
     """
+    logger.debug(f"index - Request: {request}")
     return render(request, "build/index.html")
 
 
@@ -177,4 +182,5 @@ def index_with_classroom(request: Request, classroom) -> Response:
     """
     Forwards the request to the React router, passing the classroom variable along.
     """
+    logger.debug(f"index_with_classroom - Classroom: {classroom}, Request: {request}")
     return render(request, "build/index.html", {"classroom": classroom})

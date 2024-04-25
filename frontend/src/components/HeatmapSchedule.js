@@ -15,7 +15,7 @@ import Legend from "./Legend"
  * combination of buildings. Hovering over any one of these time blocks shows a tooltip displaying the number of
  * classrooms in use as well as a link to view each classroom being used during the selected (or hovered over) time block.
  *
- * @author Ryan Johnson, Adrian Rincon Jimenez
+ * @author Ryan Johnson
  */
 export default function HeatmapSchedule() {
     const [firstRender, setFirstRender] = useState(true);
