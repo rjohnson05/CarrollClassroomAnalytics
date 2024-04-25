@@ -188,14 +188,15 @@ def calculate_classroom_time_blocks(classroom: str):
     logger.debug(f"services.calculate_classroom_time_blocks: Classroom Name: {classroom}")
     days_list = ['M', 'T', 'W', 'th', 'F']
     classroom_time_blocks = {}
+
     for day in days_list:
         # Finds all start/end times in the specified building on the current day
         start_times = [time[0].strftime("%H:%M:%S") for time in
-                       Course.objects.filter(classroom__name=classroom, day__contains=day).values_list(
-                           'start_time').distinct()]
+                       Course.objects.filter(classroom__name=classroom, day__contains=day).values_list('start_time')
+                       .distinct().exclude(start_time=None)]
         end_times = [time[0].strftime("%H:%M:%S") for time in
-                     Course.objects.values_list('end_time').filter(classroom__name=classroom,
-                                                                   day__contains=day).distinct()]
+                     Course.objects.filter(classroom__name=classroom, day__contains=day).values_list('end_time')
+                     .distinct().exclude(start_time=None)]
         all_times = start_times + end_times + ['06:00:00', '23:59:00']
         start_end_times = sorted(set(all_times))  # Organizes times from earliest to latest
         logger.debug(f"calculate_classroom_time_blocks: Possible Start/End Times: {start_end_times}")

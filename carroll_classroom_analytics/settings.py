@@ -155,12 +155,9 @@ LOGGING = {
             "formatter": "standard",
         },
     },
-    "loggers": {
-        "django": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        }
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
     }
 }
 
