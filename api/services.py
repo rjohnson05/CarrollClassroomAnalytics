@@ -496,4 +496,4 @@ def upload_classroom_data(file):
         logger.debug(f"Classroom {classroom} created/updated")
 
     logger.info(f"Classroom spreadsheet uploaded successfully: {file.name}")
-    return True
+    return True, missing_columns
