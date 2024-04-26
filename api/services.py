@@ -482,16 +482,18 @@ def upload_classroom_data(file):
         # Create the new updated classroom object
         classroom, _ = Classroom.objects.update_or_create(
             name=row['Building Information'] + "-" + str(row['Room Number']),
-            building=row['Building Information'].strip(),
-            room_num=row['Room Number'],
-            occupancy=row['Number of Student Seats in Room'] if not pd.isna(
-                row['Number of Student Seats in Room']) else None,
-            width=row['Width of Room'] if not pd.isna(row['Width of Room']) else None,
-            length=row['Length of Room'] if not pd.isna(row['Length of Room']) else None,
-            projector_num=row['Number of Projectors in Room'] if not pd.isna(
-                row['Number of Projectors in Room']) else None,
-            features=features,
-            notes=row['Notes'] if not pd.isna(row['Notes']) else None,
+            defaults={
+                'building': row['Building Information'].strip(),
+                'room_num': row['Room Number'],
+                'occupancy': row['Number of Student Seats in Room'] if not pd.isna(
+                    row['Number of Student Seats in Room']) else None,
+                'width': row['Width of Room'] if not pd.isna(row['Width of Room']) else None,
+                'length': row['Length of Room'] if not pd.isna(row['Length of Room']) else None,
+                'projector_num': row['Number of Projectors in Room'] if not pd.isna(
+                    row['Number of Projectors in Room']) else None,
+                'features': features,
+                'notes': row['Notes'] if not pd.isna(row['Notes']) else None,
+            }
         )
         logger.debug(f"Classroom {classroom} created/updated")
 
