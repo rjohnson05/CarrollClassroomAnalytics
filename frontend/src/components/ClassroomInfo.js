@@ -41,7 +41,7 @@ export default function ClassroomInfo() {
     return (<div>
         <NavBar/>
 
-        <h1 className="main-title header">{classroomName} DETAILED VIEW</h1>
+        <h1 className="main-title header">{classroomName} CLASSROOM SCHEDULE</h1>
 
         <div className="heatmap-container">
             <div className="week-grid">
