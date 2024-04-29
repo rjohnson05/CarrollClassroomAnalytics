@@ -1,18 +1,15 @@
-from audioop import reverse
-
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from django.shortcuts import render, redirect
 from api import services
 
 import logging
 
-logger = logging.getLogger("views")
+logger = logging.getLogger("api_views")
 
 """
-Contains all views for the Carroll College analytics software. These methods receive HTTP requests and return a response
-to the front end.
+Contains the backend views for the Carroll College analytics software. Each of these views contains logic and make
+queries fo the database. These methods receive HTTP requests and return a response to the front end.
 
 Author: Ryan Johnson
 """
@@ -168,19 +165,3 @@ def get_past_time(request: Request) -> Response:
                      f"(in {buildings_list}): {past_start_time}")
 
     return Response(past_start_time)
-
-
-def index(request: Request) -> Response:
-    """
-    Forwards the request to the React router, displaying the correct page.
-    """
-    logger.debug(f"index - Request: {request}")
-    return render(request, "build/index.html")
-
-
-def index_with_classroom(request: Request, classroom) -> Response:
-    """
-    Forwards the request to the React router, passing the classroom variable along.
-    """
-    logger.debug(f"index_with_classroom - Classroom: {classroom}, Request: {request}")
-    return render(request, "build/index.html", {"classroom": classroom})

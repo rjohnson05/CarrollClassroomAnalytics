@@ -8,11 +8,6 @@ Author: Ryan Johnson
 """
 
 urlpatterns = [
-    path('', views.index, name="index"),
-    path('used_classrooms/', views.index, name="index"),
-    path('classrooms/<str:classroom>', views.index_with_classroom, name="index"),
-    path('upload/', views.index, name="index"),
-
     path('get_number_classes/', views.get_number_classes, name="get_number_classes"),
     path('get_building_names/', views.get_building_names, name="get_building_names"),
     path('get_used_classrooms/', views.get_used_classrooms, name="get_used_classrooms"),
