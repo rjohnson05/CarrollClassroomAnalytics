@@ -43,7 +43,9 @@ export default function ClassroomDaySchedule({day, timeBlockList, courseData}) {
 
     /**
      * Selects the course data for a specific time block. This is used when displaying course data in the tooltip. This
-     * course data includes the name, instructors, number of students enrolled, and day of the week.
+     * course data includes the name, instructors, number of students enrolled, and day of the week. The course name,
+     * instructor, and enrollment data are stored in lists. In the case of multiple courses being listed during the same
+     * time block, the length of these lists is greater than one.
      *
      * @param timeBlock Array of two strings: the start/end times of the block
      * @returns         Array containing the data for the course being held during the specified time block
@@ -51,11 +53,17 @@ export default function ClassroomDaySchedule({day, timeBlockList, courseData}) {
     const selectData = (timeBlock) => {
         const startTime = timeBlock[0];
         const endTime = timeBlock[1];
-        const courseName = courseData[day][timeBlock[0]][0][0];
-        const instructors = courseData[day][timeBlock[0]][0][1];
-        const studentsEnrolled = courseData[day][timeBlock[0]][0][2];
+        const courseNameList = []
+        const instructorsList = []
+        const studentsEnrolledList = []
 
-        return [startTime, endTime, courseName, instructors, studentsEnrolled, day]
+        for (let i = 0; i < courseData[day][timeBlock[0]].length; i++) {
+            courseNameList.push(courseData[day][timeBlock[0]][i][0]);
+            instructorsList.push(courseData[day][timeBlock[0]][i][1]);
+            studentsEnrolledList.push(courseData[day][timeBlock[0]][i][2]);
+        }
+
+        return [startTime, endTime, courseNameList, instructorsList, studentsEnrolledList, day]
     }
 
     return (<div>
@@ -63,17 +71,29 @@ export default function ClassroomDaySchedule({day, timeBlockList, courseData}) {
                  render={({content}) => {
                      if (content) {
                          const contentsArray = JSON.parse(content);
+                         const startTime = contentsArray[0];
+                         const endTime = contentsArray[1];
+                         const courseNameList = contentsArray[2];
+                         const instructorsList = contentsArray[3];
+                         const studentsEnrolledList = contentsArray[4];
+
                          return (<div style={{display: 'flex', flexDirection: 'column'}}>
-                             <span>Time: {contentsArray[0]?.substring(0, 5)} - {contentsArray[1]?.substring(0, 5)}</span>
-                             {contentsArray[2] ? <div>
-                                 <p className="tooltip-line">Course: {contentsArray[2]}</p>
-                                 <p className="tooltip-line">Instructor(s): {contentsArray[3]}</p>
-                                 <p className="tooltip-line">Students Enrolled: {contentsArray[4]}</p>
-                             </div> : <div>
-                                 <p className="tooltip-line">Course: N/A</p>
-                                 <p className="tooltip-line">Instructor: N/A</p>
-                                 <p className="tooltip-line">Students Enrolled: N/A</p>
-                             </div>}
+                             <span>Time: {startTime?.substring(0, 5)} - {endTime?.substring(0, 5)}</span>
+                             {console.log(courseNameList[0])}
+                             {courseNameList[0] !== null ?
+                                 courseNameList.map((courseName, index) => (
+                                     <div>
+                                         <hr/>
+                                         <p className="tooltip-line">Course: {courseNameList[index]}</p>
+                                         <p className="tooltip-line">Instructor: {instructorsList[index]}</p>
+                                         <p className="tooltip-line">Students Enrolled: {studentsEnrolledList[index]}</p>
+                                     </div>)) :
+                                 <div>
+                                     <hr/>
+                                     <p className="tooltip-line">Course: N/A</p>
+                                     <p className="tooltip-line">Instructor: N/A</p>
+                                     <p className="tooltip-line">Students Enrolled: N/A</p>
+                                 </div>}
                          </div>);
                      } else {
                          return null;

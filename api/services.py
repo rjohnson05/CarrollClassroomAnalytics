@@ -156,18 +156,18 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] 
         current_courses = (Course.objects.all().filter(day__contains=day,
                                                        start_time__lte=start_time,
                                                        end_time__gte=end_time)
-                           .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
+                           .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP")).order_by('classroom__building', 'classroom__room_num')
     else:
         # Searches for used classrooms within only buildings specified by the filter
         current_courses = (Course.objects.all().filter(day__contains=day,
                                                        start_time__lte=start_time,
                                                        end_time__gte=end_time,
                                                        classroom__building__in=buildings)
-                           .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP"))
+                           .exclude(classroom__isnull=True).exclude(classroom__building__exact="OFCP")).order_by('classroom__building', 'classroom__room_num')
     logger.debug(f"get_used_classrooms - Courses found running between {start_time} and {end_time} on {day} "
                  f"within {buildings} buildings: {current_courses}")
     courses_data = [
-        [course.name, course.classroom.name, course.instructor, course.classroom.occupancy, course.enrolled]
+        [course.name, course.classroom.name, course.instructor.name, course.classroom.occupancy, course.enrolled]
         for course in current_courses]
     logger.debug(f"get_used_classrooms - Course Data: {courses_data}")
 
@@ -251,7 +251,7 @@ def get_classroom_courses(classroom: str) -> {}:
             if len(running_course) == 0:
                 courses_data = ["", "", 0]
             else:
-                courses_data = [[course.name, course.instructor, course.enrolled] for course in running_course]
+                courses_data = [[course.name, course.instructor.name, course.enrolled] for course in running_course]
             day_courses[block_start_time] = courses_data
         logger.debug(f"get_classroom_courses - Courses for {classroom} on {day}: {day_courses}")
         classroom_courses[day] = day_courses
