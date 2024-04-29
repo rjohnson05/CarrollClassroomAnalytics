@@ -102,7 +102,7 @@ class Course(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
 
     instruction_method = models.CharField(max_length=255)
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, null=True, db_column="instructor_id")
+    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, null=True)
 
     enrolled = models.IntegerField(null=True)
     capacity = models.IntegerField(null=True)
