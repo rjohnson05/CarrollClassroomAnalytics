@@ -87,9 +87,6 @@ DATABASES = {
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'HOST': 'localhost',
         'PORT': 3306,
-        'TEST': {
-            'NAME': os.path.join('test_', os.getenv('DATABASE_NAME'))
-        }
     }
 }
 
