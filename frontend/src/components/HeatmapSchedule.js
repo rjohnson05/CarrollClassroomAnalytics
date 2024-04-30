@@ -179,166 +179,166 @@ export default function HeatmapSchedule() {
 
 
     return (<div className="body">
-            <NavBar/>
-            <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
+        <NavBar/>
+        <h1 className="main-title header-font">CLASSROOM UTILIZATION OVERVIEW</h1>
 
-            <div className="filter-container">
-                <button className="filter-button" ref={filterButtonRef}>
-                    <span className="pi pi-filter-fill filter-icon"></span>FILTER
-                </button>
+        <div className="filter-container">
+            <button className="filter-button" ref={filterButtonRef}>
+                <span className="pi pi-filter-fill filter-icon"></span>FILTER
+            </button>
 
-                {filterOpen && <form className="filter-dropdown" ref={filterOpen ? filterDropdownRef : false}>
-                    {Object.keys(buildingNames).map(abbrev => (<div key={abbrev}>
-                            <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
-                                   onClick={() => filterBuilding({abbrev})}/>
-                            <label className="filter-options" htmlFor={abbrev}>{buildingNames[abbrev]}</label>
-                        </div>))}
-                </form>}
+            {filterOpen && <form className="filter-dropdown" ref={filterOpen ? filterDropdownRef : false}>
+                {Object.keys(buildingNames).map(abbrev => (<div key={abbrev}>
+                    <input type="checkbox" checked={buildingFilter[abbrev]} name={abbrev}
+                           onClick={() => filterBuilding({abbrev})}/>
+                    <label className="filter-options" htmlFor={abbrev}>{buildingNames[abbrev]}</label>
+                </div>))}
+            </form>}
+        </div>
+
+        <div className="heatmap-container">
+            <div className="legend-container">
+                {numberClasses && Object.keys(numberClasses).length > 0 && maxNumClasses ?
+                    <Legend className="legend" numClassroomsList={numberClasses}
+                            maxNumberClasses={maxNumClasses}/> : numberClasses ? "No data available" : "Legend Loading..."}
             </div>
 
-            <div className="heatmap-container">
-                <div className="legend-container">
-                    {numberClasses && Object.keys(numberClasses).length > 0 && maxNumClasses ?
-                        <Legend className="legend" numClassroomsList={numberClasses}
-                                maxNumberClasses={maxNumClasses}/> : numberClasses ? "No data available" : "Legend Loading..."}
+            <div className="week-grid">
+                <div className="time-grid">
+                    <div className="hour-block">
+                        <p className="hour-label"> 6 AM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 7 AM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 8 AM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 9 AM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label">10 AM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label">11 AM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label">12 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 1 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 2 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 3 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 4 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 5 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 6 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 7 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 8 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label"> 9 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label">10 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
+                    <div className="hour-block">
+                        <p className="hour-label">11 PM</p>
+                        <hr className="hour-line"/>
+                    </div>
                 </div>
 
-                <div className="week-grid">
-                    <div className="time-grid">
-                        <div className="hour-block">
-                            <p className="hour-label"> 6 AM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 7 AM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 8 AM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 9 AM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label">10 AM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label">11 AM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label">12 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 1 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 2 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 3 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 4 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 5 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 6 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 7 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 8 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label"> 9 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label">10 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                        <div className="hour-block">
-                            <p className="hour-label">11 PM</p>
-                            <hr className="hour-line"/>
-                        </div>
-                    </div>
-
-                    <div className="days-container">
-                        <div className="day">
-                            <h3 className="day-header">MONDAY</h3>
-                            {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
+                <div className="days-container">
+                    <div className="day">
+                        <h3 className="day-header">MONDAY</h3>
+                        {/* Displays the heatmap for a single day once it has successfully loaded. Until then, only the
                  Loading text is displayed */}
-                            {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
-                                <div className="heatmap">
-                                    <HeatMap timeBlockList={timeBlocks['M']}
-                                             day='M' buildingList={buildingFilter}
-                                             numClassroomsList={numberClasses['M']}
-                                             maxNumberClasses={maxNumClasses}/>
-                                </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
-                                    <p>Loading...</p>}
-                        </div>
-                        <div className="day">
-                            <h3 className="day-header">TUESDAY</h3>
-                            {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
-                                <div className="heatmap">
-                                    <HeatMap timeBlockList={timeBlocks['T']}
-                                             day='T' buildingList={buildingFilter}
-                                             numClassroomsList={numberClasses['T']}
-                                             maxNumberClasses={maxNumClasses}/>
-                                </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
-                                    <p>Loading...</p>}
-                        </div>
-                        <div className="day">
-                            <h3 className="day-header">WEDNESDAY</h3>
-                            {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
-                                <div className="heatmap">
-                                    <HeatMap timeBlockList={timeBlocks['W']}
-                                             day='W' buildingList={buildingFilter}
-                                             numClassroomsList={numberClasses['W']}
-                                             maxNumberClasses={maxNumClasses}/>
-                                </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
-                                    <p>Loading...</p>}
-                        </div>
-                        <div className="day">
-                            <h3 className="day-header">THURSDAY</h3>
-                            {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
-                                <div className="heatmap">
-                                    <HeatMap timeBlockList={timeBlocks['th']}
-                                             day='th' buildingList={buildingFilter}
-                                             numClassroomsList={numberClasses['th']}
-                                             maxNumberClasses={maxNumClasses}/>
-                                </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
-                                    <p>Loading...</p>}
-                        </div>
-                        <div className="day">
-                            <h3 className="day-header">FRIDAY</h3>
-                            {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
-                                <div className="heatmap">
-                                    <HeatMap timeBlockList={timeBlocks['F']}
-                                             day='F' buildingList={buildingFilter}
-                                             numClassroomsList={numberClasses['F']}
-                                             maxNumberClasses={maxNumClasses}/>
-                                </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
-                                    <p>Loading...</p>}
-                        </div>
+                        {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['M']}
+                                         day='M' buildingList={buildingFilter}
+                                         numClassroomsList={numberClasses['M']}
+                                         maxNumberClasses={maxNumClasses}/>
+                            </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
+                                <p>Loading...</p>}
+                    </div>
+                    <div className="day">
+                        <h3 className="day-header">TUESDAY</h3>
+                        {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['T']}
+                                         day='T' buildingList={buildingFilter}
+                                         numClassroomsList={numberClasses['T']}
+                                         maxNumberClasses={maxNumClasses}/>
+                            </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
+                                <p>Loading...</p>}
+                    </div>
+                    <div className="day">
+                        <h3 className="day-header">WEDNESDAY</h3>
+                        {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['W']}
+                                         day='W' buildingList={buildingFilter}
+                                         numClassroomsList={numberClasses['W']}
+                                         maxNumberClasses={maxNumClasses}/>
+                            </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
+                                <p>Loading...</p>}
+                    </div>
+                    <div className="day">
+                        <h3 className="day-header">THURSDAY</h3>
+                        {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['th']}
+                                         day='th' buildingList={buildingFilter}
+                                         numClassroomsList={numberClasses['th']}
+                                         maxNumberClasses={maxNumClasses}/>
+                            </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
+                                <p>Loading...</p>}
+                    </div>
+                    <div className="day">
+                        <h3 className="day-header">FRIDAY</h3>
+                        {timeBlocks && numberClasses && (Object.keys(timeBlocks).length > 0 && Object.keys(numberClasses).length > 0 && maxNumClasses) ?
+                            <div className="heatmap">
+                                <HeatMap timeBlockList={timeBlocks['F']}
+                                         day='F' buildingList={buildingFilter}
+                                         numClassroomsList={numberClasses['F']}
+                                         maxNumberClasses={maxNumClasses}/>
+                            </div> : timeBlocks && numberClasses ? <p>No heatmap data available</p> :
+                                <p>Loading...</p>}
                     </div>
                 </div>
             </div>
-        </div>);
+        </div>
+    </div>);
 }

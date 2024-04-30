@@ -1,9 +1,10 @@
+import logging
+
+from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from api import services
 
-import logging
+from api import services
 
 logger = logging.getLogger("api_views")
 
@@ -134,10 +135,12 @@ def get_next_time(request: Request) -> Response:
     buildings_list = buildings.split(", ")
     if buildings.__len__() == 0:
         next_end_time = services.get_next_time(day, start_time)
-        logger.debug(f"get_next_time - End time for block starting at {start_time} on {day} (in all buildings): {next_end_time}")
+        logger.debug(
+            f"get_next_time - End time for block starting at {start_time} on {day} (in all buildings): {next_end_time}")
     else:
         next_end_time = services.get_next_time(day, start_time, buildings_list)
-        logger.debug(f"get_next_time - End time for block starting at {start_time} on {day} (in {buildings_list}): {next_end_time}")
+        logger.debug(
+            f"get_next_time - End time for block starting at {start_time} on {day} (in {buildings_list}): {next_end_time}")
 
     return Response(next_end_time)
 

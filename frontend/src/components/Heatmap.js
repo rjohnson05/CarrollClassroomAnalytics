@@ -51,34 +51,37 @@ export default function Heatmap({day, buildingList, timeBlockList, numClassrooms
 
 
     return (<div>
-            {/*A tooltip appears when hovering over the colored blocks, showing how many classrooms are in use*/}
-            <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" clickable={true}
-                     render={({content}) => {
-                         if (content) {
-                             const contentParts = content.split(",");
-                             const day = contentParts[3];
-                             const buildingListArray = Object.entries(buildingList).filter(([key, value]) => key && value)
-                                                   .map(([key]) => key).join(', ');
-                             const startTime = contentParts[0]?.substring(0, 5);
-                             const endTime = contentParts[1]?.substring(0, 5);
-                             return (<div style={{display: 'flex', flexDirection: 'column'}}>
-                                     <span>Time: {contentParts[0]?.substring(0, 5)} - {contentParts[1]?.substring(0, 5)}</span>
-                                     <span>Classrooms in Use: {contentParts[2]}</span>
-                                     {/*Link to show which classrooms are used during a specific time block*/}
-                                     <Link className="link" to={{pathname: `/used_classrooms`, search: `?day=${day}&buildingList=${buildingListArray}&startTime=${startTime}&endTime=${endTime}`}} target="_blank" rel="noopener noreferrer">
-                                         View Used Classrooms</Link>
-                                 </div>);
-                         } else {
-                             return null;
-                         }
-                     }}></Tooltip>
-            {timeBlockList ? timeBlockList.map((timeBlock) => (
-                <svg key={timeBlock} viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
-                     style={{display: "block"}}>
-                    <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1]) + 1}
-                          fill={colorScale(numClassroomsList[timeBlock[0]])}
-                          className="tooltip-target"
-                          data-tooltip-content={[timeBlock[0], timeBlock[1], numClassroomsList[timeBlock[0]], day, buildingList]}/>
-                </svg>)) : <p>No heatmap data available</p>}
-        </div>);
+        {/*A tooltip appears when hovering over the colored blocks, showing how many classrooms are in use*/}
+        <Tooltip className="dark" anchorSelect=".tooltip-target" place="right" clickable={true}
+                 render={({content}) => {
+                     if (content) {
+                         const contentParts = content.split(",");
+                         const day = contentParts[3];
+                         const buildingListArray = Object.entries(buildingList).filter(([key, value]) => key && value)
+                             .map(([key]) => key).join(', ');
+                         const startTime = contentParts[0]?.substring(0, 5);
+                         const endTime = contentParts[1]?.substring(0, 5);
+                         return (<div style={{display: 'flex', flexDirection: 'column'}}>
+                             <span>Time: {contentParts[0]?.substring(0, 5)} - {contentParts[1]?.substring(0, 5)}</span>
+                             <span>Classrooms in Use: {contentParts[2]}</span>
+                             {/*Link to show which classrooms are used during a specific time block*/}
+                             <Link className="link" to={{
+                                 pathname: `/used_classrooms`,
+                                 search: `?day=${day}&buildingList=${buildingListArray}&startTime=${startTime}&endTime=${endTime}`
+                             }} target="_blank" rel="noopener noreferrer">
+                                 View Used Classrooms</Link>
+                         </div>);
+                     } else {
+                         return null;
+                     }
+                 }}></Tooltip>
+        {timeBlockList ? timeBlockList.map((timeBlock) => (
+            <svg key={timeBlock} viewBox={`0 0 100 ${calculateMinutes(timeBlock[0], timeBlock[1])}`}
+                 style={{display: "block"}}>
+                <rect width="100%" height={calculateMinutes(timeBlock[0], timeBlock[1]) + 1}
+                      fill={colorScale(numClassroomsList[timeBlock[0]])}
+                      className="tooltip-target"
+                      data-tooltip-content={[timeBlock[0], timeBlock[1], numClassroomsList[timeBlock[0]], day, buildingList]}/>
+            </svg>)) : <p>No heatmap data available</p>}
+    </div>);
 }

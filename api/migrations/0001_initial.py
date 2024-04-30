@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,7 +16,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=255)),
-                ('building', models.CharField(choices=[('', ''), ('CENG', 'Civil Engineering'), ('CHPL', 'All Saints Chapel'), ('CUBE', 'Cube'), ('EQCT', 'Equine Center'), ('FSCT', 'Fortin Science Center Labs'), ('GUAD', 'Guadalupe Hall'), ('HAC', 'Hunthausen Activity Center'), ('OCON', "O'Connell Hall"), ('OFCP', 'Off-Campus'), ('PCCC', 'Perkins Call Canine Center'), ('PECT', 'PE Center'), ('SIMP', 'Simperman Hall'), ('STCH', 'St. Charles Hall'), ('WBAR', 'Waterbarn')], max_length=255)),
+                ('building', models.CharField(
+                    choices=[('', ''), ('CENG', 'Civil Engineering'), ('CHPL', 'All Saints Chapel'), ('CUBE', 'Cube'),
+                             ('EQCT', 'Equine Center'), ('FSCT', 'Fortin Science Center Labs'),
+                             ('GUAD', 'Guadalupe Hall'), ('HAC', 'Hunthausen Activity Center'),
+                             ('OCON', "O'Connell Hall"), ('OFCP', 'Off-Campus'), ('PCCC', 'Perkins Call Canine Center'),
+                             ('PECT', 'PE Center'), ('SIMP', 'Simperman Hall'), ('STCH', 'St. Charles Hall'),
+                             ('WBAR', 'Waterbarn')], max_length=255)),
                 ('room_num', models.CharField(max_length=255)),
                 ('occupancy', models.FloatField(blank=True, default=None, null=True)),
                 ('width', models.IntegerField(blank=True, default=None, null=True)),
@@ -50,12 +55,17 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(max_length=255)),
                 ('start_time', models.TimeField(null=True)),
                 ('end_time', models.TimeField(null=True)),
-                ('day', models.CharField(choices=[('M', 'Monday'), ('T', 'Tuesday'), ('W', 'Wednesday'), ('th', 'Thursday'), ('MW', 'Monday, Wednesday'), ('MWF', 'Monday, Wednesday, Friday'), ('Tth', 'Tuesday, Thursday')], max_length=255)),
+                ('day', models.CharField(
+                    choices=[('M', 'Monday'), ('T', 'Tuesday'), ('W', 'Wednesday'), ('th', 'Thursday'),
+                             ('MW', 'Monday, Wednesday'), ('MWF', 'Monday, Wednesday, Friday'),
+                             ('Tth', 'Tuesday, Thursday')], max_length=255)),
                 ('instruction_method', models.CharField(max_length=255)),
                 ('enrolled', models.IntegerField(null=True)),
                 ('capacity', models.IntegerField(null=True)),
-                ('classroom', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='api.classroom')),
-                ('instructor', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='api.instructor')),
+                ('classroom',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='api.classroom')),
+                ('instructor',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='api.instructor')),
             ],
         ),
     ]

@@ -89,8 +89,7 @@ export default function FileUpload() {
                 setSuccessText(false);
                 setFileErrorShowing(true);
                 setMissingColumns(res.data['missingColumns'].join(', '));
-            }
-            else {
+            } else {
                 // Shows the success text upon a successful file upload
                 setUploadingText(false);
                 setSuccessText(true);
@@ -133,79 +132,79 @@ export default function FileUpload() {
 
 
     return (<div>
-            <NavBar/>
-            <h1 className="title-font">UPLOAD DATA</h1>
-            {uploadingText && <p className="info-text">Uploading...</p>}
-            {successText && <p className="info-text">File successfully uploaded.</p>}
-            {fileErrorShowing &&
-                <div>
-                    <p className="info-text">This file has improper formatting. Add the following columns and then try
-                        again:</p> <br/>
-                    <p className="info-text">{missingColumns}</p>
-                </div>
-            }
+        <NavBar/>
+        <h1 className="title-font">UPLOAD DATA</h1>
+        {uploadingText && <p className="info-text">Uploading...</p>}
+        {successText && <p className="info-text">File successfully uploaded.</p>}
+        {fileErrorShowing &&
+            <div>
+                <p className="info-text">This file has improper formatting. Add the following columns and then try
+                    again:</p> <br/>
+                <p className="info-text">{missingColumns}</p>
+            </div>
+        }
 
         {/*Creates the dropdown for uploading schedule data*/}
         <div
             className={`upload-option ${uploadOptionDropdownStatus && isClicked("schedule") ? 'upload-option-square' : ''}`}>
-                {/*Creates the main block that houses the dropdown*/}
-                <div className="upload-option-dropdown" onClick={() => dropdownToggle("schedule")}>
-                    {uploadOptionDropdownStatus && isClicked("schedule") ?
-                        <KeyboardArrowUpIcon className="dropdown-icon"/> :
-                        <KeyboardArrowDownIcon className="dropdown-icon"/>}
-                    <p className="option-title">Upload Schedule Data</p>
-                </div>
-                <div
-                    className={`dropdown ${uploadOptionDropdownStatus && isClicked("schedule") ? 'dropdown-visible' : ''}`}>
-                    {uploadOptionDropdownStatus && uploadOptionDropdownStatus["schedule"] ? <div>
-                        <form className="upload-area" id="schedule" onSubmit={handleSubmit} method="POST">
-                            <div className="file-chooser-block">
-                                <input id="schedule-chooser" type="file" accept=".xls, .xlsx"
-                                       onChange={handleFileChange} hidden/>
-                                <label htmlFor="schedule-chooser" className="file-chooser">
-                                    <CloudUploadIcon/>
-                                    <p className="upload-label">Choose Schedule Spreadsheet</p>
-                                </label>
-                                {scheduleFile ?
-                                    <p className="file-name-preview"><b>File Name: </b>{scheduleFile.name}</p> :
-                                    <p></p>}
-                            </div>
-
-                            <button className="submit-button" type="submit">Upload File</button>
-                        </form>
-                    </div> : <div></div>}
-                </div>
+            {/*Creates the main block that houses the dropdown*/}
+            <div className="upload-option-dropdown" onClick={() => dropdownToggle("schedule")}>
+                {uploadOptionDropdownStatus && isClicked("schedule") ?
+                    <KeyboardArrowUpIcon className="dropdown-icon"/> :
+                    <KeyboardArrowDownIcon className="dropdown-icon"/>}
+                <p className="option-title">Upload Schedule Data</p>
             </div>
-
-            {/*Creates the dropdown for uploading classroom data*/}
             <div
-                className={`upload-option ${uploadOptionDropdownStatus && isClicked("classroom") ? 'upload-option-square' : ''}`}>
-                <div className="upload-option-dropdown" onClick={() => dropdownToggle("classroom")}>
-                    {uploadOptionDropdownStatus && isClicked("classroom") ?
-                        <KeyboardArrowUpIcon className="dropdown-icon"/> :
-                        <KeyboardArrowDownIcon className="dropdown-icon"/>}
-                    <p className="option-title">Upload Classroom Data</p>
-                </div>
-                <div
-                    className={`dropdown ${uploadOptionDropdownStatus && isClicked("classroom") ? 'dropdown-visible' : ''}`}>
-                    {uploadOptionDropdownStatus && uploadOptionDropdownStatus["classroom"] ? <div>
-                        <form className="upload-area" id="classroom" onSubmit={handleSubmit} method="POST">
-                            <div className="file-chooser-block">
-                                <input id="classroom-chooser" type="file" accept=".xls, .xlsx"
-                                       onChange={handleFileChange} hidden/>
-                                <label htmlFor="classroom-chooser" className="file-chooser">
-                                    <CloudUploadIcon/>
-                                    <p className="upload-label">Choose Classroom Spreadsheet</p>
-                                </label>
-                                {classroomFile ?
-                                    <p className="file-name-preview"><b>File Name: </b>{classroomFile.name}</p> :
-                                    <p></p>}
-                            </div>
+                className={`dropdown ${uploadOptionDropdownStatus && isClicked("schedule") ? 'dropdown-visible' : ''}`}>
+                {uploadOptionDropdownStatus && uploadOptionDropdownStatus["schedule"] ? <div>
+                    <form className="upload-area" id="schedule" onSubmit={handleSubmit} method="POST">
+                        <div className="file-chooser-block">
+                            <input id="schedule-chooser" type="file" accept=".xls, .xlsx"
+                                   onChange={handleFileChange} hidden/>
+                            <label htmlFor="schedule-chooser" className="file-chooser">
+                                <CloudUploadIcon/>
+                                <p className="upload-label">Choose Schedule Spreadsheet</p>
+                            </label>
+                            {scheduleFile ?
+                                <p className="file-name-preview"><b>File Name: </b>{scheduleFile.name}</p> :
+                                <p></p>}
+                        </div>
 
-                            <button className="submit-button" type="submit">Upload File</button>
-                        </form>
-                    </div> : <div></div>}
-                </div>
+                        <button className="submit-button" type="submit">Upload File</button>
+                    </form>
+                </div> : <div></div>}
             </div>
-        </div>);
+        </div>
+
+        {/*Creates the dropdown for uploading classroom data*/}
+        <div
+            className={`upload-option ${uploadOptionDropdownStatus && isClicked("classroom") ? 'upload-option-square' : ''}`}>
+            <div className="upload-option-dropdown" onClick={() => dropdownToggle("classroom")}>
+                {uploadOptionDropdownStatus && isClicked("classroom") ?
+                    <KeyboardArrowUpIcon className="dropdown-icon"/> :
+                    <KeyboardArrowDownIcon className="dropdown-icon"/>}
+                <p className="option-title">Upload Classroom Data</p>
+            </div>
+            <div
+                className={`dropdown ${uploadOptionDropdownStatus && isClicked("classroom") ? 'dropdown-visible' : ''}`}>
+                {uploadOptionDropdownStatus && uploadOptionDropdownStatus["classroom"] ? <div>
+                    <form className="upload-area" id="classroom" onSubmit={handleSubmit} method="POST">
+                        <div className="file-chooser-block">
+                            <input id="classroom-chooser" type="file" accept=".xls, .xlsx"
+                                   onChange={handleFileChange} hidden/>
+                            <label htmlFor="classroom-chooser" className="file-chooser">
+                                <CloudUploadIcon/>
+                                <p className="upload-label">Choose Classroom Spreadsheet</p>
+                            </label>
+                            {classroomFile ?
+                                <p className="file-name-preview"><b>File Name: </b>{classroomFile.name}</p> :
+                                <p></p>}
+                        </div>
+
+                        <button className="submit-button" type="submit">Upload File</button>
+                    </form>
+                </div> : <div></div>}
+            </div>
+        </div>
+    </div>);
 }

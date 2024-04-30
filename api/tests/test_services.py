@@ -1,8 +1,8 @@
 import datetime
 import os
 
-from django.test import TestCase
 import pandas as pd
+from django.test import TestCase
 
 from api import services
 from api.models import Classroom, Course, Instructor
@@ -920,7 +920,6 @@ class GetUsedClassrooms(TestCase):
             room_num="OFCP"
         )
 
-
     # Ensures that no classrooms are found if there are no courses
     def test_no_courses(self):
         actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00')
@@ -1201,11 +1200,14 @@ class CalculateClassroomTimeBlocks(TestCase):
         self.create_simp_course(datetime.time(hour=8, minute=00), datetime.time(hour=8, minute=50))
         self.create_simp_course(datetime.time(hour=9, minute=00), datetime.time(hour=9, minute=50))
         actual_blocks = calculate_classroom_time_blocks("SIMP-120")
-        predicted_blocks = {'M': [['06:00:00', '08:00:00'], ['08:00:00', '08:50:00'], ['08:50:00', '09:00:00'], ['09:00:00', '09:50:00'], ['09:50:00', '23:59:00']],
+        predicted_blocks = {'M': [['06:00:00', '08:00:00'], ['08:00:00', '08:50:00'], ['08:50:00', '09:00:00'],
+                                  ['09:00:00', '09:50:00'], ['09:50:00', '23:59:00']],
                             'T': [['06:00:00', '23:59:00']],
-                            'W': [['06:00:00', '08:00:00'], ['08:00:00', '08:50:00'], ['08:50:00', '09:00:00'], ['09:00:00', '09:50:00'], ['09:50:00', '23:59:00']],
+                            'W': [['06:00:00', '08:00:00'], ['08:00:00', '08:50:00'], ['08:50:00', '09:00:00'],
+                                  ['09:00:00', '09:50:00'], ['09:50:00', '23:59:00']],
                             'th': [['06:00:00', '23:59:00']],
-                            'F': [['06:00:00', '08:00:00'], ['08:00:00', '08:50:00'], ['08:50:00', '09:00:00'], ['09:00:00', '09:50:00'], ['09:50:00', '23:59:00']]}
+                            'F': [['06:00:00', '08:00:00'], ['08:00:00', '08:50:00'], ['08:50:00', '09:00:00'],
+                                  ['09:00:00', '09:50:00'], ['09:50:00', '23:59:00']]}
         self.assertEqual(actual_blocks, predicted_blocks)
 
     # Ensure that only the course from the specified classroom is returned
@@ -1334,7 +1336,8 @@ class GetClassroomCourses(TestCase):
             'W': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor.name, course.enrolled]],
                   '08:50:00': ['', '', 0]},
             'th': {'06:00:00': ['', '', 0]},
-            'F': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor.name, course.enrolled]], '08:50:00': ['', '', 0]}}
+            'F': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor.name, course.enrolled]],
+                  '08:50:00': ['', '', 0]}}
         self.assertEqual(actual_courses, predicted_courses)
 
     # Ensure that a course being taught in classroom different from the one specified is not returned
@@ -1955,10 +1958,10 @@ class UploadScheduleData(TestCase):
         course = Course.objects.get(section_id=int(df['COURSE_SECTIONS_ID'].iloc[0]))
         predicted_instructor = Instructor.objects.create(name=df['SEC_FACULTY_INFO'].iloc[0])
         predicted_classroom = Classroom.objects.create(
-                name=df['CSM_BLDG'].iloc[0] + "-" + str(df['CSM_ROOM'].iloc[0]),
-                building=df['CSM_BLDG'].iloc[0],
-                room_num=df['CSM_ROOM'].iloc[0],
-            )
+            name=df['CSM_BLDG'].iloc[0] + "-" + str(df['CSM_ROOM'].iloc[0]),
+            building=df['CSM_BLDG'].iloc[0],
+            room_num=df['CSM_ROOM'].iloc[0],
+        )
 
         for index, row in df.iterrows():
             self.assertEqual(course.section_id, int(row['COURSE_SECTIONS_ID']))
@@ -1971,8 +1974,8 @@ class UploadScheduleData(TestCase):
             self.assertEqual(course.subject, row['SEC_SUBJECT'])
             self.assertEqual(course.min_credits, float(row['SEC_MIN_CRED']))
             self.assertEqual(course.status, row['SEC_STATUS'])
-            self.assertEqual(course.start_time, datetime.datetime.strptime(row['CSM_START_TIME'],'%I:%M%p').time())
-            self.assertEqual(course.end_time, datetime.datetime.strptime(row['CSM_END_TIME'],'%I:%M%p').time())
+            self.assertEqual(course.start_time, datetime.datetime.strptime(row['CSM_START_TIME'], '%I:%M%p').time())
+            self.assertEqual(course.end_time, datetime.datetime.strptime(row['CSM_END_TIME'], '%I:%M%p').time())
             self.assertEqual(course.day, calculate_day_string(row))
             self.assertEqual(course.classroom.name, predicted_classroom.name)
             self.assertEqual(course.instruction_method, row['CSM_INSTR_METHOD'])

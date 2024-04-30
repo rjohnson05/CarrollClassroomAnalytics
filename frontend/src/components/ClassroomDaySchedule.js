@@ -86,7 +86,8 @@ export default function ClassroomDaySchedule({day, timeBlockList, courseData}) {
                                          <hr/>
                                          <p className="tooltip-line">Course: {courseNameList[index]}</p>
                                          <p className="tooltip-line">Instructor: {instructorsList[index]}</p>
-                                         <p className="tooltip-line">Students Enrolled: {studentsEnrolledList[index]}</p>
+                                         <p className="tooltip-line">Students
+                                             Enrolled: {studentsEnrolledList[index]}</p>
                                      </div>)) :
                                  <div>
                                      <hr/>

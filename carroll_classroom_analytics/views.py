@@ -1,8 +1,8 @@
+import logging
+
+from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.shortcuts import render
-
-import logging
 
 logger = logging.getLogger("index_views")
 
