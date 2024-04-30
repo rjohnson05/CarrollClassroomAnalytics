@@ -970,9 +970,9 @@ class GetUsedClassrooms(TestCase):
         classroom = Classroom.objects.get(name="SIMP-120")
         course = Course.objects.get(name="Advanced Software Engineering")
 
-        actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00')
+        actual_classrooms = get_used_classrooms('M', '08:00', '08:50')
         predicted_classrooms = {
-            classroom.name: [[course.name, course.instructor, course.classroom.occupancy, course.enrolled]]}
+            classroom.name: [[course.name, course.instructor.name, course.classroom.occupancy, course.enrolled]]}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
     # Ensures that several classrooms are returned if both are in the specified time block
@@ -984,15 +984,15 @@ class GetUsedClassrooms(TestCase):
         course1 = Course.objects.get(name="Advanced Software Engineering")
         course2 = Course.objects.get(name="Small Group Communication")
 
-        actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00')
+        actual_classrooms = get_used_classrooms('M', '08:00', '08:50')
         predicted_classrooms = {
-            classroom1.name: [[course1.name, course1.instructor, course1.classroom.occupancy, course1.enrolled]],
-            classroom2.name: [[course2.name, course2.instructor, course2.classroom.occupancy, course2.enrolled]]}
+            classroom1.name: [[course1.name, course1.instructor.name, course1.classroom.occupancy, course1.enrolled]],
+            classroom2.name: [[course2.name, course2.instructor.name, course2.classroom.occupancy, course2.enrolled]]}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
     # Ensures that no classrooms are returned if none are used in the specified building
     def test_no_classroom_used_one_building(self):
-        actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00', ["SIMP"])
+        actual_classrooms = get_used_classrooms('M', '08:00', '08:50', ["SIMP"])
         predicted_classrooms = {}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
@@ -1002,9 +1002,9 @@ class GetUsedClassrooms(TestCase):
         classroom = Classroom.objects.get(name="SIMP-120")
         course = Course.objects.get(name="Advanced Software Engineering")
 
-        actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00', ["SIMP"])
+        actual_classrooms = get_used_classrooms('M', '08:00', '08:50', ["SIMP"])
         predicted_classrooms = {
-            classroom.name: [[course.name, course.instructor, course.classroom.occupancy, course.enrolled]]}
+            classroom.name: [[course.name, course.instructor.name, course.classroom.occupancy, course.enrolled]]}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
     # Ensures that both classrooms used in the specified building are returned
@@ -1016,10 +1016,10 @@ class GetUsedClassrooms(TestCase):
         course1 = Course.objects.get(name="Advanced Software Engineering", classroom__name='SIMP-120')
         course2 = Course.objects.get(name="Advanced Software Engineering", classroom__name='SIMP-121')
 
-        actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00', ["SIMP"])
+        actual_classrooms = get_used_classrooms('M', '08:00', '08:50', ["SIMP"])
         predicted_classrooms = {
-            classroom1.name: [[course1.name, course1.instructor, course1.classroom.occupancy, course1.enrolled]],
-            classroom2.name: [[course2.name, course2.instructor, course2.classroom.occupancy, course2.enrolled]]}
+            classroom1.name: [[course1.name, course1.instructor.name, course1.classroom.occupancy, course1.enrolled]],
+            classroom2.name: [[course2.name, course2.instructor.name, course2.classroom.occupancy, course2.enrolled]]}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
     # Ensures that no classrooms are returned when there are none used within the specified two buildings
@@ -1027,7 +1027,7 @@ class GetUsedClassrooms(TestCase):
         self.create_simp_course(datetime.time(hour=8, minute=00), datetime.time(hour=8, minute=50))
         self.create_simp_course(datetime.time(hour=9, minute=00), datetime.time(hour=9, minute=50), "SIMP", "121")
 
-        actual_classrooms = get_used_classrooms('M', '10:00:00', '10:50:00', ["SIMP", "STCH"])
+        actual_classrooms = get_used_classrooms('M', '10:00', '10:50', ["SIMP", "STCH"])
         predicted_classrooms = {}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
@@ -1037,9 +1037,9 @@ class GetUsedClassrooms(TestCase):
         classroom1 = Classroom.objects.get(name="SIMP-120")
         course1 = Course.objects.get(name="Advanced Software Engineering")
 
-        actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00', ["SIMP", "STCH"])
+        actual_classrooms = get_used_classrooms('M', '08:00', '08:50', ["SIMP", "STCH"])
         predicted_classrooms = {
-            classroom1.name: [[course1.name, course1.instructor, course1.classroom.occupancy, course1.enrolled]]}
+            classroom1.name: [[course1.name, course1.instructor.name, course1.classroom.occupancy, course1.enrolled]]}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
     # Ensures that both classrooms are returned when two buildings are specified
@@ -1051,10 +1051,10 @@ class GetUsedClassrooms(TestCase):
         course1 = Course.objects.get(name="Advanced Software Engineering")
         course2 = Course.objects.get(name="Small Group Communication")
 
-        actual_classrooms = get_used_classrooms('M', '08:00:00', '08:50:00', ["SIMP", "STCH"])
+        actual_classrooms = get_used_classrooms('M', '08:00', '08:50', ["SIMP", "STCH"])
         predicted_classrooms = {
-            classroom1.name: [[course1.name, course1.instructor, course1.classroom.occupancy, course1.enrolled]],
-            classroom2.name: [[course2.name, course2.instructor, course2.classroom.occupancy, course2.enrolled]]}
+            classroom1.name: [[course1.name, course1.instructor.name, course1.classroom.occupancy, course1.enrolled]],
+            classroom2.name: [[course2.name, course2.instructor.name, course2.classroom.occupancy, course2.enrolled]]}
         self.assertEqual(actual_classrooms, predicted_classrooms)
 
     # Ensures that a course with a null classroom returns no results
@@ -1328,13 +1328,13 @@ class GetClassroomCourses(TestCase):
 
         actual_courses = get_classroom_courses("SIMP-120")[1]
         predicted_courses = {
-            'M': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor, course.enrolled]],
+            'M': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor.name, course.enrolled]],
                   '08:50:00': ['', '', 0]},
             'T': {'06:00:00': ['', '', 0]},
-            'W': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor, course.enrolled]],
+            'W': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor.name, course.enrolled]],
                   '08:50:00': ['', '', 0]},
             'th': {'06:00:00': ['', '', 0]},
-            'F': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor, course.enrolled]], '08:50:00': ['', '', 0]}}
+            'F': {'06:00:00': ['', '', 0], '08:00:00': [[course.name, course.instructor.name, course.enrolled]], '08:50:00': ['', '', 0]}}
         self.assertEqual(actual_courses, predicted_courses)
 
     # Ensure that a course being taught in classroom different from the one specified is not returned
@@ -1359,16 +1359,16 @@ class GetClassroomCourses(TestCase):
 
         actual_courses = get_classroom_courses("SIMP-120")[1]
         predicted_courses = {
-            'M': {'06:00:00': ["", "", 0], '08:00:00': [[course1.name, course1.instructor, course1.enrolled]],
-                  '08:50:00': ["", "", 0], '09:00:00': [[course2.name, course2.instructor, course2.enrolled]],
+            'M': {'06:00:00': ["", "", 0], '08:00:00': [[course1.name, course1.instructor.name, course1.enrolled]],
+                  '08:50:00': ["", "", 0], '09:00:00': [[course2.name, course2.instructor.name, course2.enrolled]],
                   '09:50:00': ["", "", 0]},
             'T': {'06:00:00': ["", "", 0]},
-            'W': {'06:00:00': ["", "", 0], '08:00:00': [[course1.name, course1.instructor, course1.enrolled]],
-                  '08:50:00': ["", "", 0], '09:00:00': [[course2.name, course2.instructor, course2.enrolled]],
+            'W': {'06:00:00': ["", "", 0], '08:00:00': [[course1.name, course1.instructor.name, course1.enrolled]],
+                  '08:50:00': ["", "", 0], '09:00:00': [[course2.name, course2.instructor.name, course2.enrolled]],
                   '09:50:00': ["", "", 0]},
             'th': {'06:00:00': ["", "", 0]},
-            'F': {'06:00:00': ["", "", 0], '08:00:00': [[course1.name, course1.instructor, course1.enrolled]],
-                  '08:50:00': ["", "", 0], '09:00:00': [[course2.name, course2.instructor, course2.enrolled]],
+            'F': {'06:00:00': ["", "", 0], '08:00:00': [[course1.name, course1.instructor.name, course1.enrolled]],
+                  '08:50:00': ["", "", 0], '09:00:00': [[course2.name, course2.instructor.name, course2.enrolled]],
                   '09:50:00': ["", "", 0]}}
         self.assertEqual(actual_courses, predicted_courses)
 
@@ -1949,7 +1949,8 @@ class UploadScheduleData(TestCase):
                            'STUDENTS_AND_RESERVED_SEATS': ['9'],
                            'SEC_CAPACITY': ['10']})
         df.to_excel('schedule.xlsx', index=False)
-        upload_schedule_data('schedule.xlsx')
+        with open('schedule.xlsx', 'rb') as file:
+            upload_schedule_data(file)
         os.remove('schedule.xlsx')
         course = Course.objects.get(section_id=int(df['COURSE_SECTIONS_ID'].iloc[0]))
         predicted_instructor = Instructor.objects.create(name=df['SEC_FACULTY_INFO'].iloc[0])
@@ -1975,7 +1976,7 @@ class UploadScheduleData(TestCase):
             self.assertEqual(course.day, calculate_day_string(row))
             self.assertEqual(course.classroom.name, predicted_classroom.name)
             self.assertEqual(course.instruction_method, row['CSM_INSTR_METHOD'])
-            self.assertEqual(course.instructor, predicted_instructor.name)
+            self.assertEqual(course.instructor.name, predicted_instructor.name)
             self.assertEqual(course.enrolled, int(row['STUDENTS_AND_RESERVED_SEATS']))
             self.assertEqual(course.capacity, int(row['SEC_CAPACITY']))
 
@@ -2005,7 +2006,8 @@ class UploadScheduleData(TestCase):
                            'STUDENTS_AND_RESERVED_SEATS': ['9'],
                            'SEC_CAPACITY': ['10']})
         df.to_csv('schedule.csv', index=False, encoding='utf')
-        upload_schedule_data('schedule.csv')
+        with open("schedule.csv", 'rb') as file:
+            upload_schedule_data(file)
         os.remove('schedule.csv')
         self.assertEqual(Course.objects.all().count(), 0)
 
@@ -2017,7 +2019,7 @@ class UploadScheduleData(TestCase):
 class UploadClassroomData(TestCase):
     # Ensure that a valid file can be uploaded to the database successfully
     def test_valid_upload(self):
-        df = pd.DataFrame({'Building Information': ['SH'],
+        df = pd.DataFrame({'Building Information': ['SIMP'],
                            'Room Number': ['120'],
                            'Number of Student Seats in Room': ['15'],
                            'Width of Room': ['20'],
@@ -2027,7 +2029,8 @@ class UploadClassroomData(TestCase):
                            'Does room have any of the following?': ['N/A'],
                            'Any other things of note in Room (TV or Periodic Table poster)': ['N/A']})
         df.to_excel('classrooms.xlsx', index=False)
-        upload_classroom_data('classrooms.xlsx')
+        with open("classrooms.xlsx", 'rb') as file:
+            upload_classroom_data(file)
         os.remove('classrooms.xlsx')
 
         for index, row in df.iterrows():
@@ -2055,6 +2058,7 @@ class UploadClassroomData(TestCase):
                            'Does room have any of the following?': ['N/A'],
                            'Any other things of note in Room (TV or Periodic Table poster)': ['N/A']})
         df.to_csv('classrooms.csv', index=False)
-        upload_schedule_data('classrooms.csv')
+        with open('classrooms.csv', encoding="utf8") as file:
+            upload_schedule_data(file)
         os.remove('classrooms.csv')
         self.assertEqual(Classroom.objects.all().count(), 0)

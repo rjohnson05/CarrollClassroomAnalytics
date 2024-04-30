@@ -146,9 +146,9 @@ def get_used_classrooms(day: str, start_time: str, end_time: str, buildings: [] 
     :return            dictionary containing the data for every classroom being used within the specified time block and
                        building
     """
-    # Start/end times must be in HH:MM:SS format
+    # Start/end times must be in HH:MM format
     if not re.match(r'^\d{2}:\d{2}$', start_time) or not re.match(r'^\d{2}:\d{2}$', end_time):
-        logger.error(f"get_used_classrooms - No classrooms found: Either {start_time} or {end_time} are not in HH:MM:SS format")
+        logger.error(f"get_used_classrooms - No classrooms found: Either {start_time} or {end_time} are not in HH:MM format")
         return {}
 
     if buildings == 'all':
@@ -256,7 +256,7 @@ def get_classroom_courses(classroom: str) -> {}:
         logger.debug(f"get_classroom_courses - Courses for {classroom} on {day}: {day_courses}")
         classroom_courses[day] = day_courses
 
-    logger.debug(f"get_classroom_courses - Courses found in {classroom}: {classroom_courses}")
+    logger.info(f"get_classroom_courses - Courses found in {classroom}: {classroom_courses}")
     logger.info(f"get_classroom_courses - Courses found in {classroom}")
     return [time_blocks, classroom_courses]
 
