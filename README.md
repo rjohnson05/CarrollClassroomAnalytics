@@ -7,7 +7,8 @@ being held within the classroom. A classroom's schedule may also be viewed, show
 held in a particular classroom on the current course schedule. This software has the capability to handle only one
 course schedule at a time. As such, if a new course schedule is uploaded, all data from the previous
 course schedule will be deleted. However, any classroom data uploaded will be preserved between course schedules. To
-update the classroom information, a new spreadsheet must be uploaded with the corrected information.
+update the classroom information, a new spreadsheet must be uploaded with the corrected information. An example
+classroom spreadsheet and course schedule spreadsheet have been provided in this project.
 
 ## Setting Up the Application
 
